@@ -9,6 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = results.data;
       const table = document.createElement("table");
 
+      let lastLineWasMatch = false; // Variable pour savoir si la ligne précédente était MATCH X
+
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
@@ -31,6 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
+
+          lastLineWasMatch = true; // on se rappelle qu'on vient d'avoir une ligne MATCH
           return;
         }
 
@@ -42,20 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = "PRONOS";
           tr.appendChild(td);
           table.appendChild(tr);
+
+          lastLineWasMatch = false; // reset, on n'affiche pas les logos après
           return;
         }
 
-        // Détecte si c'est une ligne match (avec équipe domicile + extérieur)
-        const nonMatchKeywords = ["MATCH", "PRONOS", "1", "N", "2", "JOURNEE", "J", ""];
-        const firstCell = row[0] ? row[0].toUpperCase() : "";
-        const isMatchLine = !nonMatchKeywords.some(k => firstCell.startsWith(k)) && row[0] && row[2];
-
+        // Pour les autres lignes
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
-          if (isMatchLine && (index === 0 || index === 2)) {
-            // Colonne équipe domicile ou extérieur
-
+          // Si la ligne suit juste une ligne MATCH, on met les logos sur colonnes 0 et 2
+          if (lastLineWasMatch && (index === 0 || index === 2)) {
             const teamName = cell.trim();
             if (teamName) {
               const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
@@ -73,8 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
               td.textContent = cell;
             }
           } else {
-            // Autres cellules sans logo
-
+            // Sinon, texte normal avec retour à la ligne si besoin
             if (cell.includes("(")) {
               const items = cell.split(")").filter(x => x.trim() !== "");
               td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
@@ -90,6 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         table.appendChild(tr);
+
+        // Après avoir traité la ligne qui suit MATCH, on remet à false
+        if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
       const container = document.getElementById("table-container");
