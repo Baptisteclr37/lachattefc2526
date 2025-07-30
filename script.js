@@ -5,46 +5,59 @@ Papa.parse(url, {
   header: false,
   complete: function(results) {
     const data = results.data;
-    const output = document.getElementById('output');
-    output.innerHTML = '';
+    console.log("Données CSV chargées :", data);
 
-    let currentTable = null;
+    const output = document.getElementById("output");
+    output.innerHTML = ''; // Clear previous content
 
-    data.forEach((row, index) => {
-      // Ignore les lignes vides
-      if (row.length < 2 || (row[0] === "" && row[1] === "")) return;
+    const table = document.createElement('table');
+    table.className = 'styled-table';
 
-      const firstCell = row[0].trim().toUpperCase();
+    data.forEach((row) => {
+      const tr = document.createElement('tr');
 
-      if (firstCell.startsWith("J0")) {
-        const title = document.createElement("h2");
-        title.textContent = row[0];
-        output.appendChild(title);
-      } else if (firstCell.startsWith("MATCH")) {
-        currentTable = document.createElement("table");
-        currentTable.classList.add("match-table");
-        output.appendChild(currentTable);
+      // Ligne "MATCH X"
+      if (row.length === 1 && row[0].startsWith('MATCH')) {
+        const td = document.createElement('td');
+        td.colSpan = 3;
+        td.textContent = row[0];
+        td.className = 'section-title';
+        tr.appendChild(td);
+      }
 
-        const matchHeader = document.createElement("tr");
-        const cell = document.createElement("td");
-        cell.colSpan = 3;
-        cell.className = "match-title";
-        cell.textContent = row[0];
-        matchHeader.appendChild(cell);
-        currentTable.appendChild(matchHeader);
-      } else {
-        const tr = document.createElement("tr");
-        row.forEach(cellText => {
-          const td = document.createElement("td");
-          td.textContent = cellText;
+      // Ligne "Pronos"
+      else if (row.length === 1 && row[0].toLowerCase().includes('pronos')) {
+        const td = document.createElement('td');
+        td.colSpan = 3;
+        td.textContent = row[0];
+        td.className = 'section-pronos';
+        tr.appendChild(td);
+      }
+
+      // Ligne normale
+      else {
+        row.forEach(cell => {
+          const td = document.createElement('td');
+
+          if (typeof cell === 'string' && cell.match(/\(.+pt\)/)) {
+            // Retours à la ligne après chaque joueur (Xpt)
+            const lines = cell.split(/\)\s*/).filter(Boolean).map(line => line + ')');
+            td.innerHTML = lines.map(line => `<div>${line}</div>`).join('');
+          } else {
+            td.textContent = cell;
+          }
+
           tr.appendChild(td);
         });
-        if (currentTable) currentTable.appendChild(tr);
       }
+
+      table.appendChild(tr);
     });
+
+    output.appendChild(table);
   },
   error: function(err) {
     document.getElementById("output").textContent = "Erreur : " + err.message;
-    console.error("Erreur de chargement CSV :", err);
+    console.error(err);
   }
 });
