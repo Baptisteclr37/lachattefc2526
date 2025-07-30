@@ -46,18 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
         row.forEach((cell) => {
           const td = document.createElement("td");
 
-          // Si cellule contient des "(Xpt)"
-          if (cell.includes("(")) {
-            const items = cell.split(")").filter(x => x.trim() !== "");
-            td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-          }
-          // Si cellule contient plusieurs noms sans parenthèse
-          else if (cell.split(" ").length > 1) {
-            const noms = cell.trim().split(/\s+/);
-            td.innerHTML = noms.map(n => n).join("<br>");
-          } else {
-            td.textContent = cell;
-          }
+          // Nettoyage de la cellule
+const clean = cell.trim();
+
+// Si cellule contient des "(Xpt)"
+if (clean.includes("(")) {
+  const items = clean.split(")").filter(x => x.trim() !== "");
+  td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+}
+// Si cellule contient plusieurs mots (avec ou sans points)
+else if (clean.split(/\s+/).length > 1) {
+  const mots = clean.split(/\s+/);
+  td.innerHTML = mots.join("<br>");
+} else {
+  td.textContent = clean;
+}
+
 
           tr.appendChild(td);
         });
