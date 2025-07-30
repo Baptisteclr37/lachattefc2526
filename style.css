@@ -1,31 +1,53 @@
 body {
-  font-family: Arial, sans-serif;
-  padding: 2rem;
+  font-family: 'Arial', sans-serif;
   background-color: #fdfdfd;
-  color: #333;
+  color: #222;
+  padding: 20px;
+  margin: 0;
 }
 
-h1, h2 {
+h1 {
   text-align: center;
-  color: #4a4a4a;
+  color: #d63384;
 }
 
-.match-table {
+h2 {
+  text-align: center;
+  background-color: #ffe6f0;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 30px;
+  color: #c2185b;
+}
+
+table.match-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1rem 0;
-  background-color: #fff;
-  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  margin: 20px 0;
+  table-layout: fixed;
 }
 
-.match-table td {
-  padding: 8px;
-  border: 1px solid #ddd;
+table.match-table td {
+  width: 33.33%;
+  padding: 10px;
   text-align: center;
+  border: 1px solid #ddd;
+  vertical-align: top;
+  word-wrap: break-word;
+  white-space: pre-line;
+  font-size: 14px;
 }
 
 .match-title {
-  background-color: #eee;
+  background-color: #dbeafe;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 16px;
+  text-align: center;
+}
+
+.pronos-title {
+  background-color: #fef08a;
+  font-weight: bold;
+  text-align: center;
+  font-style: italic;
 }
