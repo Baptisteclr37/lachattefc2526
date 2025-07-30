@@ -4,26 +4,47 @@ Papa.parse(url, {
   download: true,
   header: false,
   complete: function(results) {
-    console.log("✅ CSV chargé !");
-    console.log(results.data); // Affiche toutes les lignes du CSV
-
     const data = results.data;
-
-    if (!Array.isArray(data) || data.length === 0) {
-      console.warn("⚠️ Données CSV vides ou mal formatées");
-      document.getElementById('output').textContent = 'Aucune donnée trouvée dans le CSV.';
-      return;
-    }
-
-    // Affichage simple pour test : 5 premières lignes
     const output = document.getElementById('output');
-    output.innerHTML = '<h2>Données CSV chargées :</h2>';
-    output.innerHTML += '<pre>' + data.slice(0, 5).map(row => row.join(' | ')).join('\n') + '</pre>';
+    output.innerHTML = '';
 
-    // Ensuite on pourra afficher un tableau plus propre ici
+    let currentTable = null;
+
+    data.forEach((row, index) => {
+      // Ignore les lignes vides
+      if (row.length < 2 || (row[0] === "" && row[1] === "")) return;
+
+      const firstCell = row[0].trim().toUpperCase();
+
+      if (firstCell.startsWith("J0")) {
+        const title = document.createElement("h2");
+        title.textContent = row[0];
+        output.appendChild(title);
+      } else if (firstCell.startsWith("MATCH")) {
+        currentTable = document.createElement("table");
+        currentTable.classList.add("match-table");
+        output.appendChild(currentTable);
+
+        const matchHeader = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = 3;
+        cell.className = "match-title";
+        cell.textContent = row[0];
+        matchHeader.appendChild(cell);
+        currentTable.appendChild(matchHeader);
+      } else {
+        const tr = document.createElement("tr");
+        row.forEach(cellText => {
+          const td = document.createElement("td");
+          td.textContent = cellText;
+          tr.appendChild(td);
+        });
+        if (currentTable) currentTable.appendChild(tr);
+      }
+    });
   },
   error: function(err) {
-    console.error("❌ Erreur de chargement CSV :", err);
     document.getElementById("output").textContent = "Erreur : " + err.message;
+    console.error("Erreur de chargement CSV :", err);
   }
 });
