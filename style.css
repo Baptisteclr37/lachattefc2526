@@ -33,3 +33,13 @@ td {
   font-weight: bold;
   text-align: center;
 }
+
+.journee-header {
+  background-color: #ff99cc;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  font-size: 18px;
+  padding: 15px;
+}
+
