@@ -54,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const team2 = match[2].trim();
               const logo1 = `images/${team1.toLowerCase().replace(/\s/g, "-")}.png`;
               const logo2 = `images/${team2.toLowerCase().replace(/\s/g, "-")}.png`;
+              console.log("Team1:", team1, "Logo1:", logo1, "Team2:", team2, "Logo2:", logo2);
 
               td.innerHTML = `
                 <div class="match-cell">
