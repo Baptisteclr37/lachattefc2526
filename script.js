@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
+
   const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
   Papa.parse(url, {
@@ -6,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     complete: function (results) {
       const data = results.data;
       const table = document.createElement("table");
-      const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
@@ -44,16 +45,19 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Lignes normales (3 colonnes)
+        // Détection ligne pronos 1/N/2 (ligne des choix)
+        const pronosLine = (row[0] === "1" || row[0] === "N" || row[0] === "2");
+
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
-          // Pour la colonne 0 (équipe domicile) et colonne 2 (équipe extérieur), insérer logo + texte
-          if (index === 0 || index === 2) {
+          if ((index === 0 || index === 2) && !pronosLine) {
+            // Colonne équipe domicile ou extérieur et pas ligne pronos
+
             const teamName = cell.trim();
             if (teamName) {
               const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
-              console.log("Logo URL for team:", teamName, "=>", logoUrl);
+
               const img = document.createElement("img");
               img.src = logoUrl;
               img.alt = teamName + " logo";
@@ -66,19 +70,16 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
               td.textContent = cell;
             }
-          }
-          else {
-            // Si cellule contient des "(Xpt)"
+          } else {
+            // Autres cellules sans logo
+
             if (cell.includes("(")) {
               const items = cell.split(")").filter(x => x.trim() !== "");
               td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-            }
-            // Si cellule contient plusieurs noms sans parenthèse
-            else if (cell.trim().split(/\s+/).length > 1) {
+            } else if (cell.trim().split(/\s+/).length > 1) {
               const noms = cell.trim().split(/\s+/);
               td.innerHTML = noms.map(n => n).join("<br>");
-            }
-            else {
+            } else {
               td.textContent = cell;
             }
           }
@@ -94,7 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(table);
     },
     error: function (err) {
-      document.getElementById("table-container").textContent = "Erreur : " + err.message;
+      const container = document.getElementById("table-container");
+      container.textContent = "Erreur : " + err.message;
     }
   });
 });
