@@ -1,63 +1,60 @@
-const url = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
+const csvUrl = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 
-Papa.parse(url, {
+Papa.parse(csvUrl, {
   download: true,
-  header: false,
   complete: function(results) {
     const data = results.data;
-    console.log("Données CSV chargées :", data);
+    const container = document.getElementById("table-container");
 
-    const output = document.getElementById("output");
-    output.innerHTML = ''; // Clear previous content
+    const table = document.createElement("table");
 
-    const table = document.createElement('table');
-    table.className = 'styled-table';
+    data.forEach((row, rowIndex) => {
+      if (row.length === 0 || (row.length === 1 && row[0] === "")) return;
 
-    data.forEach((row) => {
-      const tr = document.createElement('tr');
+      const tr = document.createElement("tr");
 
-      // Ligne "MATCH X"
-      if (row.length === 1 && row[0].startsWith('MATCH')) {
-        const td = document.createElement('td');
-        td.colSpan = 3;
+      if (row[0].toUpperCase().startsWith("MATCH")) {
+        const td = document.createElement("td");
         td.textContent = row[0];
-        td.className = 'section-title';
-        tr.appendChild(td);
-      }
-
-      // Ligne "Pronos"
-      else if (row.length === 1 && row[0].toLowerCase().includes('pronos')) {
-        const td = document.createElement('td');
         td.colSpan = 3;
-        td.textContent = row[0];
-        td.className = 'section-pronos';
+        td.classList.add("match-title");
         tr.appendChild(td);
+        table.appendChild(tr);
+        return;
       }
 
-      // Ligne normale
-      else {
-        row.forEach(cell => {
-          const td = document.createElement('td');
-
-          if (typeof cell === 'string' && cell.match(/\(.+pt\)/)) {
-            // Retours à la ligne après chaque joueur (Xpt)
-            const lines = cell.split(/\)\s*/).filter(Boolean).map(line => line + ')');
-            td.innerHTML = lines.map(line => `<div>${line}</div>`).join('');
-          } else {
-            td.textContent = cell;
-          }
-
-          tr.appendChild(td);
-        });
+      if (row[0].toUpperCase().includes("PRONOS")) {
+        const td = document.createElement("td");
+        td.textContent = "PRONOS";
+        td.colSpan = 3;
+        td.classList.add("pronos-title");
+        tr.appendChild(td);
+        table.appendChild(tr);
+        return;
       }
+
+      row.slice(0, 3).forEach(cell => {
+        const td = document.createElement("td");
+
+        // For cells with players and points, format them line by line
+        if (cell.includes("(")) {
+          const parts = cell.split(/\s+/).filter(p => p.trim() !== "");
+          const formatted = parts.join("\n");
+          td.textContent = formatted;
+        } else {
+          td.textContent = cell;
+        }
+
+        tr.appendChild(td);
+      });
 
       table.appendChild(tr);
     });
 
-    output.appendChild(table);
+    container.innerHTML = "";
+    container.appendChild(table);
   },
   error: function(err) {
-    document.getElementById("output").textContent = "Erreur : " + err.message;
-    console.error(err);
+    document.getElementById("table-container").textContent = "Erreur : " + err.message;
   }
 });
