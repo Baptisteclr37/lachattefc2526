@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Ligne MATCH 1, MATCH 2...
+        // Ligne MATCH X
         if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -43,16 +43,45 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        // Ligne avec score (ex: Lyon 2 - 1 Nice)
+        if (row[0] && row[0].match(/.+\d+\s*-\s*\d+.+/)) {
+          row.forEach(cell => {
+            const td = document.createElement("td");
+
+            const match = cell.match(/^(.+?)\s*\d+\s*-\s*\d+\s*(.+)$/);
+            if (match) {
+              const team1 = match[1].trim();
+              const team2 = match[2].trim();
+              const logo1 = `images/${team1.toLowerCase().replace(/\s/g, "-")}.png`;
+              const logo2 = `images/${team2.toLowerCase().replace(/\s/g, "-")}.png`;
+
+              td.innerHTML = `
+                <div class="match-cell">
+                  <img src="${logo1}" class="team-logo" alt="${team1} logo">
+                  <span>${team1}</span>
+                  <strong>${cell.match(/\d+\s*-\s*\d+/)[0]}</strong>
+                  <span>${team2}</span>
+                  <img src="${logo2}" class="team-logo" alt="${team2} logo">
+                </div>`;
+            } else {
+              td.textContent = cell;
+            }
+
+            tr.appendChild(td);
+          });
+
+          table.appendChild(tr);
+          return;
+        }
+
+        // Autres lignes (joueurs etc.)
         row.forEach((cell) => {
           const td = document.createElement("td");
 
-          // Si cellule contient des "(Xpt)"
           if (cell.includes("(")) {
             const items = cell.split(")").filter(x => x.trim() !== "");
             td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-          }
-          // Si cellule contient plusieurs noms sans parenthèse
-          else if (cell.split(" ").length > 1) {
+          } else if (cell.split(" ").length > 1) {
             const noms = cell.trim().split(/\s+/);
             td.innerHTML = noms.map(n => n).join("<br>");
           } else {
@@ -70,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
       container.appendChild(table);
     },
     error: function (err) {
-      document.getElementById("output").textContent = "Erreur : " + err.message;
+      document.getElementById("table-container").textContent = "Erreur : " + err.message;
     }
   });
 });
