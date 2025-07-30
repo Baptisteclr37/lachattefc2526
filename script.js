@@ -1,80 +1,73 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
+const logoFolder = 'images/'; // dossier des logos
+const logoExt = '.png';       // extension des fichiers logos
 
-  Papa.parse(url, {
-    download: true,
-    complete: function (results) {
-      const data = results.data;
-      const table = document.createElement("table");
+function getLogoHTML(teamName) {
+  if (!teamName) return '';
+  const cleanName = teamName.trim().toLowerCase();
 
-      data.forEach((row, i) => {
-        const tr = document.createElement("tr");
+  const imgHTML = `<img src="${logoFolder}${cleanName}${logoExt}" alt="${cleanName}" style="height:20px; vertical-align:middle; margin-right:5px;">`;
 
-        // Ligne 0 : Titre J01 fusionné
-        if (i === 0 && row[0]) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        // Ligne MATCH 1, MATCH 2...
-        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "match-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        // Ligne PRONOS
-        if (row[0] && row[0].toUpperCase() === "PRONOS") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "pronos-header";
-          td.textContent = "PRONOS";
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        row.forEach((cell) => {
-          const td = document.createElement("td");
-
-          // Nettoyage de la cellule
-const clean = cell.trim();
-
-// Si cellule contient des "(Xpt)"
-if (clean.includes("(")) {
-  const items = clean.split(")").filter(x => x.trim() !== "");
-  td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-}
-// Si cellule contient plusieurs mots (avec ou sans points)
-else if (clean.split(/\s+/).length > 1) {
-  const mots = clean.split(/\s+/);
-  td.innerHTML = mots.join("<br>");
-} else {
-  td.textContent = clean;
+  return imgHTML + teamName.trim();
 }
 
+function createTable(data) {
+  let html = '<table><tbody>';
 
-          tr.appendChild(td);
-        });
-
-        table.appendChild(tr);
-      });
-
-      const container = document.getElementById("output");
-      container.innerHTML = "";
-      container.appendChild(table);
-    },
-    error: function (err) {
-      document.getElementById("output").textContent = "Erreur : " + err.message;
+  for (let i = 0; i < data.length; i++) {
+    let row = data[i];
+    // fusion première ligne "J01"
+    if (i === 0) {
+      html += `<tr><td colspan="3" class="journee">${row[0]}</td></tr>`;
+      continue;
     }
-  });
-});
+    
+    // fusion ligne MATCH X
+    if (row[0].startsWith('MATCH')) {
+      html += `<tr><td colspan="3" class="match">${row[0]}</td></tr>`;
+      continue;
+    }
+
+    // fusion ligne PRONOS
+    if (row[0] === 'Pronos') {
+      html += `<tr><td colspan="3" class="pronos">${row[0]}</td></tr>`;
+      continue;
+    }
+
+    html += '<tr>';
+
+    for (let col = 0; col < 3; col++) {
+      let cell = row[col] || '';
+
+      // si ligne de noms/pronos, on formate les retours à la ligne sur les joueurs
+      if (i > 3 && col === 0 && (cell.includes('(') || cell.match(/[A-Za-z]/))) {
+        // découpage par joueur (ex: Jo (1pt))
+        let joueurs = cell.split(/(?<=\))\s*/); // split après ")"
+        if (joueurs.length === 1) {
+          // pas de point, on split par espace ou virgule
+          joueurs = cell.split(/[,;]/);
+          joueurs = joueurs.map(j => j.trim()).filter(Boolean);
+        }
+        cell = joueurs.map(j => j.trim()).join('<br>');
+      }
+      if (i > 3 && (col === 0 || col === 1 || col === 2)) {
+        // ajoute logos équipes dans colonnes équipe (col 0 et 2)
+        if (col === 0 || col === 2) {
+          cell = getLogoHTML(cell);
+        }
+      }
+
+      html += `<td>${cell}</td>`;
+    }
+    html += '</tr>';
+  }
+
+  html += '</tbody></table>';
+  return html;
+}
+
+// fonction de chargement et affichage
+function loadData(data) {
+  console.log('Données CSV chargées :', data);
+  const tableHtml = createTable(data);
+  document.getElementById('output').innerHTML = tableHtml;
+}
