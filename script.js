@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     complete: function (results) {
       const data = results.data;
       const table = document.createElement("table");
-      const baseImagePath = "/lachattefc2526/images/";
+      const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
-        // Ligne 0 : Titre J01 fusionnée
+        // Ligne 0 : Titre J01 fusionné
         if (i === 0 && row[0]) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Ligne MATCH X
+        // Ligne MATCH 1, MATCH 2...
         if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -44,43 +44,43 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        row.forEach((cell, cellIndex) => {
+        // Lignes normales (3 colonnes)
+        row.forEach((cell, index) => {
           const td = document.createElement("td");
 
-          // Ligne du score avec noms des équipes (ex : PSG 2 - 1 Lyon)
-          const match = cell.match(/^(.+?)\s+(\d+\s*-\s*\d+)\s+(.+)$/);
-          if (match) {
-            const team1 = match[1].trim();
-            const score = match[2].trim();
-            const team2 = match[3].trim();
+          // Pour la colonne 0 (équipe domicile) et colonne 2 (équipe extérieur), insérer logo + texte
+          if (index === 0 || index === 2) {
+            const teamName = cell.trim();
+            if (teamName) {
+              const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
+              console.log("Logo URL for team:", teamName, "=>", logoUrl);
+              const img = document.createElement("img");
+              img.src = logoUrl;
+              img.alt = teamName + " logo";
+              img.className = "team-logo";
+              td.appendChild(img);
 
-            const logo1 = `${baseImagePath}${team1.toLowerCase().replace(/\s/g, "-")}.png`;
-            const logo2 = `${baseImagePath}${team2.toLowerCase().replace(/\s/g, "-")}.png`;
-            console.log("LOGO 1", logo1);
-console.log("LOGO 2", logo2);
-
-            td.innerHTML = `
-              <div class="match-row">
-                <img src="${logo1}" alt="${team1}" class="team-logo"> ${team1}
-                <strong style="margin: 0 8px;">${score}</strong>
-                <img src="${logo2}" alt="${team2}" class="team-logo"> ${team2}
-              </div>
-            `;
-            tr.appendChild(td);
-            return;
+              const span = document.createElement("span");
+              span.textContent = " " + teamName;
+              td.appendChild(span);
+            } else {
+              td.textContent = cell;
+            }
           }
-
-          // Joueurs avec points
-          if (cell.includes("(")) {
-            const items = cell.split(")").filter(x => x.trim() !== "");
-            td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-          }
-          // Joueurs sans points (plus d'un mot dans la cellule)
-          else if (cell.trim().split(/\s+/).length > 1) {
-            const noms = cell.trim().split(/\s+/);
-            td.innerHTML = noms.map(n => n).join("<br>");
-          } else {
-            td.textContent = cell;
+          else {
+            // Si cellule contient des "(Xpt)"
+            if (cell.includes("(")) {
+              const items = cell.split(")").filter(x => x.trim() !== "");
+              td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+            }
+            // Si cellule contient plusieurs noms sans parenthèse
+            else if (cell.trim().split(/\s+/).length > 1) {
+              const noms = cell.trim().split(/\s+/);
+              td.innerHTML = noms.map(n => n).join("<br>");
+            }
+            else {
+              td.textContent = cell;
+            }
           }
 
           tr.appendChild(td);
