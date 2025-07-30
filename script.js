@@ -6,11 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     complete: function (results) {
       const data = results.data;
       const table = document.createElement("table");
+      const baseImagePath = "/lachattefc2526/images/";
 
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
-        // Ligne 0 : Titre J01 fusionné
+        // Ligne 0 : Titre J01 fusionnée
         if (i === 0 && row[0]) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -43,52 +44,42 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Ligne avec score (ex: Lyon 2 - 1 Nice)
-        if (row[0] && row[0].match(/.+\d+\s*-\s*\d+.+/)) {
-          row.forEach(cell => {
-            const td = document.createElement("td");
-
-            const match = cell.match(/^(.+?)\s*\d+\s*-\s*\d+\s*(.+)$/);
-            if (match) {
-              const team1 = match[1].trim();
-              const team2 = match[2].trim();
-              const logo1 = `images/${team1.toLowerCase().replace(/\s/g, "-")}.png`;
-              const logo2 = `images/${team2.toLowerCase().replace(/\s/g, "-")}.png`;
-              console.log("Team1:", team1, "Logo1:", logo1, "Team2:", team2, "Logo2:", logo2);
-
-              td.innerHTML = `
-                <div class="match-cell">
-                  <img src="${logo1}" class="team-logo" alt="${team1} logo">
-                  <span>${team1}</span>
-                  <strong>${cell.match(/\d+\s*-\s*\d+/)[0]}</strong>
-                  <span>${team2}</span>
-                  <img src="${logo2}" class="team-logo" alt="${team2} logo">
-                </div>`;
-            } else {
-              td.textContent = cell;
-            }
-
-            tr.appendChild(td);
-          });
-
-          table.appendChild(tr);
-          return;
-        }
-
-        // Autres lignes (joueurs etc.)
-        row.forEach((cell) => {
+        row.forEach((cell, cellIndex) => {
           const td = document.createElement("td");
 
-         if (cell.includes("(")) {
-  // Ex: "Tibo (2) Baptiste (1)"
-  const items = cell.match(/[^()]+\(.*?\)/g);
-  td.innerHTML = items ? items.map(x => x.trim()).join("<br>") : cell;
-} else {
-  // Ex: "Baptiste Tibo Raf"
-  const noms = cell.trim().split(/\s+/);
-  td.innerHTML = noms.map(n => n).join("<br>");
-}
+          // Ligne du score avec noms des équipes (ex : PSG 2 - 1 Lyon)
+          const match = cell.match(/^(.+?)\s+(\d+\s*-\s*\d+)\s+(.+)$/);
+          if (match) {
+            const team1 = match[1].trim();
+            const score = match[2].trim();
+            const team2 = match[3].trim();
 
+            const logo1 = `${baseImagePath}${team1.toLowerCase().replace(/\s/g, "-")}.png`;
+            const logo2 = `${baseImagePath}${team2.toLowerCase().replace(/\s/g, "-")}.png`;
+
+            td.innerHTML = `
+              <div class="match-row">
+                <img src="${logo1}" alt="${team1}" class="team-logo"> ${team1}
+                <strong style="margin: 0 8px;">${score}</strong>
+                <img src="${logo2}" alt="${team2}" class="team-logo"> ${team2}
+              </div>
+            `;
+            tr.appendChild(td);
+            return;
+          }
+
+          // Joueurs avec points
+          if (cell.includes("(")) {
+            const items = cell.split(")").filter(x => x.trim() !== "");
+            td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+          }
+          // Joueurs sans points (plus d'un mot dans la cellule)
+          else if (cell.trim().split(/\s+/).length > 1) {
+            const noms = cell.trim().split(/\s+/);
+            td.innerHTML = noms.map(n => n).join("<br>");
+          } else {
+            td.textContent = cell;
+          }
 
           tr.appendChild(td);
         });
