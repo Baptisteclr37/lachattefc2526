@@ -1,53 +1,55 @@
 body {
-  font-family: 'Arial', sans-serif;
-  background-color: #fdfdfd;
-  color: #222;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
-  margin: 0;
+  background-color: #fdfdfd;
+  color: #333;
 }
 
 h1 {
   text-align: center;
-  color: #d63384;
+  color: #ba2d65;
+  margin-bottom: 30px;
 }
 
-h2 {
-  text-align: center;
-  background-color: #ffe6f0;
-  padding: 10px;
-  border-radius: 10px;
-  margin-top: 30px;
-  color: #c2185b;
-}
-
-table.match-table {
+.styled-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
-  table-layout: fixed;
+  margin: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-table.match-table td {
+.styled-table td {
   width: 33.33%;
-  padding: 10px;
-  text-align: center;
   border: 1px solid #ddd;
+  padding: 10px;
   vertical-align: top;
+  text-align: center;
   word-wrap: break-word;
-  white-space: pre-line;
   font-size: 14px;
 }
 
-.match-title {
-  background-color: #dbeafe;
+.section-title {
+  background-color: #ffe1ec;
   font-weight: bold;
-  font-size: 16px;
   text-align: center;
+  font-size: 16px;
+  color: #ba2d65;
+  padding: 12px;
 }
 
-.pronos-title {
-  background-color: #fef08a;
+.section-pronos {
+  background-color: #e0f0ff;
   font-weight: bold;
   text-align: center;
-  font-style: italic;
+  font-size: 14px;
+  color: #225c92;
+  padding: 10px;
+}
+
+.styled-table tr:nth-child(even):not(.section-title):not(.section-pronos) {
+  background-color: #f9f9f9;
+}
+
+.styled-table tr:hover td {
+  background-color: #f0f0f0;
 }
