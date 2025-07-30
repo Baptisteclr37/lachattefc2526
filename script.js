@@ -10,7 +10,18 @@ document.addEventListener("DOMContentLoaded", () => {
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
-        // Ligne titre MATCH 1, MATCH 2...
+        // Ligne 0 : Titre J01 fusionné
+        if (i === 0 && row[0]) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        // Ligne MATCH 1, MATCH 2...
         if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -32,13 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        row.forEach((cell, j) => {
+        row.forEach((cell) => {
           const td = document.createElement("td");
 
-          // Format spécial pour les noms/points
-          if (i > 4 && cell.includes("(")) {
+          // Si cellule contient des "(Xpt)"
+          if (cell.includes("(")) {
             const items = cell.split(")").filter(x => x.trim() !== "");
             td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+          }
+          // Si cellule contient plusieurs noms sans parenthèse
+          else if (cell.split(" ").length > 1) {
+            const noms = cell.trim().split(/\s+/);
+            td.innerHTML = noms.map(n => n).join("<br>");
           } else {
             td.textContent = cell;
           }
