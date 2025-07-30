@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const logo1 = `${baseImagePath}${team1.toLowerCase().replace(/\s/g, "-")}.png`;
             const logo2 = `${baseImagePath}${team2.toLowerCase().replace(/\s/g, "-")}.png`;
+            console.log("LOGO 1", logo1);
+console.log("LOGO 2", logo2);
 
             td.innerHTML = `
               <div class="match-row">
