@@ -45,14 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Détection ligne pronos 1/N/2 (ligne des choix)
-        const pronosLine = (row[0] === "1" || row[0] === "N" || row[0] === "2");
+        // Détecte si c'est une ligne match (avec équipe domicile + extérieur)
+        const nonMatchKeywords = ["MATCH", "PRONOS", "1", "N", "2", "JOURNEE", "J", ""];
+        const firstCell = row[0] ? row[0].toUpperCase() : "";
+        const isMatchLine = !nonMatchKeywords.some(k => firstCell.startsWith(k)) && row[0] && row[2];
 
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
-          if ((index === 0 || index === 2) && !pronosLine) {
-            // Colonne équipe domicile ou extérieur et pas ligne pronos
+          if (isMatchLine && (index === 0 || index === 2)) {
+            // Colonne équipe domicile ou extérieur
 
             const teamName = cell.trim();
             if (teamName) {
