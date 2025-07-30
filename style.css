@@ -43,6 +43,23 @@ td {
   padding: 15px;
 }
 
+.team-logo {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin: 0 5px;
+}
+
+.match-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   table {
@@ -71,3 +88,4 @@ td {
     overflow-x: auto;
   }
 }
+
