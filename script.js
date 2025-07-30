@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
         table.appendChild(tr);
       });
 
-      const container = document.getElementById("output");
+      const container = document.getElementById("table-container");
       container.innerHTML = "";
       container.appendChild(table);
     },
