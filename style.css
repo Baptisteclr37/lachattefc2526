@@ -43,3 +43,31 @@ td {
   padding: 15px;
 }
 
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+  table {
+    font-size: 16px;
+  }
+
+  td, th {
+    padding: 10px 5px;
+  }
+
+  .cell-multiline {
+    line-height: 1.6;
+    font-size: 15px;
+  }
+
+  .match-header, .day-header, .pronos-row {
+    font-size: 17px;
+    font-weight: bold;
+  }
+
+  body {
+    padding: 10px;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
