@@ -79,15 +79,16 @@ document.addEventListener("DOMContentLoaded", () => {
         row.forEach((cell) => {
           const td = document.createElement("td");
 
-          if (cell.includes("(")) {
-            const items = cell.split(")").filter(x => x.trim() !== "");
-            td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-          } else if (cell.split(" ").length > 1) {
-            const noms = cell.trim().split(/\s+/);
-            td.innerHTML = noms.map(n => n).join("<br>");
-          } else {
-            td.textContent = cell;
-          }
+         if (cell.includes("(")) {
+  // Ex: "Tibo (2) Baptiste (1)"
+  const items = cell.match(/[^()]+\(.*?\)/g);
+  td.innerHTML = items ? items.map(x => x.trim()).join("<br>") : cell;
+} else {
+  // Ex: "Baptiste Tibo Raf"
+  const noms = cell.trim().split(/\s+/);
+  td.innerHTML = noms.map(n => n).join("<br>");
+}
+
 
           tr.appendChild(td);
         });
