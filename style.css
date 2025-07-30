@@ -46,8 +46,13 @@ td {
 .team-logo {
   width: 20px;
   height: 20px;
+  margin-right: 5px;
   vertical-align: middle;
-  margin: 0 5px;
+}
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .match-cell {
