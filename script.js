@@ -22,21 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const tr = document.createElement("tr");
 
-        if (i === 0 && [0]) {
+        if (i === 0 && row[0]) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "journee-header";
-          td.textContent = [0];
+          td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
           return;
         }
 
-        if ([0] && [0].toUpperCase().startsWith("MATCH")) {
+        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "match-header";
-          td.textContent = [0];
+          td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
 
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if ([0] && [0].toUpperCase() === "PRONOS") {
+        if (row[0] && row[0].toUpperCase() === "PRONOS") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "pronos-header";
@@ -56,11 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if ([0] && [0].toUpperCase() === "CLASSEMENT JOURNEE") {
+        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee-header";
-          td.textContent = [0];
+          td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
           return;
@@ -71,9 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
           td.colSpan = 3;
           td.className = "classement-journee";
 
-          let classementArray = ([0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
+          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
           if (classementArray.length === 1) {
-            classementArray = [0].split(/\s{2,}/).filter(x => x.trim() !== "");
+            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
           }
 
           classementArray.sort((a, b) => {
@@ -89,10 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Fusion des lignes MISSILES JOUES + suivante sur 3 colonnes
-        if ([0] && [0].toUpperCase() === "MISSILES JOUES") {
+        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") {
           const td = document.createElement("td");
           td.colSpan = 3;
-          td.textContent = [0];
+          td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
 
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Ligne avec logos après MATCH
-        forEach((cell, index) => {
+        row.forEach((cell, index) => {
           const td = document.createElement("td");
 
           if (lastLineWasMatch && (index === 0 || index === 2)) {
@@ -159,10 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Fonction corrigée pour marquer les missiles
       function markMissiles() {
-  const missilesIndex = data.findIndex( => [0] && [0].toUpperCase() === "MISSILES JOUES");
-  if (missilesIndex === -1) return;
+  const missilesRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
+  if (missilesRowIndex === -1) return;
 
-  const missilesText = data[missilesIndex + 1]?.[0];
+  const missilesText = data[missilesRowIndex + 1]?.[0];
   if (!missilesText) return;
 
   const missiles = missilesText.split(/\r?\n/).filter(x => x.trim() !== "").map(line => {
@@ -222,12 +222,71 @@ document.addEventListener("DOMContentLoaded", () => {
     joueurTd.innerHTML = updatedHTML;
   });
 }
+// Masquer les deux lignes du tableau correspondant aux missiles
+const missilesRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
+if (missilesRowIndex !== -1) {
+  const rows = table.querySelectorAll("tr");
 
+  // On identifie les lignes affichées correspondant à l’index CSV
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+    if (visibleIndex === missilesRowIndex || visibleIndex === missilesRowIndex + 1) {
+      rows[i].style.display = "none";
+    }
+    // Incrémenter uniquement si ce n’est pas une ligne fusionnée ou vide
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+}
 
 
       markMissiles();
 
-        
+      // === JACKPOT JOUES - Fusionner sur 3 colonnes ===
+      // === JACKPOT JOUES - Fusionner sur 3 colonnes et formater correctement ===
+const jackpotRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "JACKPOT JOUES");
+if (jackpotRowIndex !== -1) {
+  const rows = table.querySelectorAll("tr");
+
+  // Trouver la ligne visible correspondant à JACKPOT JOUES dans le tableau HTML
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+
+    if (visibleIndex === jackpotRowIndex || visibleIndex === jackpotRowIndex + 1) {
+    if (visibleIndex === jackpotRowIndex) {
+      // Ligne du titre JACKPOT JOUES
+      const cells = rows[i].querySelectorAll("td");
+      if (cells.length > 0) {
+        const content = cells[0].innerHTML;
+        rows[i].innerHTML = `<td colspan="3" style="font-weight: bold;">${content}</td>`;
+      }
+    }
+
+    if (visibleIndex === jackpotRowIndex + 1) {
+      // Ligne du contenu des JACKPOTS
+      const cells = rows[i].querySelectorAll("td");
+      if (cells.length > 0) {
+        const rawItems = cells[0].innerText.trim().split(/\s+/); // Découpe par espace
+        const formatted = [];
+
+        for (let j = 0; j < rawItems.length; j += 4) {
+          const line = rawItems.slice(j, j + 4).join(" ");
+          formatted.push(line);
+        }
+
+        rows[i].innerHTML = `<td colspan="3">${formatted.join("<br>")}</td>`;
+      }
+    }
+
+    // Incrémenter que si ce n’est pas une ligne masquée
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+}
 
 
 
