@@ -12,7 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
       let lastLineWasMatch = false;
       const matchMap = new Map(); // Pour retrouver les lignes de pronos par match
 
+      let skipNext = false; // pour sauter la ligne fusionnée après MISSILES JOUES
+
       data.forEach((row, i) => {
+        if (skipNext) {
+          skipNext = false;
+          return; // on saute cette ligne pour éviter double affichage
+        }
+
         const tr = document.createElement("tr");
 
         if (i === 0 && row[0]) {
@@ -78,6 +85,27 @@ document.addEventListener("DOMContentLoaded", () => {
           td.innerHTML = classementArray.join("<br>");
           tr.appendChild(td);
           table.appendChild(tr);
+          return;
+        }
+
+        // Fusion des lignes MISSILES JOUES + suivante sur 3 colonnes
+        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+          // Ligne suivante fusionnée
+          if (data[i + 1]) {
+            const trNext = document.createElement("tr");
+            const tdNext = document.createElement("td");
+            tdNext.colSpan = 3;
+            tdNext.textContent = data[i + 1][0] || "";
+            trNext.appendChild(tdNext);
+            table.appendChild(trNext);
+            skipNext = true; // ignorer la ligne suivante dans la boucle principale
+          }
           return;
         }
 
