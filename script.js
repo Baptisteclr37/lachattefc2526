@@ -146,10 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
-        const trs = table.querySelectorAll("tr");
-markMissiles();
-
-
         // Sauvegarde de ligne de pronostics après PRONOS
         if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
           const team1 = data[i - 3]?.[0]?.trim() || "";
@@ -163,42 +159,136 @@ markMissiles();
 
       // Fonction corrigée pour marquer les missiles
       function markMissiles() {
-  missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-    // Trouver la ligne du match
-    let foundLineIndex = -1;
-    for (let i = 0; i < trs.length; i++) {
-      const td = trs[i].querySelector("td");
-      if (!td) continue;
-      const span = td.querySelector("span");
-      const text = span ? span.textContent.trim() : td.textContent.trim();
-      if (text === equipeDom) {
-        foundLineIndex = i;
-        break;
+        // Récupérer la ligne de texte des missiles joués
+        const missilesRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
+        if (missilesRowIndex === -1) {
+          console.log("Pas de section MISSILES JOUES trouvée");
+          return;
+        }
+
+        // Le texte contenant les missiles est sur la ligne juste après MISSILES JOUES
+        const missilesText = data[missilesRowIndex + 1]?.[0];
+        if (!missilesText) {
+          console.log("Aucun missile listé après MISSILES JOUES");
+          return;
+        }
+
+        const missiles = missilesText.split(/\r?\n/).filter(x => x.trim() !== "");
+
+        // On récupère toutes les lignes du tableau affiché
+        const trs = table.querySelectorAll("tr");
+
+        missiles.forEach(missile => {
+          // Format attendu : "ÉquipeDomicile ÉquipeExtérieur Joueur Prono"
+          const parts = missile.trim().split(/\s+/);
+          if (parts.length < 4) return;
+
+          // On extrait équipe domicile, extérieur, joueur et prono
+          const equipeDom = parts[0];
+          const equipeExt = parts[1];
+          const joueur = parts[2];
+          const prono = parts[3];
+
+          console.log(`Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono}`);
+
+          // Trouver la ligne du match dans le tableau en cherchant par équipe domicile
+          let foundLineIndex = -1;
+
+          for (let i = 0; i < trs.length; i++) {
+            const tds = trs[i].querySelectorAll("td");
+
+            for (const td of tds) {
+              // Chercher le texte uniquement dans le <span> si présent, sinon le contenu textuel normal
+              const span = td.querySelector('span');
+              const text = span ? span.textContent.trim() : td.textContent.trim();
+
+              if (text === equipeDom) {
+                foundLineIndex = i;
+                break;
+              }
+            }
+
+            if (foundLineIndex !== -1) break;
+          }
+
+          if (foundLineIndex === -1) {
+            console.warn(`Ligne de match pour équipe domicile "${equipeDom}" non trouvée`);
+            return;
+          }
+
+          const matchTr = trs[foundLineIndex];
+
+          // Le prono est affiché dans la cellule correspondant à la colonne (1, N, 2)
+          // On doit chercher la colonne du prono pour ce match
+          // Pour simplifier, on va parcourir les td à partir du 4e (index 3) et voir si le joueur y est mentionné
+
+          // On trouve la cellule où le joueur est mentionné dans la ligne des pronos juste après le match
+          // On considère que la ligne des pronos est celle qui suit immédiatement la ligne du match
+          const pronosTr = trs[foundLineIndex + 2]; // ligne après le "PRONOS"
+
+          if (!pronosTr) {
+            console.warn(`Pas de ligne PRONOS associée au match de ${equipeDom}`);
+            return;
+          }
+
+          const pronosTds = pronosTr.querySelectorAll("td");
+
+          // On cherche la colonne du joueur dans la ligne PRONOS
+          let joueurColIndex = -1;
+          for (let c = 0; c < pronosTds.length; c++) {
+            // Le joueur peut être sur plusieurs lignes, on vérifie si son nom est dans le texte
+            if (pronosTds[c].textContent.includes(joueur)) {
+              joueurColIndex = c;
+              break;
+            }
+          }
+
+          if (joueurColIndex === -1) {
+            console.warn(`Joueur ${joueur} non trouvé dans les pronos pour le match ${equipeDom} vs ${equipeExt}`);
+            return;
+          }
+
+          // Le prono est un des 3 choix : 1, N ou 2.
+          // Sur la ligne juste avant PRONOS (ligne juste avant), les choix "1", "N", "2" sont listés.
+
+          const choixTr = trs[foundLineIndex + 1]; // ligne juste avant PRONOS
+
+          if (!choixTr) {
+            console.warn(`Pas de ligne des choix 1/N/2 trouvée pour le match ${equipeDom} vs ${equipeExt}`);
+            return;
+          }
+
+          const choixTds = choixTr.querySelectorAll("td");
+
+          // Trouver la colonne où le prono du missile correspond (ex : la colonne où "1" est écrit)
+
+          let pronoColIndex = -1;
+          for (let c = 0; c < choixTds.length; c++) {
+            if (choixTds[c].textContent.trim() === prono) {
+              pronoColIndex = c;
+              break;
+            }
+          }
+
+          if (pronoColIndex === -1) {
+            console.warn(`Prono ${prono} non trouvé dans la ligne des choix pour le match ${equipeDom} vs ${equipeExt}`);
+            return;
+          }
+
+          // On ajoute une icône 🎯 à côté du joueur dans la cellule correspondante au prono
+
+          const cibleTd = pronosTds[pronoColIndex];
+          if (!cibleTd) return;
+
+          // Vérifier si l’icône n’est pas déjà présente pour éviter doublon
+          if (!cibleTd.querySelector(".missile-icon")) {
+            const spanMissile = document.createElement("span");
+            spanMissile.textContent = " 🎯";
+            spanMissile.className = "missile-icon";
+            cibleTd.appendChild(spanMissile);
+          }
+        });
       }
-    }
-
-    if (foundLineIndex === -1) {
-      console.warn(`Match ${equipeDom} vs ${equipeExt} non trouvé`);
-      return;
-    }
-
-    // La cellule à modifier se trouve 3 lignes après celle du match, dans la première colonne
-    const targetRow = trs[foundLineIndex + 3];
-    if (!targetRow) return;
-
-    const td = targetRow.querySelectorAll("td")[0]; // colonne 1
-    if (!td) return;
-
-    const currentHTML = td.innerHTML;
-    const lines = currentHTML.split("<br>").map(line => {
-      const clean = line.replace(/🎯/g, "").trim();
-      return clean === joueur ? `🎯 ${clean}` : line;
-    });
-
-    td.innerHTML = lines.join("<br>");
-  });
-}
-
 
       markMissiles();
 
