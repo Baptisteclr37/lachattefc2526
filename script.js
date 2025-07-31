@@ -81,28 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Fusion des lignes "MISSILES JOUES" et ligne suivante sur 3 colonnes
-        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          // Ligne suivante fusionnée si elle existe
-          if (data[i + 1]) {
-            const tr2 = document.createElement("tr");
-            const td2 = document.createElement("td");
-            td2.colSpan = 3;
-            td2.textContent = data[i + 1][0] || "";
-            tr2.appendChild(td2);
-            table.appendChild(tr2);
-          }
-
-          // On saute la ligne suivante pour ne pas la traiter deux fois
-          return;
-        }
-
         // Ligne avec logos après MATCH
         row.forEach((cell, index) => {
           const td = document.createElement("td");
