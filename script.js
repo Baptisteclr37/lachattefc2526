@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // === TRAITEMENT MISSILES ===
+      // === TRAITEMENT MISSILES CORRIGÉ ===
       missileData.forEach(line => {
         const parts = line.split(/\s+/);
         if (parts.length < 4) return;
@@ -145,14 +145,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const lines = td.innerHTML.split("<br>");
         const updatedLines = lines.map(line => {
-          const lineClean = line.replace("🎯", "").trim();
-          const joueurSansPoints = joueur.trim();
-          const joueurAvecPoints = joueurSansPoints + " ";
-          if (lineClean === joueurSansPoints || lineClean.startsWith(joueurAvecPoints)) {
-            return lineClean + " 🎯";
+          const cleanLine = line.replace("🎯", "").trim();
+
+          // Extraction du nom sans les points entre parenthèses
+          const nomSansPoints = cleanLine.split("(")[0].trim();
+
+          if (nomSansPoints === joueur.trim()) {
+            return cleanLine + " 🎯";
           }
           return line;
         });
+
         td.innerHTML = updatedLines.join("<br>");
       });
 
