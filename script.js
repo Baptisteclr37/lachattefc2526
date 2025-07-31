@@ -244,6 +244,32 @@ if (missilesRowIndex !== -1) {
 
       markMissiles();
 
+      // === JACKPOT JOUES - Fusionner sur 3 colonnes ===
+const jackpotRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "JACKPOT JOUES");
+if (jackpotRowIndex !== -1) {
+  const rows = table.querySelectorAll("tr");
+
+  // Trouver la ligne visible correspondant à JACKPOT JOUES dans le tableau HTML
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+
+    if (visibleIndex === jackpotRowIndex || visibleIndex === jackpotRowIndex + 1) {
+      const cells = rows[i].querySelectorAll("td");
+      if (cells.length > 0) {
+        const content = cells[0].innerHTML;
+        rows[i].innerHTML = `<td colspan="3" style="font-weight: bold;">${content}</td>`;
+      }
+    }
+
+    // Incrémenter que si ce n’est pas une ligne masquée
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+}
+
+
       document.body.appendChild(table);
     },
   });
