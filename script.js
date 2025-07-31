@@ -3,6 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
+  // Fonction pour normaliser une clé équipe1___équipe2 en minuscule et sans espaces parasites
+  function normalizeKey(team1, team2) {
+    return team1.trim().toLowerCase() + "___" + team2.trim().toLowerCase();
+  }
+
   Papa.parse(url, {
     download: true,
     complete: function (results) {
@@ -77,10 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        // MISSILES JOUES : ignorer visuellement mais stocker la data
         if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
-          console.log("MISSILES JOUES détectés :", missileData);
           return;
         }
 
@@ -117,66 +122,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
+        // Sauvegarde de ligne de pronostics avec clé normalisée
         if (data[i - 1] && data[i - 1][0]?.toUpperCase() === "PRONOS") {
           const team1 = data[i - 3]?.[0]?.trim() || "";
           const team2 = data[i - 3]?.[2]?.trim() || "";
-          const key = team1 + "___" + team2;
+          const key = normalizeKey(team1, team2);
           matchMap.set(key, tr);
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // Ajout des cibles 🎯
+      // === TRAITEMENT MISSILES ===
       missileData.forEach(line => {
         const parts = line.split(/\s+/);
         if (parts.length < 4) return;
         const [team1, team2, joueur, prono] = parts;
-        const key = team1 + "___" + team2;
+        const key = normalizeKey(team1, team2);
         const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
         if (pronoColIndex == null) return;
 
         const pronosTr = matchMap.get(key);
         if (!pronosTr) {
-          console.warn(`Match introuvable pour missiles: ${key}`);
+          console.log("Match introuvable pour missiles:", key);
           return;
         }
 
         const td = pronosTr.children[pronoColIndex];
-        if (!td) {
-          console.warn(`Colonne prono introuvable pour ${prono} dans match ${key}`);
-          return;
-        }
+        if (!td) return;
 
         const lines = td.innerHTML.split("<br>");
-
-        let found = false;
         const updatedLines = lines.map(line => {
-          const cleanLine = line.replace(/🎯/g, "").trim();
-
-          // Plus souple : compare en ignorant la casse et en enlevant accents/espaces multiples
-          const normalize = str =>
-            str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
-
-          if (normalize(cleanLine.split("(")[0]) === normalize(joueur)) {
-            found = true;
-            return cleanLine + " 🎯";
+          const lineClean = line.replace("🎯", "").trim();
+          const joueurSansPoints = joueur.trim();
+          const joueurAvecPoints = joueurSansPoints + " ";
+          if (lineClean === joueurSansPoints || lineClean.startsWith(joueurAvecPoints)) {
+            return lineClean + " 🎯";
           }
           return line;
         });
-
-        if (!found) {
-          console.warn(`Joueur '${joueur}' non trouvé dans la colonne prono ${prono} du match ${key}`);
-        }
-
         td.innerHTML = updatedLines.join("<br>");
       });
 
-      document.getElementById("table-container").innerHTML = "";
-      document.getElementById("table-container").appendChild(table);
+      const container = document.getElementById("table-container");
+      container.innerHTML = "";
+      container.appendChild(table);
     },
     error: function (err) {
-      document.getElementById("table-container").textContent = "Erreur : " + err.message;
+      const container = document.getElementById("table-container");
+      container.textContent = "Erreur : " + err.message;
     }
   });
 });
