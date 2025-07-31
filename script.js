@@ -1,109 +1,168 @@
-fetch("data.csv")
-  .then((response) => response.text())
-  .then((text) => {
-    const rows = text.trim().split("\n").map((row) => row.split("\t"));
-    const container = document.getElementById("table-container");
-    const table = document.createElement("table");
-    container.innerHTML = "";
-    table.classList.add("results-table");
+document.addEventListener("DOMContentLoaded", () => {
+  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
-    const logoBasePath = "images/";
+  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
-    rows.forEach((row, rowIndex) => {
-      const tr = document.createElement("tr");
+  Papa.parse(url, {
+    download: true,
+    complete: function (results) {
+      const data = results.data;
+      const table = document.createElement("table");
 
-      // Fusionner lignes spécifiques
-      if (
-        row[0] &&
-        (row[0].startsWith("J") || row[0].startsWith("MATCH") || row[0].startsWith("PRONOS") || row[0].includes("CLASSEMENT"))
-      ) {
-        const td = document.createElement("td");
-        td.colSpan = 3;
-        td.textContent = row[0];
-        td.className = "section-header";
-        tr.appendChild(td);
-        table.appendChild(tr);
-        return;
-      }
+      let lastLineWasMatch = false;
+      const matchMap = new Map();
+      let missileData = [];
 
-      // Lignes normales
-      row.forEach((cell, colIndex) => {
-        const td = document.createElement("td");
-        td.innerHTML = cell.replace(/\n/g, "<br>");
-        tr.appendChild(td);
-      });
+      data.forEach((row, i) => {
+        const tr = document.createElement("tr");
 
-      // Ajouter logos si ligne précédente est "MATCH X"
-      if (
-        rowIndex > 0 &&
-        rows[rowIndex - 1][0] &&
-        rows[rowIndex - 1][0].startsWith("MATCH")
-      ) {
-        const team1 = row[0]?.trim().toLowerCase();
-        const team2 = row[2]?.trim().toLowerCase();
-
-        const logo1 = document.createElement("img");
-        logo1.src = `${logoBasePath}${team1}.png`;
-        logo1.onerror = () => (logo1.style.display = "none");
-        logo1.className = "team-logo";
-
-        const logo2 = document.createElement("img");
-        logo2.src = `${logoBasePath}${team2}.png`;
-        logo2.onerror = () => (logo2.style.display = "none");
-        logo2.className = "team-logo";
-
-        tr.children[0].prepend(logo1);
-        tr.children[2].appendChild(logo2);
-      }
-
-      table.appendChild(tr);
-    });
-
-    container.appendChild(table);
-
-    // === TRAITEMENT MISSILES JOUES ===
-    const missileTitleIndex = rows.findIndex(row => row[0] && row[0].toUpperCase().includes("MISSILES JOUES"));
-    if (missileTitleIndex !== -1 && rows[missileTitleIndex + 1] && rows[missileTitleIndex + 1][0]) {
-      const missileLines = rows[missileTitleIndex + 1][0].split('\n');
-
-      missileLines.forEach(line => {
-        const parts = line.trim().split(" ");
-        if (parts.length !== 4) return;
-        const [team1, team2, player, prono] = parts;
-
-        const trs = table.querySelectorAll("tr");
-        for (let i = 0; i < trs.length; i++) {
-          const tds = trs[i].querySelectorAll("td");
-          if (
-            tds.length === 3 &&
-            tds[0].textContent.trim() === team1 &&
-            tds[2].textContent.trim() === team2
-          ) {
-            const headerRow = trs[i + 2];
-            const pronoRow = trs[i + 3];
-            if (!headerRow || !pronoRow) return;
-
-            const headers = headerRow.querySelectorAll("td");
-            const pronos = pronoRow.querySelectorAll("td");
-
-            headers.forEach((cell, colIndex) => {
-              if (cell.textContent.trim() === prono) {
-                const targetCell = pronos[colIndex];
-                if (targetCell) {
-                  const lines = targetCell.innerHTML.split("<br>");
-                  const updatedLines = lines.map(line => {
-                    const cleanLine = line.replace(/ 🎯/g, "").trim();
-                    if (cleanLine.startsWith(player)) {
-                      return cleanLine + " 🎯";
-                    }
-                    return line;
-                  });
-                  targetCell.innerHTML = updatedLines.join("<br>");
-                }
-              }
-            });
-          }
+        if (i === 0 && row[0]) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
         }
+
+        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "match-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          lastLineWasMatch = true;
+          return;
+        }
+
+        if (row[0] && row[0].toUpperCase() === "PRONOS") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "pronos-header";
+          td.textContent = "PRONOS";
+          tr.appendChild(td);
+          table.appendChild(tr);
+          lastLineWasMatch = false;
+          return;
+        }
+
+        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee";
+          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
+          if (classementArray.length === 1) {
+            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
+          }
+          classementArray.sort((a, b) => {
+            const numA = parseInt(a.trim().split(".")[0]) || 9999;
+            const numB = parseInt(b.trim().split(".")[0]) || 9999;
+            return numA - numB;
+          });
+          td.innerHTML = classementArray.join("<br>");
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        // MISSILES JOUES : ignorer visuellement mais stocker la data
+        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
+        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
+          missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
+          return;
+        }
+
+        row.forEach((cell, index) => {
+          const td = document.createElement("td");
+          if (lastLineWasMatch && (index === 0 || index === 2)) {
+            const teamName = cell.trim();
+            if (teamName) {
+              const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
+              const img = document.createElement("img");
+              img.src = logoUrl;
+              img.alt = teamName + " logo";
+              img.className = "team-logo";
+              td.appendChild(img);
+              const span = document.createElement("span");
+              span.textContent = " " + teamName;
+              td.appendChild(span);
+            } else {
+              td.textContent = cell;
+            }
+          } else {
+            if (cell.includes("(")) {
+              const items = cell.split(")").filter(x => x.trim() !== "");
+              td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+            } else if (cell.trim().split(/\s+/).length > 1) {
+              const noms = cell.trim().split(/\s+/);
+              td.innerHTML = noms.map(n => n).join("<br>");
+            } else {
+              td.textContent = cell;
+            }
+          }
+          tr.appendChild(td);
+        });
+
+        table.appendChild(tr);
+
+        // Sauvegarde de ligne de pronostics
+        if (data[i - 1] && data[i - 1][0]?.toUpperCase() === "PRONOS") {
+          const team1 = data[i - 3]?.[0]?.trim() || "";
+          const team2 = data[i - 3]?.[2]?.trim() || "";
+          const key = team1 + "___" + team2;
+          matchMap.set(key, tr);
+        }
+
+        if (lastLineWasMatch) lastLineWasMatch = false;
       });
+
+      // === TRAITEMENT MISSILES ===
+      missileData.forEach(line => {
+        const parts = line.split(/\s+/);
+        if (parts.length < 4) return;
+        const [team1, team2, joueur, prono] = parts;
+        const key = team1 + "___" + team2;
+        const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
+        if (pronoColIndex == null) return;
+
+        const pronosTr = matchMap.get(key);
+        if (!pronosTr) return;
+
+        const td = pronosTr.children[pronoColIndex];
+        if (!td) return;
+
+        const lines = td.innerHTML.split("<br>");
+        const updatedLines = lines.map(line => {
+          const lineClean = line.replace("🎯", "").trim();
+          const joueurSansPoints = joueur.trim();
+          const joueurAvecPoints = joueurSansPoints + " ";
+          if (lineClean === joueurSansPoints || lineClean.startsWith(joueurAvecPoints)) {
+            return lineClean + " 🎯";
+          }
+          return line;
+        });
+        td.innerHTML = updatedLines.join("<br>");
+      });
+
+      const container = document.getElementById("table-container");
+      container.innerHTML = "";
+      container.appendChild(table);
+    },
+    error: function (err) {
+      const container = document.getElementById("table-container");
+      container.textContent = "Erreur : " + err.message;
     }
   });
+});
