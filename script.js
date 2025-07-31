@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let lastLineWasMatch = false;
       const matchMap = new Map(); // Pour retrouver les lignes de pronos par match
 
-      let missileData = [];
-
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
@@ -83,4 +81,61 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        
+        // Ligne avec logos après MATCH
+        row.forEach((cell, index) => {
+          const td = document.createElement("td");
+
+          if (lastLineWasMatch && (index === 0 || index === 2)) {
+            const teamName = cell.trim();
+            if (teamName) {
+              const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
+              const img = document.createElement("img");
+              img.src = logoUrl;
+              img.alt = teamName + " logo";
+              img.className = "team-logo";
+              td.appendChild(img);
+
+              const span = document.createElement("span");
+              span.textContent = " " + teamName;
+              td.appendChild(span);
+            } else {
+              td.textContent = cell;
+            }
+          } else {
+            if (cell.includes("(")) {
+              const items = cell.split(")").filter(x => x.trim() !== "");
+              td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+            } else if (cell.trim().split(/\s+/).length > 1) {
+              const noms = cell.trim().split(/\s+/);
+              td.innerHTML = noms.map(n => n).join("<br>");
+            } else {
+              td.textContent = cell;
+            }
+          }
+
+          tr.appendChild(td);
+        });
+
+        table.appendChild(tr);
+
+        // Sauvegarde de ligne de pronostics après PRONOS
+        if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
+          const team1 = data[i - 3]?.[0]?.trim() || "";
+          const team2 = data[i - 3]?.[2]?.trim() || "";
+          const key = team1 + "___" + team2;
+          matchMap.set(key, tr);
+        }
+
+        if (lastLineWasMatch) lastLineWasMatch = false;
+      });
+
+      const container = document.getElementById("table-container");
+      container.innerHTML = "";
+      container.appendChild(table);
+    },
+    error: function (err) {
+      const container = document.getElementById("table-container");
+      container.textContent = "Erreur : " + err.message;
+    }
+  });
+});
