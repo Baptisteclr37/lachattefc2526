@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let missileData = [];
 
+      // Fonction de normalisation des noms d'équipe
+      const normalize = str => str.trim().toLowerCase().replace(/\s+/g, "-");
+
       data.forEach((row, i) => {
         const tr = document.createElement("tr");
 
@@ -87,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
+          console.log("Missiles détectés :", missileData);
           return;
         }
 
@@ -129,21 +133,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Sauvegarde de ligne de pronostics après PRONOS
         if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
-          // Recherche de la ligne MATCH X au-dessus
-          let matchLineIndex = i - 2; // On part juste au-dessus de PRONOS
-          while (matchLineIndex >= 0 && (!data[matchLineIndex][0] || !data[matchLineIndex][0].toUpperCase().startsWith("MATCH"))) {
-            matchLineIndex--;
-          }
-
-          if (matchLineIndex >= 0) {
-            const teamsLine = data[matchLineIndex + 1]; // Ligne juste après MATCH X
-            if (teamsLine) {
-              const team1 = teamsLine[0]?.trim() || "";
-              const team2 = teamsLine[2]?.trim() || "";
-              const key = team1 + "___" + team2;
-              matchMap.set(key, tr);
-            }
-          }
+          const team1Raw = data[i - 3]?.[0]?.trim() || "";
+          const team2Raw = data[i - 3]?.[2]?.trim() || "";
+          const team1 = normalize(team1Raw);
+          const team2 = normalize(team2Raw);
+          const key = team1 + "___" + team2;
+          console.log(`Mapping prono ligne ${i} => clé : ${key}`);
+          matchMap.set(key, tr);
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
@@ -151,18 +147,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Traitement missiles
       missileData.forEach(line => {
-        const [team1, team2, joueur, prono] = line.split(/\s+/);
+        console.log("Traitement missile ligne :", line);
+        const parts = line.split(/\s+/);
+        if(parts.length < 4){
+          console.log("Ligne missile invalide, skip :", line);
+          return;
+        }
+        let [team1Raw, team2Raw, joueur, prono] = parts;
+        const team1 = normalize(team1Raw);
+        const team2 = normalize(team2Raw);
+        console.log({ team1Raw, team2Raw, team1, team2, joueur, prono });
+
         const key = team1 + "___" + team2;
         const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
-        if (pronoColIndex == null) return;
+        if (pronoColIndex == null) {
+          console.log("Prono invalide :", prono);
+          return;
+        }
 
         const pronosTr = matchMap.get(key);
-        if (!pronosTr) return;
+        if (!pronosTr) {
+          console.log("Match non trouvé dans matchMap :", key);
+          return;
+        }
+
+        console.log("Pronos tr cells count:", pronosTr.children.length);
+        for(let i=0; i<pronosTr.children.length; i++) {
+          console.log(i, pronosTr.children[i].textContent);
+        }
 
         const td = pronosTr.children[pronoColIndex];
-        if (!td) return;
+        if (!td) {
+          console.log("Colonne prono non trouvée pour index :", pronoColIndex);
+          return;
+        }
 
         const lines = td.innerHTML.split("<br>");
+        lines.forEach(l => console.log(`Comparaison ligne prono: [${l}] vs joueur [${joueur}]`));
         const updatedLines = lines.map(line => {
           const cleanLine = line.replace("🎯", "").trim();
           if (cleanLine === joueur || cleanLine.startsWith(joueur + " ")) {
