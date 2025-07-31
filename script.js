@@ -22,21 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const tr = document.createElement("tr");
 
-        if (i === 0 && row[0]) {
+        if (i === 0 && [0]) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "journee-header";
-          td.textContent = row[0];
+          td.textContent = [0];
           tr.appendChild(td);
           table.appendChild(tr);
           return;
         }
 
-        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
+        if ([0] && [0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "match-header";
-          td.textContent = row[0];
+          td.textContent = [0];
           tr.appendChild(td);
           table.appendChild(tr);
 
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0] && row[0].toUpperCase() === "PRONOS") {
+        if ([0] && [0].toUpperCase() === "PRONOS") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "pronos-header";
@@ -56,11 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
+        if ([0] && [0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee-header";
-          td.textContent = row[0];
+          td.textContent = [0];
           tr.appendChild(td);
           table.appendChild(tr);
           return;
@@ -71,9 +71,9 @@ document.addEventListener("DOMContentLoaded", () => {
           td.colSpan = 3;
           td.className = "classement-journee";
 
-          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
+          let classementArray = ([0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
           if (classementArray.length === 1) {
-            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
+            classementArray = [0].split(/\s{2,}/).filter(x => x.trim() !== "");
           }
 
           classementArray.sort((a, b) => {
@@ -89,10 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Fusion des lignes MISSILES JOUES + suivante sur 3 colonnes
-        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") {
+        if ([0] && [0].toUpperCase() === "MISSILES JOUES") {
           const td = document.createElement("td");
           td.colSpan = 3;
-          td.textContent = row[0];
+          td.textContent = [0];
           tr.appendChild(td);
           table.appendChild(tr);
 
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Ligne avec logos après MATCH
-        row.forEach((cell, index) => {
+        .forEach((cell, index) => {
           const td = document.createElement("td");
 
           if (lastLineWasMatch && (index === 0 || index === 2)) {
@@ -159,10 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Fonction corrigée pour marquer les missiles
       function markMissiles() {
-  const missilesRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
-  if (missilesRowIndex === -1) return;
+  const missilesIndex = data.findIndex( => [0] && [0].toUpperCase() === "MISSILES JOUES");
+  if (missilesIndex === -1) return;
 
-  const missilesText = data[missilesRowIndex + 1]?.[0];
+  const missilesText = data[missilesIndex + 1]?.[0];
   if (!missilesText) return;
 
   const missiles = missilesText.split(/\r?\n/).filter(x => x.trim() !== "").map(line => {
@@ -244,26 +244,7 @@ if (missilesRowIndex !== -1) {
 
       markMissiles();
 
-        // Fusion des lignes JACKPOT JOUES + suivante sur 3 colonnes
-        if (row[0] && row[0].toUpperCase() === "JACKPOT JOUES") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          // Ligne suivante fusionnée
-          if (data[i + 1]) {
-            const trNext = document.createElement("tr");
-            const tdNext = document.createElement("td");
-            tdNext.colSpan = 3;
-            tdNext.textContent = data[i + 1][0] || "";
-            trNext.appendChild(tdNext);
-            table.appendChild(trNext);
-            skipNext = true; // ignorer la ligne suivante dans la boucle principale
-          }
-          return;
-        }
+        
 
 
 
