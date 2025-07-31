@@ -14,7 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let skipNext = false; // pour sauter la ligne fusionnée après MISSILES JOUES
 
-      // Construction du tableau
       data.forEach((row, i) => {
         if (skipNext) {
           skipNext = false;
@@ -158,90 +157,101 @@ document.addEventListener("DOMContentLoaded", () => {
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // *** Nouvelle fonction pour traiter les missiles joués ***
-      function markMissiles(table) {
-        // Trouver la ligne contenant "MISSILES JOUES"
-        const trs = Array.from(table.querySelectorAll("tr"));
-        let missilesIndex = -1;
-        for (let i = 0; i < trs.length; i++) {
-          const cell = trs[i].querySelector("td");
-          if (cell && cell.colSpan === 3 && cell.textContent.trim().toUpperCase() === "MISSILES JOUES") {
-            missilesIndex = i;
+      // Après création du tableau, on marque les missiles
+      markMissiles(table);
+
+      const container = document.getElementById("table-container");
+      container.innerHTML = "";
+      container.appendChild(table);
+    },
+    error: function (err) {
+      const container = document.getElementById("table-container");
+      container.textContent = "Erreur : " + err.message;
+    }
+  });
+
+  function markMissiles(table) {
+    const trs = Array.from(table.querySelectorAll("tr"));
+    let missilesIndex = -1;
+    for (let i = 0; i < trs.length; i++) {
+      const cell = trs[i].querySelector("td");
+      if (cell && cell.colSpan === 3 && cell.textContent.trim().toUpperCase() === "MISSILES JOUES") {
+        missilesIndex = i;
+        break;
+      }
+    }
+    if (missilesIndex === -1) {
+      console.warn("MISSILES JOUES non trouvé");
+      return;
+    }
+
+    const missilesLine = trs[missilesIndex + 1];
+    if (!missilesLine) {
+      console.warn("Ligne après MISSILES JOUES manquante");
+      return;
+    }
+    const missilesCell = missilesLine.querySelector("td");
+    if (!missilesCell) {
+      console.warn("Cellule fusionnée après MISSILES JOUES manquante");
+      return;
+    }
+
+    const text = missilesCell.textContent.trim();
+    const regex = /(\S+)\s+(\S+)\s+(\S+)\s+([1N2])/g;
+    let match;
+    let foundAny = false;
+
+    while ((match = regex.exec(text)) !== null) {
+      const equipeDom = match[1];
+      const equipeExt = match[2];
+      const nomJoueur = match[3];
+      const prono = match[4];
+      console.log(`Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${nomJoueur} prono=${prono}`);
+      foundAny = true;
+
+      // Trouver la ligne match par équipe domicile
+      let foundLineIndex = -1;
+      for (let i = 0; i < trs.length; i++) {
+        const tds = trs[i].querySelectorAll("td");
+        for (const td of tds) {
+          if (td.childNodes.length === 1 && td.textContent.trim() === equipeDom) {
+            foundLineIndex = i;
             break;
           }
         }
-        if (missilesIndex === -1) return; // pas trouvé
-
-        // Ligne juste en dessous avec toutes les chaînes dans une seule cellule fusionnée
-        const missilesLine = trs[missilesIndex + 1];
-        if (!missilesLine) return;
-
-        const missilesCell = missilesLine.querySelector("td");
-        if (!missilesCell) return;
-
-        // On récupère tout le texte, puis on découpe en chaînes selon le pattern : EquipeDom EquipeExt NomDuJoueur Prono
-        // On suppose que prono est toujours 1, N ou 2 à la fin de chaque chaîne
-        // Exemple : "Brest Lille Mat 1 Nantes ParisSG Batist 1"
-        const text = missilesCell.textContent.trim();
-
-        // Regex pour extraire toutes les chaînes
-        // \b(\S+)\s+(\S+)\s+(\S+)\s+([1N2])\b
-        const regex = /(\S+)\s+(\S+)\s+(\S+)\s+([1N2])/g;
-        let match;
-
-        while ((match = regex.exec(text)) !== null) {
-          const equipeDom = match[1];
-          const equipeExt = match[2];
-          const nomJoueur = match[3];
-          const prono = match[4];
-          // console.log({ equipeDom, equipeExt, nomJoueur, prono });
-
-          // Remonter dans le tableau pour trouver la ligne avec cellule texte = equipeDom
-          let foundLineIndex = -1;
-          for (let i = 0; i < trs.length; i++) {
-            const tds = trs[i].querySelectorAll("td");
-            for (const td of tds) {
-              // On cherche une cellule qui contient EXACTEMENT le texte equipeDom,
-              // mais en ignorant les spans, images etc.
-              if (td.childNodes.length === 1 && td.textContent.trim() === equipeDom) {
-                foundLineIndex = i;
-                break;
-              }
-            }
-            if (foundLineIndex !== -1) break;
-          }
-          if (foundLineIndex === -1) continue; // non trouvé
-
-          // Ligne du prono = foundLineIndex + 3 (car 3 lignes en dessous)
-          const pronoLineIndex = foundLineIndex + 3;
-          if (pronoLineIndex >= trs.length) continue;
-
-          const pronoLine = trs[pronoLineIndex];
-          const pronoTds = pronoLine.querySelectorAll("td");
-
-          // Chercher dans les 3 colonnes de prono la cellule qui contient nomJoueur
-          // Les noms peuvent avoir suffixe ' (x pts)' -> on ignore le suffixe
-          for (const td of pronoTds) {
-            const textContent = td.textContent.trim();
-            // Extraire le nom avant le premier espace ou parenthèse
-            const nomSimple = textContent.split(/\s|\(/)[0];
-            if (nomSimple.toLowerCase() === nomJoueur.toLowerCase()) {
-              // Ajouter le emoji 🎯 au début s'il n'y est pas déjà
-              if (!td.textContent.startsWith("🎯")) {
-                td.textContent = "🎯 " + td.textContent;
-              }
-              break;
-            }
-          }
-        }
+        if (foundLineIndex !== -1) break;
+      }
+      if (foundLineIndex === -1) {
+        console.warn(`Ligne de match pour équipe domicile "${equipeDom}" non trouvée`);
+        continue;
       }
 
-      markMissiles(table);
+      // Ligne pronos = 3 lignes après ligne match
+      const pronoLineIndex = foundLineIndex + 3;
+      if (pronoLineIndex >= trs.length) {
+        console.warn(`Ligne pronos (index ${pronoLineIndex}) hors tableau`);
+        continue;
+      }
+      const pronoLine = trs[pronoLineIndex];
+      const pronoTds = pronoLine.querySelectorAll("td");
 
-      document.body.appendChild(table);
-    },
-    error: function (err) {
-      console.error("Erreur chargement CSV:", err);
-    },
-  });
+      let marked = false;
+      for (const td of pronoTds) {
+        const textContent = td.textContent.trim();
+        const nomSimple = textContent.split(/\s|\(/)[0];
+        if (nomSimple.toLowerCase() === nomJoueur.toLowerCase()) {
+          if (!td.textContent.startsWith("* ")) {
+            td.textContent = "* " + td.textContent;
+            console.log(`Marqué joueur ${nomJoueur} avec *`);
+            marked = true;
+          }
+          break;
+        }
+      }
+      if (!marked) console.warn(`Joueur ${nomJoueur} non trouvé sur la ligne pronos`);
+    }
+    if (!foundAny) {
+      console.warn("Aucun missile trouvé dans le texte");
+    }
+  }
 });
