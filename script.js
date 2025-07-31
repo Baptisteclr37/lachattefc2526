@@ -10,13 +10,105 @@ document.addEventListener("DOMContentLoaded", () => {
       const table = document.createElement("table");
 
       let lastLineWasMatch = false;
-      const matchMap = new Map(); // Pour retrouver les lignes de pronos par match
-
-      let missileData = [];
+      let currentMatchIndex = -1;
+      let currentDomicile = "";
+      let currentExterieur = "";
+      let missilesData = null; // tableau des missiles, index correspondant à colonnes joueurs
+      let skipNextLine = false; // pour ne pas afficher MISSILES JOUES et la ligne suivante
 
       data.forEach((row, i) => {
+        // Gestion des lignes "MISSILES JOUES" et la ligne qui suit, à ignorer à l'affichage
+        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") {
+          missilesData = null; // on remet à null au cas où
+          skipNextLine = true; // ligne suivante est données missiles à traiter mais non affichée
+          return; // on ne crée pas de tr pour cette ligne
+        }
+
+        if (skipNextLine) {
+          // Cette ligne contient les missiles, on la stocke dans missilesData
+          missilesData = row;
+          skipNextLine = false;
+          return; // ne pas afficher
+        }
+
         const tr = document.createElement("tr");
 
+        // Ligne MATCHX
+        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "match-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+          lastLineWasMatch = true;
+          currentMatchIndex = i;
+          currentDomicile = "";
+          currentExterieur = "";
+          return;
+        }
+
+        // Ligne équipes & résultats (juste après MATCHX)
+        if (i === currentMatchIndex + 1) {
+          currentDomicile = row[0] ? row[0].trim() : "";
+          currentExterieur = row[2] ? row[2].trim() : "";
+
+          row.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+          return;
+        }
+
+        // Ligne PRONOS (label)
+        if (row[0] && row[0].toUpperCase() === "PRONOS") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "pronos-header";
+          td.textContent = "PRONOS";
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        // Ligne pronos des joueurs (ligne juste après PRONOS)
+        if (i === currentMatchIndex + 3) {
+          row.forEach((cell, colIndex) => {
+            const td = document.createElement("td");
+            if (colIndex === 0) {
+              // Première colonne : souvent vide ou autre info, on laisse tel quel
+              td.textContent = cell;
+            } else {
+              let content = cell;
+
+              if (missilesData && missilesData[colIndex]) {
+                // Format attendu : "NomJoueur Prono" dans cell
+                const parts = cell.trim().split(" ");
+                const nomJoueurDansCell = parts[0] || "";
+                const pronoDansCell = parts[1] || "";
+
+                const missileVal = missilesData[colIndex].trim();
+
+                // Construire clé missile : "domicile extérieur joueur prono"
+                const missileTarget = `${currentDomicile} ${currentExterieur} ${nomJoueurDansCell} ${pronoDansCell}`;
+
+                if (missileVal === missileTarget) {
+                  content += " 🎯"; // cible smiley
+                }
+              }
+              td.textContent = content;
+            }
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+          return;
+        }
+
+        // Les autres lignes (ex: J01 titre, classement, etc.) restent inchangées
+        // Ligne 0 : Titre J01 fusionné
         if (i === 0 && row[0]) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -27,30 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "match-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          lastLineWasMatch = true;
-          return;
-        }
-
-        if (row[0] && row[0].toUpperCase() === "PRONOS") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "pronos-header";
-          td.textContent = "PRONOS";
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          lastLineWasMatch = false;
-          return;
-        }
-
+        // Ligne CLASSEMENT JOURNEE fusionnée sur 3 colonnes avec style
         if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -61,36 +130,29 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+        // Ligne contenant le classement de la journée à trier
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee";
 
-          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
+          let classementRaw = row[0] || "";
+          let classementArray = classementRaw.split(/\r?\n/).filter(x => x.trim() !== "");
           if (classementArray.length === 1) {
-            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
+            classementArray = classementRaw.split(/\s{2,}/).filter(x => x.trim() !== "");
           }
-
           classementArray.sort((a, b) => {
             const numA = parseInt(a.trim().split(".")[0]) || 9999;
             const numB = parseInt(b.trim().split(".")[0]) || 9999;
             return numA - numB;
           });
-
           td.innerHTML = classementArray.join("<br>");
           tr.appendChild(td);
           table.appendChild(tr);
           return;
         }
 
-        // MISSILES JOUES : ignorer visuellement mais stocker la data
-        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
-        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
-          missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
-          return;
-        }
-
-        // Ligne avec logos après MATCH
+        // Pour les autres lignes simples on affiche tout normalement
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
@@ -98,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const teamName = cell.trim();
             if (teamName) {
               const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
+
               const img = document.createElement("img");
               img.src = logoUrl;
               img.alt = teamName + " logo";
@@ -121,45 +184,11 @@ document.addEventListener("DOMContentLoaded", () => {
               td.textContent = cell;
             }
           }
-
           tr.appendChild(td);
         });
 
         table.appendChild(tr);
-
-        // Sauvegarde de ligne de pronostics après PRONOS
-        if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
-          const team1 = data[i - 3]?.[0]?.trim() || "";
-          const team2 = data[i - 3]?.[2]?.trim() || "";
-          const key = team1 + "___" + team2;
-          matchMap.set(key, tr);
-        }
-
         if (lastLineWasMatch) lastLineWasMatch = false;
-      });
-
-      // Traitement missiles
-      missileData.forEach(line => {
-        const [team1, team2, joueur, prono] = line.split(/\s+/);
-        const key = team1 + "___" + team2;
-        const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
-        if (pronoColIndex == null) return;
-
-        const pronosTr = matchMap.get(key);
-        if (!pronosTr) return;
-
-        const td = pronosTr.children[pronoColIndex];
-        if (!td) return;
-
-        const lines = td.innerHTML.split("<br>");
-        const updatedLines = lines.map(line => {
-          const cleanLine = line.replace("🎯", "").trim();
-          if (cleanLine === joueur || cleanLine.startsWith(joueur + " ")) {
-            return cleanLine + " 🎯";
-          }
-          return line;
-        });
-        td.innerHTML = updatedLines.join("<br>");
       });
 
       const container = document.getElementById("table-container");
