@@ -291,6 +291,6 @@ if (jackpotRowIndex !== -1) {
 
 
       document.body.appendChild(table);
-    },
+    };
   });
 });
