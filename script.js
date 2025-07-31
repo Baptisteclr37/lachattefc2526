@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Ligne avec logos après MATCH
-        .forEach((cell, index) => {
+        forEach((cell, index) => {
           const td = document.createElement("td");
 
           if (lastLineWasMatch && (index === 0 || index === 2)) {
