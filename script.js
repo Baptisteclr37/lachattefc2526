@@ -3,12 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
-  function normalizeKey(team1, team2) {
-    return (team1 || "").toLowerCase().replace(/\s/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "") +
-           "___" +
-           (team2 || "").toLowerCase().replace(/\s/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
-
   Papa.parse(url, {
     download: true,
     complete: function (results) {
@@ -32,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0]?.toUpperCase().startsWith("MATCH")) {
+        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "match-header";
@@ -43,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0]?.toUpperCase() === "PRONOS") {
+        if (row[0] && row[0].toUpperCase() === "PRONOS") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "pronos-header";
@@ -54,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (row[0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
+        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee-header";
@@ -64,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        if (i > 0 && data[i - 1]?.[0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
+        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee";
@@ -83,14 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // MISSILES JOUES
-        if (row[0]?.toUpperCase() === "MISSILES JOUES") return;
-        if (i > 0 && data[i - 1]?.[0]?.toUpperCase() === "MISSILES JOUES") {
+        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
+        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
           return;
         }
 
-        // Affichage ligne (logos, pronos, etc.)
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
@@ -103,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
               img.alt = teamName + " logo";
               img.className = "team-logo";
               td.appendChild(img);
+
               const span = document.createElement("span");
               span.textContent = " " + teamName;
               td.appendChild(span);
@@ -126,10 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
-        // Sauvegarde de ligne pronos
-        if (data[i - 1]?.[0]?.toUpperCase() === "PRONOS") {
-          const team1 = data[i - 3]?.[0]?.trim() || "";
-          const team2 = data[i - 3]?.[2]?.trim() || "";
+        // ➤ Correction ici : récupération des noms d'équipes
+        if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
+          const matchLine = data[i - 3] || [];
+          const team1 = matchLine[0]?.trim() || "";
+          const team2 = matchLine[2]?.trim() || "";
           const key = normalizeKey(team1, team2);
           matchMap.set(key, tr);
         }
@@ -137,13 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // 🔎 LOG MATCHMAP
+      // ➤ Logs pour debug
       console.log("Clés des matches détectées dans la table :");
       for (const key of matchMap.keys()) {
         console.log(key);
       }
 
-      // 🎯 TRAITEMENT MISSILES
+      // ➤ Traitement des missiles
       console.log("Clés des missiles :");
       missileData.forEach(line => {
         const parts = line.split(/\s+/);
@@ -151,16 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const [team1, team2, joueur, prono] = parts;
         const key = normalizeKey(team1, team2);
         console.log(key);
-
         const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
         if (pronoColIndex == null) return;
-
         const pronosTr = matchMap.get(key);
-        if (!pronosTr) {
-          console.warn("Match introuvable pour missile :", key);
-          return;
-        }
-
+        if (!pronosTr) return;
         const td = pronosTr.children[pronoColIndex];
         if (!td) return;
 
@@ -179,10 +167,13 @@ document.addEventListener("DOMContentLoaded", () => {
       container.innerHTML = "";
       container.appendChild(table);
     },
-
     error: function (err) {
       const container = document.getElementById("table-container");
       container.textContent = "Erreur : " + err.message;
     }
   });
+
+  function normalizeKey(team1, team2) {
+    return `${team1.toLowerCase().replace(/\s+/g, "")}___${team2.toLowerCase().replace(/\s+/g, "")}`;
+  }
 });
