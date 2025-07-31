@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
-  // Fonction pour normaliser une clé équipe1___équipe2 en minuscule et sans espaces parasites
+  // Fonction pour normaliser la clé (minuscule, trim)
   function normalizeKey(team1, team2) {
     return team1.trim().toLowerCase() + "___" + team2.trim().toLowerCase();
   }
@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
-        // Sauvegarde de ligne de pronostics avec clé normalisée
+        // Sauvegarde de ligne de pronostics
         if (data[i - 1] && data[i - 1][0]?.toUpperCase() === "PRONOS") {
           const team1 = data[i - 3]?.[0]?.trim() || "";
           const team2 = data[i - 3]?.[2]?.trim() || "";
@@ -131,6 +131,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
+      });
+
+      // LOG DES CLÉS MATCHES ET MISSILES
+      console.log("Clés des matches détectées dans la table :");
+      for (const key of matchMap.keys()) {
+        console.log(key);
+      }
+
+      console.log("Clés des missiles :");
+      missileData.forEach(line => {
+        const parts = line.split(/\s+/);
+        if (parts.length < 4) return;
+        const [team1, team2, joueur, prono] = parts;
+        const key = normalizeKey(team1, team2);
+        console.log(key);
       });
 
       // === TRAITEMENT MISSILES ===
@@ -144,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pronosTr = matchMap.get(key);
         if (!pronosTr) {
-          console.log("Match introuvable pour missiles:", key);
+          console.warn(`Match introuvable pour missiles: ${key}`);
           return;
         }
 
