@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const joueur = parts[2];
           const prono = parts[3];
 
-          console.log(Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono});
+          console.log(`Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono}`);
 
           // Trouver la ligne du match dans le tableau en cherchant par équipe domicile
           let foundLineIndex = -1;
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           if (foundLineIndex === -1) {
-            console.warn(Ligne de match pour équipe domicile "${equipeDom}" non trouvée);
+            console.warn(`Ligne de match pour équipe domicile "${equipeDom}" non trouvée`);
             return;
           }
 
@@ -227,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const pronosTr = trs[foundLineIndex + 2]; // ligne après le "PRONOS"
 
           if (!pronosTr) {
-            console.warn(Pas de ligne PRONOS associée au match de ${equipeDom});
+            console.warn(`Pas de ligne PRONOS associée au match de ${equipeDom}`);
             return;
           }
 
@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           if (joueurColIndex === -1) {
-            console.warn(Joueur ${joueur} non trouvé dans les pronos pour le match ${equipeDom} vs ${equipeExt});
+            console.warn(`Joueur ${joueur} non trouvé dans les pronos pour le match ${equipeDom} vs ${equipeExt}`);
             return;
           }
 
@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const choixTr = trs[foundLineIndex + 1]; // ligne juste avant PRONOS
 
           if (!choixTr) {
-            console.warn(Pas de ligne des choix 1/N/2 trouvée pour le match ${equipeDom} vs ${equipeExt});
+            console.warn(`Pas de ligne des choix 1/N/2 trouvée pour le match ${equipeDom} vs ${equipeExt}`);
             return;
           }
 
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
 
           if (pronoColIndex === -1) {
-            console.warn(Prono ${prono} non trouvé dans la ligne des choix pour le match ${equipeDom} vs ${equipeExt});
+            console.warn(`Prono ${prono} non trouvé dans la ligne des choix pour le match ${equipeDom} vs ${equipeExt}`);
             return;
           }
 
