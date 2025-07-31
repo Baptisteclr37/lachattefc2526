@@ -267,7 +267,8 @@ if (jackpotRowIndex !== -1) {
       // Ligne du contenu des JACKPOTS
       const cells = rows[i].querySelectorAll("td");
       if (cells.length > 0) {
-        const rawItems = cells[0].innerText.trim().split(/\s+/); // Découpe par espace
+        const rawItems = cells[0].textContent.trim().split(/\s+/);
+ // Découpe par espace
         const formatted = [];
 
         for (let j = 0; j < rawItems.length; j += 4) {
