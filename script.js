@@ -3,9 +3,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
-  // Fonction pour normaliser la clé (minuscule, trim)
-  function normalizeKey(team1, team2) {
-    return team1.trim().toLowerCase() + "___" + team2.trim().toLowerCase();
+  function normalizeKey(t1, t2) {
+    return t1.trim().toLowerCase().replace(/\s+/g, "") + "___" + t2.trim().toLowerCase().replace(/\s+/g, "");
   }
 
   Papa.parse(url, {
@@ -14,59 +13,105 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = results.data;
       const table = document.createElement("table");
 
-      let lastLineWasMatch = false;
       const matchMap = new Map();
       let missileData = [];
 
+      let currentMatchTeams = null;
+      let skipNextLine = false;
+
       data.forEach((row, i) => {
-        const tr = document.createElement("tr");
+        if (skipNextLine) {
+          // Cette ligne est la ligne des équipes juste après "MATCH X"
+          const team1 = (row[0] || "").trim();
+          const team2 = (row[2] || "").trim();
+          if (team1 && team2) {
+            currentMatchTeams = { team1, team2 };
+            // On ajoute une ligne d'équipes au tableau avec logos
+            const trTeams = document.createElement("tr");
 
-        if (i === 0 && row[0]) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
+            // Col équipe domicile avec logo + nom
+            const tdTeam1 = document.createElement("td");
+            const img1 = document.createElement("img");
+            img1.src = baseImagePath + team1.toLowerCase().replace(/\s+/g, "-") + ".png";
+            img1.alt = team1 + " logo";
+            img1.className = "team-logo";
+            tdTeam1.appendChild(img1);
+            const span1 = document.createElement("span");
+            span1.textContent = " " + team1;
+            tdTeam1.appendChild(span1);
+            trTeams.appendChild(tdTeam1);
+
+            // Col score ou vide (col 1)
+            const tdScore = document.createElement("td");
+            tdScore.textContent = row[1] || "";
+            trTeams.appendChild(tdScore);
+
+            // Col équipe extérieur avec logo + nom
+            const tdTeam2 = document.createElement("td");
+            const img2 = document.createElement("img");
+            img2.src = baseImagePath + team2.toLowerCase().replace(/\s+/g, "-") + ".png";
+            img2.alt = team2 + " logo";
+            img2.className = "team-logo";
+            tdTeam2.appendChild(img2);
+            const span2 = document.createElement("span");
+            span2.textContent = " " + team2;
+            tdTeam2.appendChild(span2);
+            trTeams.appendChild(tdTeam2);
+
+            table.appendChild(trTeams);
+          } else {
+            currentMatchTeams = null;
+          }
+          skipNextLine = false;
+          return; // on a traité la ligne d’équipes, on passe à la suivante
+        }
+
+        // Si la ligne commence par "MATCH", on active le skip pour la ligne suivante
+        if (row[0] && row[0].toString().toUpperCase().startsWith("MATCH")) {
+          // On peut aussi créer un header ligne match
+          const trMatchHeader = document.createElement("tr");
+          const tdMatchHeader = document.createElement("td");
+          tdMatchHeader.colSpan = 3;
+          tdMatchHeader.className = "match-header";
+          tdMatchHeader.textContent = row[0];
+          trMatchHeader.appendChild(tdMatchHeader);
+          table.appendChild(trMatchHeader);
+
+          skipNextLine = true;
           return;
         }
 
-        if (row[0] && row[0].toUpperCase().startsWith("MATCH")) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "match-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          lastLineWasMatch = true;
+        // Ligne "PRONOS" = header pronos
+        if (row[0] && row[0].toString().toUpperCase() === "PRONOS") {
+          const trPronosHeader = document.createElement("tr");
+          const tdPronosHeader = document.createElement("td");
+          tdPronosHeader.colSpan = 3;
+          tdPronosHeader.className = "pronos-header";
+          tdPronosHeader.textContent = "PRONOS";
+          trPronosHeader.appendChild(tdPronosHeader);
+          table.appendChild(trPronosHeader);
           return;
         }
 
-        if (row[0] && row[0].toUpperCase() === "PRONOS") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "pronos-header";
-          td.textContent = "PRONOS";
-          tr.appendChild(td);
-          table.appendChild(tr);
-          lastLineWasMatch = false;
+        // Ligne "CLASSEMENT JOURNEE" = header classement
+        if (row[0] && row[0].toString().toUpperCase() === "CLASSEMENT JOURNEE") {
+          const trClassementHeader = document.createElement("tr");
+          const tdClassementHeader = document.createElement("td");
+          tdClassementHeader.colSpan = 3;
+          tdClassementHeader.className = "classement-journee-header";
+          tdClassementHeader.textContent = row[0];
+          trClassementHeader.appendChild(tdClassementHeader);
+          table.appendChild(trClassementHeader);
           return;
         }
 
-        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
+        // Ligne juste après "CLASSEMENT JOURNEE" = contenu classement
+        if (i > 0 && data[i - 1][0]?.toString().toUpperCase() === "CLASSEMENT JOURNEE") {
+          const trClassement = document.createElement("tr");
+          const tdClassement = document.createElement("td");
+          tdClassement.colSpan = 3;
+          tdClassement.className = "classement-journee";
 
-        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee";
           let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
           if (classementArray.length === 1) {
             classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
@@ -76,64 +121,43 @@ document.addEventListener("DOMContentLoaded", () => {
             const numB = parseInt(b.trim().split(".")[0]) || 9999;
             return numA - numB;
           });
-          td.innerHTML = classementArray.join("<br>");
-          tr.appendChild(td);
-          table.appendChild(tr);
+          tdClassement.innerHTML = classementArray.join("<br>");
+          trClassement.appendChild(tdClassement);
+          table.appendChild(trClassement);
           return;
         }
 
-        // MISSILES JOUES : ignorer visuellement mais stocker la data
-        if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
-        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
-          missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
-          return;
-        }
-
-        row.forEach((cell, index) => {
-          const td = document.createElement("td");
-          if (lastLineWasMatch && (index === 0 || index === 2)) {
-            const teamName = cell.trim();
-            if (teamName) {
-              const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
-              const img = document.createElement("img");
-              img.src = logoUrl;
-              img.alt = teamName + " logo";
-              img.className = "team-logo";
-              td.appendChild(img);
-              const span = document.createElement("span");
-              span.textContent = " " + teamName;
-              td.appendChild(span);
-            } else {
-              td.textContent = cell;
-            }
-          } else {
-            if (cell.includes("(")) {
-              const items = cell.split(")").filter(x => x.trim() !== "");
-              td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-            } else if (cell.trim().split(/\s+/).length > 1) {
-              const noms = cell.trim().split(/\s+/);
-              td.innerHTML = noms.map(n => n).join("<br>");
-            } else {
-              td.textContent = cell;
-            }
+        // MISSILES JOUES : ignorer ligne header et stocker données ligne suivante
+        if (row[0] && row[0].toString().toUpperCase() === "MISSILES JOUES") {
+          // ligne suivante contiendra les missiles
+          if (data[i + 1] && data[i + 1][0]) {
+            missileData = data[i + 1][0].split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
           }
-          tr.appendChild(td);
+          return;
+        }
+
+        // Toutes les autres lignes = pronostics des joueurs
+        if (!currentMatchTeams) {
+          // Pas de match en cours, on ignore cette ligne
+          return;
+        }
+
+        // Création ligne pronos
+        const trPronos = document.createElement("tr");
+        row.forEach(cell => {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          trPronos.appendChild(td);
         });
 
-        table.appendChild(tr);
+        // Sauvegarde dans matchMap avec clé normalisée
+        const key = normalizeKey(currentMatchTeams.team1, currentMatchTeams.team2);
+        matchMap.set(key, trPronos);
 
-        // Sauvegarde de ligne de pronostics
-        if (data[i - 1] && data[i - 1][0]?.toUpperCase() === "PRONOS") {
-          const team1 = data[i - 3]?.[0]?.trim() || "";
-          const team2 = data[i - 3]?.[2]?.trim() || "";
-          const key = normalizeKey(team1, team2);
-          matchMap.set(key, tr);
-        }
-
-        if (lastLineWasMatch) lastLineWasMatch = false;
+        table.appendChild(trPronos);
       });
 
-      // LOG DES CLÉS MATCHES ET MISSILES
+      // LOG console pour débogage
       console.log("Clés des matches détectées dans la table :");
       for (const key of matchMap.keys()) {
         console.log(key);
@@ -159,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const pronosTr = matchMap.get(key);
         if (!pronosTr) {
-          console.warn(`Match introuvable pour missiles: ${key}`);
+          console.warn("Match introuvable pour missiles:", key);
           return;
         }
 
@@ -179,13 +203,13 @@ document.addEventListener("DOMContentLoaded", () => {
         td.innerHTML = updatedLines.join("<br>");
       });
 
-      const container = document.getElementById("table-container");
+      // Affichage dans le container
+      const container = document.getElementById("container");
       container.innerHTML = "";
       container.appendChild(table);
     },
     error: function (err) {
-      const container = document.getElementById("table-container");
-      container.textContent = "Erreur : " + err.message;
-    }
+      console.error("Erreur PapaParse :", err);
+    },
   });
 });
