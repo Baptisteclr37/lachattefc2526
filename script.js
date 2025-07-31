@@ -222,6 +222,24 @@ document.addEventListener("DOMContentLoaded", () => {
     joueurTd.innerHTML = updatedHTML;
   });
 }
+// Masquer les deux lignes du tableau correspondant aux missiles
+const missilesRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
+if (missilesRowIndex !== -1) {
+  const rows = table.querySelectorAll("tr");
+
+  // On identifie les lignes affichées correspondant à l’index CSV
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+    if (visibleIndex === missilesRowIndex || visibleIndex === missilesRowIndex + 1) {
+      rows[i].style.display = "none";
+    }
+    // Incrémenter uniquement si ce n’est pas une ligne fusionnée ou vide
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+}
 
 
       markMissiles();
