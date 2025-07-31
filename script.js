@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const table = document.createElement("table");
 
       let lastLineWasMatch = false;
-      const matchMap = new Map();
+      const matchMap = new Map(); // Pour retrouver les lignes de pronos par match
+
       let missileData = [];
 
       data.forEach((row, i) => {
@@ -33,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
+
           lastLineWasMatch = true;
           return;
         }
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = "PRONOS";
           tr.appendChild(td);
           table.appendChild(tr);
+
           lastLineWasMatch = false;
           return;
         }
@@ -62,27 +65,32 @@ document.addEventListener("DOMContentLoaded", () => {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee";
+
           let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
           if (classementArray.length === 1) {
             classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
           }
+
           classementArray.sort((a, b) => {
             const numA = parseInt(a.trim().split(".")[0]) || 9999;
             const numB = parseInt(b.trim().split(".")[0]) || 9999;
             return numA - numB;
           });
+
           td.innerHTML = classementArray.join("<br>");
           tr.appendChild(td);
           table.appendChild(tr);
           return;
         }
 
+        // MISSILES JOUES : ignorer visuellement mais stocker la data
         if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
           return;
         }
 
+        // Ligne avec logos après MATCH
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
@@ -119,36 +127,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
-        // ➤ Correction ici : récupération des noms d'équipes
+        // Sauvegarde de ligne de pronostics après PRONOS
         if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
-          const matchLine = data[i - 3] || [];
-          const team1 = matchLine[0]?.trim() || "";
-          const team2 = matchLine[2]?.trim() || "";
-          const key = normalizeKey(team1, team2);
-          matchMap.set(key, tr);
+          // Recherche de la ligne MATCH X au-dessus
+          let matchLineIndex = i - 2; // On part juste au-dessus de PRONOS
+          while (matchLineIndex >= 0 && (!data[matchLineIndex][0] || !data[matchLineIndex][0].toUpperCase().startsWith("MATCH"))) {
+            matchLineIndex--;
+          }
+
+          if (matchLineIndex >= 0) {
+            const teamsLine = data[matchLineIndex + 1]; // Ligne juste après MATCH X
+            if (teamsLine) {
+              const team1 = teamsLine[0]?.trim() || "";
+              const team2 = teamsLine[2]?.trim() || "";
+              const key = team1 + "___" + team2;
+              matchMap.set(key, tr);
+            }
+          }
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // ➤ Logs pour debug
-      console.log("Clés des matches détectées dans la table :");
-      for (const key of matchMap.keys()) {
-        console.log(key);
-      }
-
-      // ➤ Traitement des missiles
-      console.log("Clés des missiles :");
+      // Traitement missiles
       missileData.forEach(line => {
-        const parts = line.split(/\s+/);
-        if (parts.length < 4) return;
-        const [team1, team2, joueur, prono] = parts;
-        const key = normalizeKey(team1, team2);
-        console.log(key);
+        const [team1, team2, joueur, prono] = line.split(/\s+/);
+        const key = team1 + "___" + team2;
         const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
         if (pronoColIndex == null) return;
+
         const pronosTr = matchMap.get(key);
         if (!pronosTr) return;
+
         const td = pronosTr.children[pronoColIndex];
         if (!td) return;
 
@@ -172,8 +182,4 @@ document.addEventListener("DOMContentLoaded", () => {
       container.textContent = "Erreur : " + err.message;
     }
   });
-
-  function normalizeKey(team1, team2) {
-    return `${team1.toLowerCase().replace(/\s+/g, "")}___${team2.toLowerCase().replace(/\s+/g, "")}`;
-  }
 });
