@@ -10,11 +10,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const table = document.createElement("table");
 
       let lastLineWasMatch = false;
-      const matchMap = new Map(); // Pour retrouver les lignes de pronos par match
+      let currentMatchTeams = null; // [domicile, exterieur]
+      const matchMap = new Map(); // clé: domicile_exterieur => ligne pronos
 
       let missileData = [];
 
-      // Fonction de normalisation des noms d'équipe
+      // Normalisation
       const normalize = str => str.trim().toLowerCase().replace(/\s+/g, "-");
 
       data.forEach((row, i) => {
@@ -37,8 +38,40 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = row[0];
           tr.appendChild(td);
           table.appendChild(tr);
-
           lastLineWasMatch = true;
+          currentMatchTeams = null;
+          return;
+        }
+
+        // Ligne des équipes après MATCH (ligne juste après MATCH)
+        if (lastLineWasMatch) {
+          currentMatchTeams = [row[0].trim(), row[2].trim()];
+          lastLineWasMatch = false;
+
+          // Affichage avec logos
+          row.forEach((cell, index) => {
+            const td = document.createElement("td");
+            if (index === 0 || index === 2) {
+              const teamName = cell.trim();
+              if (teamName) {
+                const logoUrl = baseImagePath + normalize(teamName) + ".png";
+                const img = document.createElement("img");
+                img.src = logoUrl;
+                img.alt = teamName + " logo";
+                img.className = "team-logo";
+                td.appendChild(img);
+                const span = document.createElement("span");
+                span.textContent = " " + teamName;
+                td.appendChild(span);
+              } else {
+                td.textContent = cell;
+              }
+            } else {
+              td.textContent = cell;
+            }
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
           return;
         }
 
@@ -49,44 +82,18 @@ document.addEventListener("DOMContentLoaded", () => {
           td.textContent = "PRONOS";
           tr.appendChild(td);
           table.appendChild(tr);
-
-          lastLineWasMatch = false;
           return;
         }
 
-        if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
+        // Ligne des pronos (après "PRONOS")
+        if (currentMatchTeams && i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
+          // Clé = "domicile___exterieur"
+          const key = normalize(currentMatchTeams[0]) + "___" + normalize(currentMatchTeams[1]);
+          console.log(`Mapping prono ligne ${i} => clé : ${key}`);
+          matchMap.set(key, tr);
         }
 
-        if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee";
-
-          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim() !== "");
-          if (classementArray.length === 1) {
-            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim() !== "");
-          }
-
-          classementArray.sort((a, b) => {
-            const numA = parseInt(a.trim().split(".")[0]) || 9999;
-            const numB = parseInt(b.trim().split(".")[0]) || 9999;
-            return numA - numB;
-          });
-
-          td.innerHTML = classementArray.join("<br>");
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        // MISSILES JOUES : ignorer visuellement mais stocker la data
+        // Traitement missiles et autres lignes...
         if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
@@ -94,96 +101,78 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Ligne avec logos après MATCH
-        row.forEach((cell, index) => {
+        // Remplissage classique des cellules sinon
+        row.forEach((cell) => {
           const td = document.createElement("td");
-
-          if (lastLineWasMatch && (index === 0 || index === 2)) {
-            const teamName = cell.trim();
-            if (teamName) {
-              const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
-              const img = document.createElement("img");
-              img.src = logoUrl;
-              img.alt = teamName + " logo";
-              img.className = "team-logo";
-              td.appendChild(img);
-
-              const span = document.createElement("span");
-              span.textContent = " " + teamName;
-              td.appendChild(span);
-            } else {
-              td.textContent = cell;
-            }
-          } else {
-            if (cell.includes("(")) {
-              const items = cell.split(")").filter(x => x.trim() !== "");
-              td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-            } else if (cell.trim().split(/\s+/).length > 1) {
-              const noms = cell.trim().split(/\s+/);
-              td.innerHTML = noms.map(n => n).join("<br>");
-            } else {
-              td.textContent = cell;
-            }
-          }
-
+          td.textContent = cell;
           tr.appendChild(td);
         });
-
         table.appendChild(tr);
-
-        // Sauvegarde de ligne de pronostics après PRONOS
-        if (data[i - 1] && data[i - 1][0] && data[i - 1][0].toUpperCase() === "PRONOS") {
-          const team1Raw = data[i - 3]?.[0]?.trim() || "";
-          const team2Raw = data[i - 3]?.[2]?.trim() || "";
-          const team1 = normalize(team1Raw);
-          const team2 = normalize(team2Raw);
-          const key = team1 + "___" + team2;
-          console.log(`Mapping prono ligne ${i} => clé : ${key}`);
-          matchMap.set(key, tr);
-        }
-
-        if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // Traitement missiles
+      // Traitement missiles (plus robuste)
       missileData.forEach(line => {
         console.log("Traitement missile ligne :", line);
-        const parts = line.split(/\s+/);
-        if(parts.length < 4){
-          console.log("Ligne missile invalide, skip :", line);
+
+        // Pour extraire équipe domicile et extérieur, on cherche quelle clé correspond dans matchMap :
+        // Exemple ligne missile : "Nantes Paris SG Batist 1"
+        // On teste toutes les clés matchMap pour trouver celle où domicile et exterieur sont au début de la ligne
+
+        let matchedKey = null;
+        let joueur = null;
+        let prono = null;
+
+        for (const key of matchMap.keys()) {
+          const [dom, ext] = key.split("___");
+          // Dom et ext en tirets, ligne en texte brut en mots séparés par espaces
+
+          const normalizedLine = line.toLowerCase().replace(/\s+/g, " ");
+          const domRegex = dom.replace(/-/g, " ");
+          const extRegex = ext.replace(/-/g, " ");
+
+          if (normalizedLine.startsWith(domRegex + " " + extRegex) || normalizedLine.startsWith(domRegex + " " + extRegex.split(" ")[0])) {
+            matchedKey = key;
+            break;
+          }
+        }
+
+        if (!matchedKey) {
+          console.log("Aucun match trouvé pour missile :", line);
           return;
         }
-        let [team1Raw, team2Raw, joueur, prono] = parts;
-        const team1 = normalize(team1Raw);
-        const team2 = normalize(team2Raw);
-        console.log({ team1Raw, team2Raw, team1, team2, joueur, prono });
 
-        const key = team1 + "___" + team2;
-        const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
-        if (pronoColIndex == null) {
+        // Enlever domicile et exterieur du début de la ligne
+        let rest = line.toLowerCase();
+        const [dom, ext] = matchedKey.split("___");
+        const domStr = dom.replace(/-/g, " ");
+        const extStr = ext.replace(/-/g, " ");
+        rest = rest.substring(domStr.length).trim();
+        if (rest.startsWith(extStr)) rest = rest.substring(extStr.length).trim();
+
+        // Le reste doit être "Joueur Prono"
+        const restParts = rest.split(" ");
+        if (restParts.length < 2) {
+          console.log("Reste missile invalide :", rest);
+          return;
+        }
+        joueur = restParts[0];
+        prono = restParts[1].toUpperCase();
+
+        if (!["1", "N", "2"].includes(prono)) {
           console.log("Prono invalide :", prono);
           return;
         }
 
-        const pronosTr = matchMap.get(key);
-        if (!pronosTr) {
-          console.log("Match non trouvé dans matchMap :", key);
+        console.log({ matchedKey, joueur, prono });
+
+        const tr = matchMap.get(matchedKey);
+        const pronoColIndex = { "1": 0, "N": 1, "2": 2 }[prono];
+        if (!tr || !tr.children[pronoColIndex]) {
+          console.log("Colonne prono non trouvée");
           return;
         }
-
-        console.log("Pronos tr cells count:", pronosTr.children.length);
-        for(let i=0; i<pronosTr.children.length; i++) {
-          console.log(i, pronosTr.children[i].textContent);
-        }
-
-        const td = pronosTr.children[pronoColIndex];
-        if (!td) {
-          console.log("Colonne prono non trouvée pour index :", pronoColIndex);
-          return;
-        }
-
+        const td = tr.children[pronoColIndex];
         const lines = td.innerHTML.split("<br>");
-        lines.forEach(l => console.log(`Comparaison ligne prono: [${l}] vs joueur [${joueur}]`));
         const updatedLines = lines.map(line => {
           const cleanLine = line.replace("🎯", "").trim();
           if (cleanLine === joueur || cleanLine.startsWith(joueur + " ")) {
