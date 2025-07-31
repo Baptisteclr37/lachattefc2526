@@ -77,10 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // MISSILES JOUES : ignorer visuellement mais stocker la data
         if (row[0] && row[0].toUpperCase() === "MISSILES JOUES") return;
         if (i > 0 && data[i - 1][0] && data[i - 1][0].toUpperCase() === "MISSILES JOUES") {
           missileData = (row[0] || "").split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
+          console.log("MISSILES JOUES détectés :", missileData);
           return;
         }
 
@@ -117,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         table.appendChild(tr);
 
-        // Sauvegarde de ligne de pronostics
         if (data[i - 1] && data[i - 1][0]?.toUpperCase() === "PRONOS") {
           const team1 = data[i - 3]?.[0]?.trim() || "";
           const team2 = data[i - 3]?.[2]?.trim() || "";
@@ -128,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
-      // === TRAITEMENT MISSILES CORRIGÉ ===
+      // Ajout des cibles 🎯
       missileData.forEach(line => {
         const parts = line.split(/\s+/);
         if (parts.length < 4) return;
@@ -138,34 +137,46 @@ document.addEventListener("DOMContentLoaded", () => {
         if (pronoColIndex == null) return;
 
         const pronosTr = matchMap.get(key);
-        if (!pronosTr) return;
+        if (!pronosTr) {
+          console.warn(`Match introuvable pour missiles: ${key}`);
+          return;
+        }
 
         const td = pronosTr.children[pronoColIndex];
-        if (!td) return;
+        if (!td) {
+          console.warn(`Colonne prono introuvable pour ${prono} dans match ${key}`);
+          return;
+        }
 
         const lines = td.innerHTML.split("<br>");
+
+        let found = false;
         const updatedLines = lines.map(line => {
-          const cleanLine = line.replace("🎯", "").trim();
+          const cleanLine = line.replace(/🎯/g, "").trim();
 
-          // Extraction du nom sans les points entre parenthèses
-          const nomSansPoints = cleanLine.split("(")[0].trim();
+          // Plus souple : compare en ignorant la casse et en enlevant accents/espaces multiples
+          const normalize = str =>
+            str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
 
-          if (nomSansPoints === joueur.trim()) {
+          if (normalize(cleanLine.split("(")[0]) === normalize(joueur)) {
+            found = true;
             return cleanLine + " 🎯";
           }
           return line;
         });
 
+        if (!found) {
+          console.warn(`Joueur '${joueur}' non trouvé dans la colonne prono ${prono} du match ${key}`);
+        }
+
         td.innerHTML = updatedLines.join("<br>");
       });
 
-      const container = document.getElementById("table-container");
-      container.innerHTML = "";
-      container.appendChild(table);
+      document.getElementById("table-container").innerHTML = "";
+      document.getElementById("table-container").appendChild(table);
     },
     error: function (err) {
-      const container = document.getElementById("table-container");
-      container.textContent = "Erreur : " + err.message;
+      document.getElementById("table-container").textContent = "Erreur : " + err.message;
     }
   });
 });
