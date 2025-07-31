@@ -244,48 +244,26 @@ if (missilesRowIndex !== -1) {
 
       markMissiles();
 
-      // === JACKPOT JOUES - Fusionner sur 3 colonnes et formater correctement ===
-const jackpotRowIndex = data.findIndex(row => row[0] && row[0].toUpperCase() === "JACKPOT JOUES");
-if (jackpotRowIndex !== -1) {
-  const rows = table.querySelectorAll("tr");
+        // Fusion des lignes JACKPOT JOUES + suivante sur 3 colonnes
+        if (row[0] && row[0].toUpperCase() === "JACKPOT JOUES") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
 
-  // Trouver la ligne visible correspondant à JACKPOT JOUES dans le tableau HTML
-  let visibleIndex = 0;
-  for (let i = 0; i < rows.length; i++) {
-    const rowText = rows[i].textContent.toUpperCase().trim();
-
-    if (visibleIndex === jackpotRowIndex) {
-      // Ligne du titre JACKPOT JOUES
-      const cells = rows[i].querySelectorAll("td");
-      if (cells.length > 0) {
-        const content = cells[0].innerHTML;
-        rows[i].innerHTML = `<td colspan="3" style="font-weight: bold;">${content}</td>`;
-      }
-    }
-
-    if (visibleIndex === jackpotRowIndex + 1) {
-      // Ligne du contenu des JACKPOTS
-      const cells = rows[i].querySelectorAll("td");
-      if (cells.length > 0) {
-        const rawItems = cells[0].textContent.trim().split(/\s+/);
- // Découpe par espace
-        const formatted = [];
-
-        for (let j = 0; j < rawItems.length; j += 4) {
-          const line = rawItems.slice(j, j + 4).join(" ");
-          formatted.push(line);
+          // Ligne suivante fusionnée
+          if (data[i + 1]) {
+            const trNext = document.createElement("tr");
+            const tdNext = document.createElement("td");
+            tdNext.colSpan = 3;
+            tdNext.textContent = data[i + 1][0] || "";
+            trNext.appendChild(tdNext);
+            table.appendChild(trNext);
+            skipNext = true; // ignorer la ligne suivante dans la boucle principale
+          }
+          return;
         }
-
-        rows[i].innerHTML = `<td colspan="3">${formatted.join("<br>")}</td>`;
-      }
-    }
-
-    // Incrémenter que si ce n’est pas une ligne masquée
-    if (!rows[i].hasAttribute('data-hidden')) {
-      visibleIndex++;
-    }
-  }
-}
 
 
 
