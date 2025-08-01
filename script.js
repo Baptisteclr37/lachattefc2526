@@ -245,45 +245,46 @@ if (missilesRowIndex !== -1) {
       markMissiles();
 
       document.body.appendChild(table);
-// --- TEST : Générer une vue par joueur sans rien casser ---
+// 🔁 Vue par joueur (à ne pas activer tout de suite si on teste)
 const pronosParJoueur = {};
 
-// Supposons que les noms des joueurs sont sur la ligne 6 (data[5])
-const indexLignePronos = data.findIndex(row => row.includes("PRONOS"));
-const ligneJoueurs = indexLignePronos >= 0 ? data[indexLignePronos + 2] : null;
+// 🔍 Trouver les lignes PRONOS et joueurs
+data.forEach((row, i) => {
+  if (row.includes("PRONOS")) {
+    const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
 
-
-if (ligneJoueurs) {
-  data.forEach(row => {
-    // Ignore les lignes vides ou non pertinentes
-    if (!row[0] || row[0].includes("MATCH") || row[0].includes("PRONOS")) return;
-
-    const equipeDomicile = row[0];
-    const resultat = row[1];
-    const equipeExterieur = row[2];
-    const match = `${equipeDomicile} - ${equipeExterieur}`;
-
-    for (let i = 3; i < row.length; i++) {
-      const joueur = ligneJoueurs[i];
-      const prono = row[i];
-
-      if (!joueur || !prono) continue;
-
-      if (!pronosParJoueur[joueur]) {
-        pronosParJoueur[joueur] = [];
-      }
-
-      pronosParJoueur[joueur].push({
-        match: match,
-        prono: prono
-      });
+    if (!lignePronos) {
+      console.error("❌ Ligne des joueurs non trouvée");
+      return;
     }
-  });
 
-  console.log("✅ Vue par joueur :", pronosParJoueur);
-} else {
-  console.warn("❌ Ligne des joueurs non trouvée");
-}
+    const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
+
+    // 0 = prono "1" | 1 = "N" | 2 = "2"
+    ["1", "N", "2"].forEach((prono, idx) => {
+      const cell = lignePronos[idx];
+      if (!cell) return;
+
+      // Séparer les joueurs sur retours à la ligne
+      const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
+
+      joueurs.forEach(joueur => {
+        // Nettoyage : enlever pictos + points éventuels
+        const nom = joueur.replace(/^.*?([A-Za-zÀ-ÿ-]+).*$/, '$1');
+
+        if (!pronosParJoueur[nom]) pronosParJoueur[nom] = [];
+        pronosParJoueur[nom].push({
+          match: matchInfo,
+          prono: prono
+        });
+      });
+    });
+  }
+});
+
+// 🧪 Exemple de log
+console.log("📋 Pronos par joueur :", pronosParJoueur);
+
 
       
     },
