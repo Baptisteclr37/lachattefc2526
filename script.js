@@ -249,7 +249,9 @@ if (missilesRowIndex !== -1) {
 const pronosParJoueur = {};
 
 // Supposons que les noms des joueurs sont sur la ligne 6 (data[5])
-const ligneJoueurs = data.find(row => row.includes("PRONOS")) ? data[data.indexOf(data.find(row => row.includes("PRONOS"))) + 1] : null;
+const indexLignePronos = data.findIndex(row => row.includes("PRONOS"));
+const ligneJoueurs = indexLignePronos >= 0 ? data[indexLignePronos + 2] : null;
+
 
 if (ligneJoueurs) {
   data.forEach(row => {
