@@ -245,6 +245,45 @@ if (missilesRowIndex !== -1) {
       markMissiles();
 
       document.body.appendChild(table);
+// --- TEST : Générer une vue par joueur sans rien casser ---
+const pronosParJoueur = {};
+
+// Supposons que les noms des joueurs sont sur la ligne 6 (data[5])
+const ligneJoueurs = data.find(row => row.includes("PRONOS")) ? data[data.indexOf(data.find(row => row.includes("PRONOS"))) + 1] : null;
+
+if (ligneJoueurs) {
+  data.forEach(row => {
+    // Ignore les lignes vides ou non pertinentes
+    if (!row[0] || row[0].includes("MATCH") || row[0].includes("PRONOS")) return;
+
+    const equipeDomicile = row[0];
+    const resultat = row[1];
+    const equipeExterieur = row[2];
+    const match = `${equipeDomicile} - ${equipeExterieur}`;
+
+    for (let i = 3; i < row.length; i++) {
+      const joueur = ligneJoueurs[i];
+      const prono = row[i];
+
+      if (!joueur || !prono) continue;
+
+      if (!pronosParJoueur[joueur]) {
+        pronosParJoueur[joueur] = [];
+      }
+
+      pronosParJoueur[joueur].push({
+        match: match,
+        prono: prono
+      });
+    }
+  });
+
+  console.log("✅ Vue par joueur :", pronosParJoueur);
+} else {
+  console.warn("❌ Ligne des joueurs non trouvée");
+}
+
+      
     },
   });
 });
