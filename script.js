@@ -249,9 +249,13 @@ if (missilesRowIndex !== -1) {
 const pronosParJoueur = {};
 
 // 🔍 Trouver les lignes PRONOS et joueurs
+      console.log("🔍 Début analyse vue par joueur...");
+
 data.forEach((row, i) => {
   if (row.includes("PRONOS")) {
+    console.log("✅ Ligne PRONOS détectée à l’index", i);
     const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
+    console.log("➡️ Ligne joueurs brut :", lignePronos);
 
     if (!lignePronos) {
       console.error("❌ Ligne des joueurs non trouvée");
