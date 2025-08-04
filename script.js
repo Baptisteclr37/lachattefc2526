@@ -254,6 +254,7 @@ const pronosParJoueur = {};
 data.forEach((row, i) => {
   if (row.includes("PRONOS")) {
     console.log("✅ Ligne PRONOS détectée à l’index", i);
+     console.log("➡️ Ligne en i+2 :", data[i + 2]);
     const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
     console.log("➡️ Ligne joueurs brut :", lignePronos);
 
@@ -261,7 +262,11 @@ data.forEach((row, i) => {
       console.error("❌ Ligne des joueurs non trouvée");
       return;
     }
-
+  // Ajoute ceci :
+  console.log("🧪 Cellule 0 :", lignePronos[0]);
+  console.log("🧪 Cellule 1 :", lignePronos[1]);
+  console.log("🧪 Cellule 2 :", lignePronos[2]);
+    
     const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
 
     // 0 = prono "1" | 1 = "N" | 2 = "2"
