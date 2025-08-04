@@ -56,17 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-         if (row[0] && row[0].toUpperCase() === "VOIR LE TABLEAU ANCIENNE VERSION") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "tableau-ancienne-version";
-          td.textContent = "VOIR LE TABLEAU ANCIENNE VERSION";
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-      
-          return;
-        }
+        
 
         if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
