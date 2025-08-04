@@ -56,6 +56,19 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+         if (row[0] && row[0].toUpperCase() === "VOIR LE TABLEAU ANCIENNE VERSION") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "tableau-ancienne-version";
+          td.textContent = "VOIR LE TABLEAU ANCIENNE VERSION";
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+      
+          return;
+        }
+        
+
         if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -259,7 +272,6 @@ data.forEach((row, i) => {
   console.log("🔎 Ligne i+3 :", data[i + 3]);
 
      console.log("➡️ Ligne en i+2 :", data[i + 2]);
-    const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
     const lignePronos = data[i + 1]; // 2 lignes sous PRONOS
     console.log("➡️ Ligne joueurs brut :", lignePronos);
 
