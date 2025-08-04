@@ -254,6 +254,10 @@ const pronosParJoueur = {};
 data.forEach((row, i) => {
   if (row.includes("PRONOS")) {
     console.log("✅ Ligne PRONOS détectée à l’index", i);
+    console.log("🔎 Ligne i+1 :", data[i + 1]);
+  console.log("🔎 Ligne i+2 :", data[i + 2]);
+  console.log("🔎 Ligne i+3 :", data[i + 3]);
+     }
      console.log("➡️ Ligne en i+2 :", data[i + 2]);
     const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
     console.log("➡️ Ligne joueurs brut :", lignePronos);
