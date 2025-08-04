@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
-  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
+  const url = "https://corsproxy.io/?https://docs.google.com/spreacolspandsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
   Papa.parse(url, {
     download: true,
@@ -53,6 +53,18 @@ document.addEventListener("DOMContentLoaded", () => {
           table.appendChild(tr);
 
           lastLineWasMatch = false;
+          return;
+        }
+
+         if (row[0] && row[0].toUpperCase() === "VOIR LE TABLEAU ANCIENNE VERSION") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "tableau-ancienne-version";
+          td.textContent = "VOIR LE TABLEAU ANCIENNE VERSION";
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+      
           return;
         }
 
