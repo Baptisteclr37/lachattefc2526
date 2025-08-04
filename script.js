@@ -303,3 +303,21 @@ console.log("📋 Pronos par joueur :", pronosParJoueur);
     },
   });
 });
+const ligneTest = data[8]; // essaie avec différentes lignes
+
+if (ligneTest) {
+  console.log("🔬 Ligne test complète :", ligneTest);
+  ["1", "N", "2"].forEach((prono, idx) => {
+    const cell = ligneTest[idx];
+    console.log(`📦 Cellule ${prono} :`, cell);
+    
+    if (cell) {
+      const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
+      joueurs.forEach(joueur => {
+        const nom = joueur.replace(/^.*?([A-Za-zÀ-ÿ-]+).*$/, '$1');
+        console.log(`👤 ${nom} a joué ${prono}`);
+      });
+    }
+  });
+}
+
