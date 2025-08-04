@@ -298,11 +298,6 @@ data.forEach((row, i) => {
 // 🧪 Exemple de log
 console.log("📋 Pronos par joueur :", pronosParJoueur);
 
-
-      
-    },
-  });
-});
 const ligneTest = data[8]; // essaie avec différentes lignes
 
 if (ligneTest) {
@@ -320,4 +315,9 @@ if (ligneTest) {
     }
   });
 }
+      
+    },
+  });
+});
+
 
