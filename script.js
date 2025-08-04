@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
-  const url = "https://corsproxy.io/?https://docs.google.com/spreacolspandsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
+  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
 
   Papa.parse(url, {
     download: true,
@@ -55,8 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
           lastLineWasMatch = false;
           return;
         }
-
-        
 
         if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
@@ -259,8 +257,9 @@ data.forEach((row, i) => {
     console.log("🔎 Ligne i+1 :", data[i + 1]);
   console.log("🔎 Ligne i+2 :", data[i + 2]);
   console.log("🔎 Ligne i+3 :", data[i + 3]);
-     
+
      console.log("➡️ Ligne en i+2 :", data[i + 2]);
+    const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
     const lignePronos = data[i + 1]; // 2 lignes sous PRONOS
     console.log("➡️ Ligne joueurs brut :", lignePronos);
 
@@ -272,7 +271,7 @@ data.forEach((row, i) => {
   console.log("🧪 Cellule 0 :", lignePronos[0]);
   console.log("🧪 Cellule 1 :", lignePronos[1]);
   console.log("🧪 Cellule 2 :", lignePronos[2]);
-    
+
     const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
 
     // 0 = prono "1" | 1 = "N" | 2 = "2"
@@ -307,7 +306,7 @@ if (ligneTest) {
   ["1", "N", "2"].forEach((prono, idx) => {
     const cell = ligneTest[idx];
     console.log(`📦 Cellule ${prono} :`, cell);
-    
+
     if (cell) {
       const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
       joueurs.forEach(joueur => {
@@ -317,9 +316,7 @@ if (ligneTest) {
     }
   });
 }
-      
+
     },
   });
 });
-
-
