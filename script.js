@@ -15,18 +15,35 @@ toggleBtn.style.cursor = 'pointer';
 container.parentNode.insertBefore(toggleBtn, container);
 
 let isVueMatch = true;
-// Fonction affichage vue joueur 
+
+// LOGOS POUR AFFICHAGE JOUEUR
+
+function createLogoCell(content) {
+  const td = document.createElement("td");
+  const teamName = content.trim();
+
+  if (teamName) {
+    const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
+    const img = document.createElement("img");
+    img.src = logoUrl;
+    img.alt = teamName + " logo";
+    img.className = "team-logo";
+    td.appendChild(img);
+
+    const span = document.createElement("span");
+    span.textContent = " " + teamName;
+    td.appendChild(span);
+  } else {
+    td.textContent = content;
+  }
+
+  return td;
+}
+
+
 function afficherVueJoueur() {
-   // On vide d’abord complètement le conteneur
   vueActive = 'joueur'; // On bascule la vue
-
-  // Vide totalement le conteneur
   container.innerHTML = '';
-
-  // On affiche un message de chargement pendant le parse
-
-   
-  // Charge la vue joueur normalement…
   container.textContent = 'Chargement des données…';
 
   Papa.parse(urlVueJoueur, {
@@ -35,47 +52,72 @@ function afficherVueJoueur() {
     complete: function(results) {
       const data = results.data;
       let html = '<table border="1" cellspacing="0" cellpadding="5">';
-
       const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
+
+      let inTeamBlock = false;
+      let teamBlockCounter = 0;
 
       data.forEach((row, rowIndex) => {
         html += '<tr>';
         const firstCell = row[0];
 
         if (firstCell === 'J01') {
-          // Ligne J01 : fusion + fond rose
           html += '<td colspan="5" style="background-color:pink;">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
 
         } else if (firstCell === 'VUE PAR JOUEUR') {
-          // Ligne VUE PAR JOUEUR : fusion simple
           html += '<td colspan="5">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
 
-           } else if (firstCell === 'Equipe Dom.') {
-          // Ligne intitulés colonnes
-           row.forEach(cell => {
+        } else if (firstCell === 'Equipe Dom.') {
+          inTeamBlock = true;
+          teamBlockCounter = 0;
+
+          row.forEach(cell => {
             html += '<td style="background-color:pink;">' + cell + '</td>';
           });
-        
-         
 
         } else if (joueurs.includes(firstCell)) {
-          // Ligne prénom joueur : fusion + classe match-header
           html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
 
         } else {
-          // Ligne normale
-          row.forEach(cell => {
-            html += '<td>' + cell + '</td>';
+          // Lignes normales, dont les 10 lignes après "Equipe Dom." avec logos
+          row.forEach((cell, colIndex) => {
+            let td;
+
+            if (inTeamBlock && teamBlockCounter < 10 && (colIndex === 0 || colIndex === 2)) {
+              td = createLogoCell(cell);
+              html += td.outerHTML;
+            } else {
+              td = document.createElement("td");
+
+              if (cell.includes("(")) {
+                const items = cell.split(")").filter(x => x.trim() !== "");
+                td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+              } else if (cell.trim().split(/\s+/).length > 1) {
+                const noms = cell.trim().split(/\s+/);
+                td.innerHTML = noms.map(n => n).join("<br>");
+              } else {
+                td.textContent = cell;
+              }
+
+              html += td.outerHTML;
+            }
           });
+
+          if (inTeamBlock && teamBlockCounter < 10) {
+            teamBlockCounter++;
+            if (teamBlockCounter >= 10) {
+              inTeamBlock = false;
+            }
+          }
         }
 
         html += '</tr>';
@@ -89,6 +131,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 
 
