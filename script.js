@@ -28,17 +28,18 @@ function createLogoCell(content) {
     img.src = logoUrl;
     img.alt = teamName + " logo";
     img.className = "team-logo";
-    td.appendChild(img);
 
-    const span = document.createElement("span");
-    span.textContent = " " + teamName;
-    td.appendChild(span);
+    td.style.textAlign = "center"; // Centrage du contenu
+    td.appendChild(img);
+    td.appendChild(document.createElement("br")); // Saut de ligne
+    td.appendChild(document.createTextNode(teamName));
   } else {
     td.textContent = content;
   }
 
   return td;
 }
+
 
 
 function afficherVueJoueur() {
