@@ -26,23 +26,29 @@ function afficherVueJoueur() {
 
       data.forEach((row, rowIndex) => {
         html += '<tr>';
-        if (rowIndex === 0 && row[0] === 'J01') {
-          // Fusionner 5 colonnes, cellule rose
-          html += '<td colspan="5" class="journee-header">' + row[0] + '</td>';
-          // On saute les 4 cellules suivantes car fusionnées
+        const firstCell = row[0];
+
+        if (firstCell === 'J01') {
+          // Ligne J01 : fusion avec fond rose
+          html += '<td colspan="5" style="background-color:pink;">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
-        } 
-  
-        else {
 
+        } else if (firstCell === 'VUE PAR JOUEUR') {
+          // Ligne VUE PAR JOUEUR : fusion sans style
+          html += '<td colspan="5">' + firstCell + '</td>';
+          for (let i = 5; i < row.length; i++) {
+            html += '<td>' + row[i] + '</td>';
+          }
 
-          // Autres lignes normales
+        } else {
+          // Ligne normale
           row.forEach(cell => {
             html += '<td>' + cell + '</td>';
           });
         }
+
         html += '</tr>';
       });
 
@@ -54,6 +60,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 
 // Fonction affichage vue match (ton gros code perso)
