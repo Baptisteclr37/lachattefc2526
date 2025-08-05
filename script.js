@@ -1,3 +1,4 @@
+let vueActive = 'match'; // Valeur par défaut
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
 
@@ -16,11 +17,14 @@ container.parentNode.insertBefore(toggleBtn, container);
 let isVueMatch = true;
 // Fonction affichage vue joueur 
 function afficherVueJoueur() {
-   // On vide d’abord complètement le conteneur
+  vueActive = 'joueur'; // On bascule la vue
+
+  // Vide totalement le conteneur
   container.innerHTML = '';
 
-  // On affiche un message de chargement pendant le parse
+  // Charge la vue joueur normalement…
   container.textContent = 'Chargement des données…';
+
   Papa.parse(urlVueJoueur, {
     download: true,
     header: false,
@@ -78,6 +82,7 @@ function afficherVueJoueur() {
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
+   if (vueActive !== 'match') return; // Empêche de charger si on est en vue joueur
   container.textContent = 'Chargement des données…';
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
