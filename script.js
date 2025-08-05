@@ -41,96 +41,164 @@ function createLogoCell(content) {
 
 
 
-function afficherVueJoueur() {
+function afficherVueMatch() {
+  container.innerHTML = "Chargement des données…";
 
-  container.innerHTML = '';
-  container.textContent = 'Chargement des données…';
-
-  Papa.parse(urlVueJoueur, {
+  Papa.parse(csvUrlMatch, {
     download: true,
     header: false,
     complete: function(results) {
       const data = results.data;
-      let html = '<table border="1" cellspacing="0" cellpadding="5">';
-      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
+      container.innerHTML = ""; // Clear container
 
-      let inTeamBlock = false;
-      let teamBlockCounter = 0;
+      const table = document.createElement("table");
+      table.className = "match-table";
 
-      data.forEach((row, rowIndex) => {
-        html += '<tr>';
-        const firstCell = row[0];
+      let skipNext = false;
 
-        if (firstCell === 'J01') {
-          html += '<td colspan="5" style="background-color:pink;">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
-          }
-
-        } else if (firstCell === 'VUE PAR JOUEUR') {
-          html += '<td colspan="5">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
-          }
-
-        } else if (firstCell === 'Equipe Dom.') {
-          inTeamBlock = true;
-          teamBlockCounter = 0;
-
-          row.forEach(cell => {
-            html += '<td style="background-color:pink;">' + cell + '</td>';
-          });
-
-        } else if (joueurs.includes(firstCell)) {
-          html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
-          }
-
-        } else {
-          // Lignes normales, dont les 10 lignes après "Equipe Dom." avec logos
-          row.forEach((cell, colIndex) => {
-            let td;
-
-            if (inTeamBlock && teamBlockCounter < 10 && (colIndex === 0 || colIndex === 2)) {
-              td = createLogoCell(cell);
-              html += td.outerHTML;
-            } else {
-              td = document.createElement("td");
-
-              if (cell.includes("(")) {
-                const items = cell.split(")").filter(x => x.trim() !== "");
-                td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-              } else if (cell.trim().split(/\s+/).length > 1) {
-                const noms = cell.trim().split(/\s+/);
-                td.innerHTML = noms.map(n => n).join("<br>");
-              } else {
-                td.textContent = cell;
-              }
-
-              html += td.outerHTML;
-            }
-          });
-
-          if (inTeamBlock && teamBlockCounter < 10) {
-            teamBlockCounter++;
-            if (teamBlockCounter >= 10) {
-              inTeamBlock = false;
-            }
-          }
+      for (let i = 0; i < data.length; i++) {
+        if (skipNext) {
+          skipNext = false;
+          continue;
         }
 
-        html += '</tr>';
-      });
+        const row = data[i];
+        const tr = document.createElement("tr");
 
-      html += '</table>';
-      container.innerHTML = html;
+        // Gestion fusion de cellules titres
+        if (row[0] && (row[0].startsWith("JOURNEE") || row[0].startsWith("MATCH") || row[0].startsWith("CLASSEMENT JOURNEE") || row[0].startsWith("MISSILES JOUES") || row[0].startsWith("JACKPOT JOUES"))) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = row[0].toLowerCase().replace(/\s/g, "-"); // classe css spécifique
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+          // Pour MISSILES JOUES, JACKPOT JOUES et CLASSEMENT JOURNEE, on fusionne avec la ligne suivante
+          if (row[0] === "MISSILES JOUES" || row[0] === "JACKPOT JOUES" || row[0] === "CLASSEMENT JOURNEE") {
+            if (data[i + 1]) {
+              const tr2 = document.createElement("tr");
+              const td2 = document.createElement("td");
+              td2.colSpan = 3;
+              td2.className = row[0].toLowerCase().replace(/\s/g, "-") + "-content";
+              td2.innerHTML = (data[i + 1][0] || "").replace(/\r?\n/g, "<br>");
+              tr2.appendChild(td2);
+              table.appendChild(tr2);
+              skipNext = true;
+            }
+          }
+
+          continue;
+        }
+
+        // Ligne classique - on affiche les logos dans colonnes 0 et 2
+        row.forEach((cell, idx) => {
+          const td = document.createElement("td");
+
+          if (idx === 0 || idx === 2) {
+            if (cell) {
+              const logoName = cell.toLowerCase().replace(/\s/g, "-");
+              const img = document.createElement("img");
+              img.src = baseImagePath + logoName + ".png";
+              img.alt = cell + " logo";
+              img.className = "team-logo";
+              td.style.textAlign = "center";
+              td.appendChild(img);
+              td.appendChild(document.createElement("br"));
+              td.appendChild(document.createTextNode(cell));
+            } else {
+              td.textContent = cell;
+            }
+          } else {
+            // Gestion du contenu texte avec retour à la ligne selon le contenu (ex : plusieurs joueurs séparés par ")")
+            if (cell && cell.includes(")")) {
+              const parts = cell.split(")").filter(x => x.trim() !== "");
+              td.innerHTML = parts.map(p => p.trim() + ")").join("<br>");
+            } else if (cell && cell.trim().split(/\s+/).length > 1) {
+              const parts = cell.trim().split(/\s+/);
+              td.innerHTML = parts.join("<br>");
+            } else {
+              td.textContent = cell;
+            }
+          }
+
+          // Gestion affichage missile 🎯 : Si dans la cellule il y a un joueur ayant joué un missile sur ce match, ajouter 🎯
+          // Remarque : il faut parser la section MISSILES JOUES, donc on la récupère au préalable
+          // Comme la section MISSILES JOUES est fusionnée, on peut la chercher dans data
+
+          // On gère ça après la création du tableau pour éviter doublons (cf plus bas)
+
+          tr.appendChild(td);
+        });
+
+        table.appendChild(tr);
+      }
+
+      // --- Gestion ajout missile 🎯 ---
+      // Récupérer la ligne des missiles joués dans data (c'est juste après la ligne "MISSILES JOUES")
+      // Elle est déjà affichée dans le tableau mais on veut aussi taguer les joueurs dans les cellules correspondantes
+
+      // Trouver la ligne index de MISSILES JOUES
+      let missilesLigne = data.findIndex(row => row[0] && row[0].toUpperCase() === "MISSILES JOUES");
+      if (missilesLigne >= 0 && data[missilesLigne + 1]) {
+        const missilesTexte = data[missilesLigne + 1][0];
+        // Exemple : "PSG OM Tibo 1\nLyon Nantes Simon 2" etc.
+        // Parse chaque missile
+        const missiles = missilesTexte.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+
+        // Parcourir toutes les lignes du tableau pour taguer les joueurs
+        // On suppose que dans le tableau les noms des joueurs sont dans des cellules, il faut trouver la cellule qui contient le nom + vérifier prono = 1/N/2 pour match
+        // Cette approche est complexe car on n'a pas de mapping direct entre match, joueur et cellule dans ce script simplifié.
+
+        // Donc on fait simple : on cherche dans toutes les cellules du tableau un texte correspondant au joueur + prono = prono missile sur la même ligne de match
+        // En pratique, on peut surligner le joueur dans la cellule correspondante
+
+        // Fonction simple pour ajouter 🎯 dans la cellule si match et joueur et prono correspondent
+
+        missiles.forEach(missile => {
+          const parts = missile.split(" ");
+          if (parts.length < 4) return;
+          const dom = parts[0].toLowerCase();
+          const ext = parts[1].toLowerCase();
+          const joueur = parts[2];
+          const prono = parts[3];
+
+          // Parcourir toutes les tr du tableau
+          for (const tr of table.querySelectorAll("tr")) {
+            // On cherche ligne match où équipe domicile et extérieur sont en colonne 0 et 2
+            const tdDom = tr.children[0];
+            const tdExt = tr.children[2];
+            if (!tdDom || !tdExt) continue;
+            if (!tdDom.textContent || !tdExt.textContent) continue;
+
+            if (tdDom.textContent.toLowerCase() === dom && tdExt.textContent.toLowerCase() === ext) {
+              // On a la bonne ligne match
+              // On cherche dans cette ligne les joueurs qui ont fait le prono
+              for (let i = 1; i < tr.children.length; i++) {
+                const td = tr.children[i];
+                if (!td) continue;
+                // Si la cellule contient le nom du joueur et le prono (ex: "Tibo 1)")
+                // On simplifie la détection en cherchant le joueur et prono dans la cellule
+                if (td.textContent.includes(joueur) && td.textContent.includes(prono)) {
+                  // Ajouter 🎯 à la fin s'il n'est pas déjà là
+                  if (!td.textContent.includes("🎯")) {
+                    td.innerHTML += " 🎯";
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      container.appendChild(table);
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
 }
+
 
 
 
