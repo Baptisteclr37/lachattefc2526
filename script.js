@@ -1,13 +1,9 @@
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
 
+const container = document.getElementById('table-container');
 
-// --- Étape 1 : création du bouton de bascule ---
-
-const containerId = 'table-container';
-const container = document.getElementById(containerId);
-
-// Création du bouton
+// Bouton bascule
 const toggleBtn = document.createElement('button');
 toggleBtn.id = 'toggleViewBtn';
 toggleBtn.textContent = 'Passer à la vue par joueur';
@@ -15,21 +11,17 @@ toggleBtn.style.margin = '10px';
 toggleBtn.style.padding = '8px 15px';
 toggleBtn.style.fontSize = '16px';
 toggleBtn.style.cursor = 'pointer';
-
-// Insère le bouton juste avant le container
 container.parentNode.insertBefore(toggleBtn, container);
 
-// Variable d’état
 let isVueMatch = true;
 
-// Fonction pour charger et afficher le CSV
-function loadCsv(url) {
-  document.getElementById('table-container').textContent = 'Chargement des données…';
-  Papa.parse(url, {
+// Fonction affichage vue joueur (tableau simple)
+function afficherVueJoueur() {
+  container.textContent = 'Chargement des données…';
+  Papa.parse(urlVueJoueur, {
     download: true,
     header: false,
     complete: function(results) {
-      // On transforme les données en tableau HTML simple
       const data = results.data;
       let html = '<table border="1" cellspacing="0" cellpadding="5">';
       data.forEach(row => {
@@ -40,28 +32,59 @@ function loadCsv(url) {
         html += '</tr>';
       });
       html += '</table>';
-      document.getElementById('table-container').innerHTML = html;
+      container.innerHTML = html;
     },
     error: function(err) {
-      document.getElementById('table-container').textContent = 'Erreur de chargement : ' + err.message;
+      container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
 }
 
-// Gestion du clic sur le bouton
+// Fonction affichage vue match (ton gros code perso)
+function afficherVueMatch() {
+  container.textContent = 'Chargement des données…';
+
+  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
+
+  Papa.parse(urlVueMatch, {
+    download: true,
+    complete: function(results) {
+      const data = results.data;
+      container.textContent = ""; // Clear container
+
+      const table = document.createElement("table");
+      // ... (copie ici ton gros code de construction du tableau personnalisé, 
+      // y compris la gestion des logos, fusions, missiles, etc.)
+
+      // Par exemple, coller ici ton code depuis "Papa.parse(url, { ..."
+
+      // À la fin:
+      container.appendChild(table);
+
+      // Appelle ta fonction markMissiles() ici, etc.
+
+    },
+    error: function(err) {
+      container.textContent = 'Erreur de chargement : ' + err.message;
+    }
+  });
+}
+
+// Initialisation vue match
+afficherVueMatch();
+
+// Gestion clic bouton bascule
 toggleBtn.addEventListener('click', () => {
   isVueMatch = !isVueMatch;
   if (isVueMatch) {
     toggleBtn.textContent = 'Passer à la vue par joueur';
-    loadCsv(urlVueMatch);
+    afficherVueMatch();
   } else {
     toggleBtn.textContent = 'Passer à la vue par match';
-    loadCsv(urlVueJoueur);
+    afficherVueJoueur();
   }
 });
 
-// Chargement initial
-loadCsv(urlVueMatch);
 
 document.addEventListener("DOMContentLoaded", () => {
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
