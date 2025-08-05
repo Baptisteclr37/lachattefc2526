@@ -1,3 +1,7 @@
+const urlVueMatch = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
+const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
+
+
 // --- Étape 1 : création du bouton de bascule ---
 
 const containerId = 'table-container';
@@ -17,6 +21,21 @@ container.parentNode.insertBefore(toggleBtn, container);
 
 // Variable d’état
 let isVueMatch = true;
+
+// Gestion du clic
+toggleBtn.addEventListener('click', () => {
+  isVueMatch = !isVueMatch;
+  if (isVueMatch) {
+    toggleBtn.textContent = 'Passer à la vue par joueur';
+    loadCsv(urlVueMatch);
+  } else {
+    toggleBtn.textContent = 'Passer à la vue par match';
+    loadCsv(urlVueJoueur);
+  }
+});
+
+// Chargement initial
+loadCsv(urlVueMatch);
 
 
 document.addEventListener("DOMContentLoaded", () => {
