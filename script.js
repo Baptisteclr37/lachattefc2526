@@ -129,6 +129,7 @@ toggleBtn.addEventListener('click', () => {
 });
 
 
+document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', function () {
   // Initialisation de la vue active
   let vueActive = 'match';
@@ -165,8 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-document.addEventListener("DOMContentLoaded", () => {
-  
 
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
