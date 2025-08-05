@@ -15,7 +15,6 @@ container.parentNode.insertBefore(toggleBtn, container);
 
 let isVueMatch = true;
 
-// Fonction affichage vue joueur (tableau simple)
 function afficherVueJoueur() {
   container.textContent = 'Chargement des données…';
   Papa.parse(urlVueJoueur, {
@@ -24,13 +23,25 @@ function afficherVueJoueur() {
     complete: function(results) {
       const data = results.data;
       let html = '<table border="1" cellspacing="0" cellpadding="5">';
-      data.forEach(row => {
+
+      data.forEach((row, rowIndex) => {
         html += '<tr>';
-        row.forEach(cell => {
-          html += '<td>' + cell + '</td>';
-        });
+        if (rowIndex === 0 && row[0] === 'J01') {
+          // Fusionner 5 colonnes, cellule rose
+          html += '<td colspan="5" style="background-color:pink;">' + row[0] + '</td>';
+          // On saute les 4 cellules suivantes car fusionnées
+          for (let i = 5; i < row.length; i++) {
+            html += '<td>' + row[i] + '</td>';
+          }
+        } else {
+          // Autres lignes normales
+          row.forEach(cell => {
+            html += '<td>' + cell + '</td>';
+          });
+        }
         html += '</tr>';
       });
+
       html += '</table>';
       container.innerHTML = html;
     },
@@ -39,6 +50,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
