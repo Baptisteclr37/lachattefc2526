@@ -15,8 +15,8 @@ container.parentNode.insertBefore(toggleBtn, container);
 
 let isVueMatch = true;
 
-const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
-
+// LOGOS POUR AFFICHAGE JOUEUR
+const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/"; // Chemin vers ton dossier contenant les logos
 function createLogoCell(content) {
   const td = document.createElement("td");
   const teamName = content.trim();
@@ -28,9 +28,9 @@ function createLogoCell(content) {
     img.alt = teamName + " logo";
     img.className = "team-logo";
 
-    td.style.textAlign = "center";
+    td.style.textAlign = "center"; // Centrage du contenu
     td.appendChild(img);
-    td.appendChild(document.createElement("br"));
+    td.appendChild(document.createElement("br")); // Saut de ligne
     td.appendChild(document.createTextNode(teamName));
   } else {
     td.textContent = content;
@@ -39,7 +39,11 @@ function createLogoCell(content) {
   return td;
 }
 
+
+
 function afficherVueJoueur() {
+
+
   container.innerHTML = '';
   container.textContent = 'Chargement des données…';
 
@@ -58,8 +62,14 @@ function afficherVueJoueur() {
         html += '<tr>';
         const firstCell = row[0];
 
-        if (firstCell === 'J01' || firstCell === 'VUE PAR JOUEUR') {
+        if (firstCell === 'J01') {
           html += '<td colspan="5" style="background-color:pink;">' + firstCell + '</td>';
+          for (let i = 5; i < row.length; i++) {
+            html += '<td>' + row[i] + '</td>';
+          }
+
+        } else if (firstCell === 'VUE PAR JOUEUR') {
+          html += '<td colspan="5">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
@@ -67,6 +77,7 @@ function afficherVueJoueur() {
         } else if (firstCell === 'Equipe Dom.') {
           inTeamBlock = true;
           teamBlockCounter = 0;
+
           row.forEach(cell => {
             html += '<td style="background-color:pink;">' + cell + '</td>';
           });
@@ -78,6 +89,7 @@ function afficherVueJoueur() {
           }
 
         } else {
+          // Lignes normales, dont les 10 lignes après "Equipe Dom." avec logos
           row.forEach((cell, colIndex) => {
             let td;
 
@@ -121,20 +133,18 @@ function afficherVueJoueur() {
   });
 }
 
+
+
+
+// Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
-  container.innerHTML = 'Chargement des données…';
 
-  const url = urlVueMatch;
 
-  Papa.parse(url, {
-    download: true,
-    complete: function (results) {
-      const data = results.data;
-      container.innerHTML = '';
+  container.textContent = 'Chargement des données…';
 
-      const table = document.createElement("table");
+  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
-        Papa.parse(urlVueMatch, {
+  Papa.parse(urlVueMatch, {
     download: true,
     complete: function(results) {
       const data = results.data;
@@ -446,29 +456,7 @@ if (missilesRowIndex !== -1) {
 
       markMissiles();
 
-    
-
-      container.appendChild(table);
-    },
-    error: function(err) {
-      container.textContent = 'Erreur de chargement : ' + err.message;
-    }
-  });
-}
-
-// ✅ Bascule entre les vues
-toggleBtn.addEventListener('click', () => {
-  isVueMatch = !isVueMatch;
-  toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
-  isVueMatch ? afficherVueMatch() : afficherVueJoueur();
-});
-
-// ✅ Chargement initial
-window.addEventListener("DOMContentLoaded", afficherVueMatch);
-
-
-
-
+      document.body.appendChild(table);
 // 🔁 Vue par joueur (à ne pas activer tout de suite si on teste)
 const pronosParJoueur = {};
 
