@@ -1,162 +1,141 @@
 // === LIENS CSV ===
-const CSV_MATCH = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv"; // Remplacer par ton vrai lien
+const CSV_MATCH = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv"; // Remplace avec le bon lien
 const CSV_JOUEUR = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv";
 
 // === DOM TARGET ===
 const container = document.getElementById("table-container");
 let currentView = "match"; // vue actuelle
-let missileData = []; // missiles 🎯
 
-// === UTILS ===
-function getLogoPath(teamName) {
-  const sanitized = teamName.toLowerCase().replace(/\s+/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return `logos/${sanitized}.png`;
-}
-
-// === BOUTON DE BASCULE ===
-function createToggleButton(nextMode) {
+// === CRÉATION DU BOUTON DE BASCULE ===
+function createToggleButton() {
   const button = document.createElement("button");
-  button.textContent = nextMode === "joueur" ? "Basculer en vue joueurs" : "Vue par match";
+  button.id = "toggle-view";
+  button.textContent = "Basculer en vue joueurs";
   button.style.marginBottom = "15px";
   button.onclick = () => {
-    if (nextMode === "joueur") {
+    if (currentView === "match") {
       currentView = "joueur";
-      loadCSV(CSV_JOUEUR, "joueur");
+      loadCSV(CSV_JOUEUR, renderJoueurView);
+      button.textContent = "Vue par match";
     } else {
       currentView = "match";
-      loadCSV(CSV_MATCH, "match");
+      loadCSV(CSV_MATCH, renderMatchView);
+      button.textContent = "Basculer en vue joueurs";
     }
   };
   return button;
 }
 
-// === RENDU TABLEAU JOUEUR (basique) ===
-function renderJoueurTable(data) {
+// === RENDU VUE MATCH (structure existante à préserver) ===
+function renderMatchView(data) {
+  container.innerHTML = "";
+  container.appendChild(createToggleButton());
+
   const table = document.createElement("table");
-  data.forEach(row => {
+
+  let rowIndex = 0;
+  while (rowIndex < data.length) {
+    const row = data[rowIndex];
+
+    // Fusion titre "Journée"
+    if (row[0]?.startsWith("J")) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "journee";
+      td.innerHTML = row[0];
+      tr.appendChild(td);
+      table.appendChild(tr);
+      rowIndex++;
+      continue;
+    }
+
+    // Fusion titre "MATCH X"
+    if (row[0]?.startsWith("MATCH")) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "match";
+      td.innerHTML = row[0];
+      tr.appendChild(td);
+      table.appendChild(tr);
+      rowIndex++;
+      continue;
+    }
+
+    // Fusion titre "PRONOS"
+    if (row[0] === "PRONOS") {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "pronos";
+      td.innerHTML = row[0];
+      tr.appendChild(td);
+      table.appendChild(tr);
+      rowIndex++;
+      continue;
+    }
+
+    // Ligne classique (avec logos, retours ligne, missiles)
     const tr = document.createElement("tr");
-    row.forEach(cell => {
+    row.forEach((cell, i) => {
+      const td = document.createElement("td");
+
+      // Logos si cellule équipe (colonne 0 ou 2)
+      if (i === 0 || i === 2) {
+        const logo = document.createElement("img");
+        const team = cell.trim();
+        logo.src = `logos/${team}.png`;
+        logo.alt = team;
+        logo.className = "logo";
+        td.appendChild(logo);
+        td.innerHTML += `<br>${team}`;
+      }
+      // Missiles 🎯
+      else if (cell.includes("🎯")) {
+        td.innerHTML = cell.replace(/\n/g, "<br>");
+        td.classList.add("missile");
+      }
+      // Cellule normale avec retour à la ligne
+      else {
+        td.innerHTML = cell.replace(/\n/g, "<br>");
+      }
+
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+    rowIndex++;
+  }
+
+  container.appendChild(table);
+}
+
+// === RENDU VUE JOUEUR (plus simple) ===
+function renderJoueurView(data) {
+  container.innerHTML = "";
+  container.appendChild(createToggleButton());
+
+  const table = document.createElement("table");
+
+  data.forEach((row) => {
+    const tr = document.createElement("tr");
+    row.forEach((cell) => {
       const td = document.createElement("td");
       td.innerHTML = cell.replace(/\n/g, "<br>");
       tr.appendChild(td);
     });
     table.appendChild(tr);
   });
-  container.innerHTML = "";
-  container.appendChild(createToggleButton("match"));
-  container.appendChild(table);
-}
-
-// === RENDU TABLEAU MATCH (stylisé) ===
-function renderMatchTable(data) {
-  container.innerHTML = "";
-  container.appendChild(createToggleButton("joueur"));
-
-  const table = document.createElement("table");
-  let rowIndex = 0;
-
-  while (rowIndex < data.length) {
-    const row = data[rowIndex];
-
-    if (row[0]?.startsWith("J")) {
-      // J01 / J02
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = row.length;
-      td.className = "journee-title";
-      td.textContent = row[0];
-      tr.appendChild(td);
-      table.appendChild(tr);
-      rowIndex++;
-    } else if (row[0]?.startsWith("MATCH")) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = row.length;
-      td.className = "match-title";
-      td.textContent = row[0];
-      tr.appendChild(td);
-      table.appendChild(tr);
-      rowIndex++;
-    } else if (row[0]?.startsWith("PRONOS")) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = row.length;
-      td.className = "pronos-title";
-      td.textContent = row[0];
-      tr.appendChild(td);
-      table.appendChild(tr);
-      rowIndex++;
-    } else if (row.length === 3) {
-      // Ligne d’équipes : logo + noms
-      const tr = document.createElement("tr");
-
-      // Colonne 1
-      const td1 = document.createElement("td");
-      td1.innerHTML = `<img src="${getLogoPath(row[0])}" class="logo"> ${row[0]}`;
-      tr.appendChild(td1);
-
-      // Colonne 2 (score ou résultat)
-      const td2 = document.createElement("td");
-      td2.innerHTML = row[1];
-      tr.appendChild(td2);
-
-      // Colonne 3
-      const td3 = document.createElement("td");
-      td3.innerHTML = `<img src="${getLogoPath(row[2])}" class="logo"> ${row[2]}`;
-      tr.appendChild(td3);
-
-      table.appendChild(tr);
-      rowIndex++;
-    } else if (row[0]?.startsWith("MISSILES")) {
-      // Sauvegarder les missiles pour usage ultérieur
-      missileData = row.join("\n").split("\n").map(line => {
-        const parts = line.trim().split(" ");
-        if (parts.length >= 4) {
-          return {
-            equipe1: parts[0],
-            equipe2: parts[1],
-            joueur: parts[2],
-            prono: parts[3],
-          };
-        }
-        return null;
-      }).filter(Boolean);
-      rowIndex++;
-    } else {
-      // Lignes normales avec joueurs + missiles 🎯
-      const tr = document.createElement("tr");
-      row.forEach(cell => {
-        const td = document.createElement("td");
-
-        let content = cell || "";
-        const missile = missileData.find(m =>
-          content.includes(m.joueur) && content.includes(`(${m.prono})`)
-        );
-        if (missile) {
-          content += " 🎯";
-        }
-
-        td.innerHTML = content.replace(/\n/g, "<br>");
-        tr.appendChild(td);
-      });
-      table.appendChild(tr);
-      rowIndex++;
-    }
-  }
 
   container.appendChild(table);
 }
 
-// === CHARGEMENT CSV VIA PAPAPARSE ===
-function loadCSV(url, mode) {
+// === CHARGEMENT CSV ===
+function loadCSV(url, callback) {
   Papa.parse(url, {
     download: true,
     complete: function (results) {
-      if (mode === "joueur") {
-        renderJoueurTable(results.data);
-      } else {
-        renderMatchTable(results.data);
-      }
+      callback(results.data);
     },
     error: function () {
       container.innerHTML = "<p>Erreur de chargement du CSV.</p>";
@@ -165,4 +144,4 @@ function loadCSV(url, mode) {
 }
 
 // === INITIALISATION ===
-loadCSV(CSV_MATCH, "match");
+loadCSV(CSV_MATCH, renderMatchView);
