@@ -56,19 +56,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-         if (row[0] && row[0].toUpperCase() === "VOIR LE TABLEAU ANCIENNE VERSION") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "tableau-ancienne-version";
-          td.textContent = "VOIR LE TABLEAU ANCIENNE VERSION";
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-      
-          return;
-        }
-        
-
         if (row[0] && row[0].toUpperCase() === "CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -192,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const trs = table.querySelectorAll("tr");
 
   missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-    console.log(Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono});
+    console.log(`Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono}`);
 
     // Trouver la ligne du match
     let foundLineIndex = -1;
@@ -208,14 +195,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (foundLineIndex === -1) {
-      console.warn(Match ${equipeDom} vs ${equipeExt} non trouvé);
+      console.warn(`Match ${equipeDom} vs ${equipeExt} non trouvé`);
       return;
     }
 
     // Chercher 3 lignes plus bas → noms des joueurs par prono
     const joueursRow = trs[foundLineIndex + 3];
     if (!joueursRow) {
-      console.warn(Ligne joueurs non trouvée pour ${equipeDom});
+      console.warn(`Ligne joueurs non trouvée pour ${equipeDom}`);
       return;
     }
 
@@ -228,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(line => {
         const cleanLine = line.replace(/🎯/g, "").trim(); // retirer ancienne cible
         const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim(); // retirer (x pts)
-        return nameOnly === joueur ? 🎯 ${cleanLine} : line;
+        return nameOnly === joueur ? `🎯 ${cleanLine}` : line;
       })
       .join("<br>");
 
@@ -258,87 +245,51 @@ if (missilesRowIndex !== -1) {
       markMissiles();
 
       document.body.appendChild(table);
+// 🔁 Vue par joueur (à ne pas activer tout de suite si on teste)
+const pronosParJoueur = {};
 
+// 🔍 Trouver les lignes PRONOS et joueurs
+      console.log("🔍 Début analyse vue par joueur...");
 
-  window.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("table-container");
-  const originalHTML = container.innerHTML;
+data.forEach((row, i) => {
+  if (row.includes("PRONOS")) {
+    console.log("✅ Ligne PRONOS détectée à l’index", i);
+    const lignePronos = data[i + 2]; // 2 lignes sous PRONOS
+    console.log("➡️ Ligne joueurs brut :", lignePronos);
 
-  // ▶️ Création des boutons
-  const boutonWrapper = document.createElement("div");
-  boutonWrapper.id = "boutons-vue";
-  boutonWrapper.style.margin = "20px";
-  boutonWrapper.style.display = "flex";
-  boutonWrapper.style.gap = "10px";
-
-  const btnVueJoueur = document.createElement("button");
-  btnVueJoueur.textContent = "Basculer en vue joueurs";
-  const btnVueMatch = document.createElement("button");
-  btnVueMatch.textContent = "Vue par match";
-  btnVueMatch.style.display = "none";
-
-  boutonWrapper.appendChild(btnVueJoueur);
-  boutonWrapper.appendChild(btnVueMatch);
-  document.body.insertBefore(boutonWrapper, container);
-
-  // ▶️ URL du CSV "vue par joueur"
-  const csvJoueursURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv";
-
-  // ▶️ Fonction de chargement CSV + affichage tableau
-  async function chargerVueParJoueur() {
-    try {
-      const response = await fetch(csvJoueursURL);
-      const csvText = await response.text();
-      const lignes = csvText.trim().split("\n").map(l => l.split(","));
-
-      const table = document.createElement("table");
-      table.className = "vue-par-joueur";
-
-      const thead = document.createElement("thead");
-      const headerRow = document.createElement("tr");
-      lignes[0].forEach(cellText => {
-        const th = document.createElement("th");
-        th.textContent = cellText;
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-
-      const tbody = document.createElement("tbody");
-      for (let i = 1; i < lignes.length; i++) {
-        const row = document.createElement("tr");
-        lignes[i].forEach(cellText => {
-          const td = document.createElement("td");
-          td.textContent = cellText;
-          row.appendChild(td);
-        });
-        tbody.appendChild(row);
-      }
-
-      table.appendChild(tbody);
-      container.innerHTML = "";
-      container.appendChild(table);
-
-      btnVueJoueur.style.display = "none";
-      btnVueMatch.style.display = "inline-block";
-    } catch (err) {
-      alert("Erreur lors du chargement de la vue par joueur.");
-      console.error(err);
+    if (!lignePronos) {
+      console.error("❌ Ligne des joueurs non trouvée");
+      return;
     }
+
+    const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
+
+    // 0 = prono "1" | 1 = "N" | 2 = "2"
+    ["1", "N", "2"].forEach((prono, idx) => {
+      const cell = lignePronos[idx];
+      if (!cell) return;
+
+      // Séparer les joueurs sur retours à la ligne
+      const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
+
+      joueurs.forEach(joueur => {
+        // Nettoyage : enlever pictos + points éventuels
+        const nom = joueur.replace(/^.*?([A-Za-zÀ-ÿ-]+).*$/, '$1');
+
+        if (!pronosParJoueur[nom]) pronosParJoueur[nom] = [];
+        pronosParJoueur[nom].push({
+          match: matchInfo,
+          prono: prono
+        });
+      });
+    });
   }
-
-  // ▶️ Boutons
-  btnVueJoueur.onclick = chargerVueParJoueur;
-
-  btnVueMatch.onclick = () => {
-    container.innerHTML = originalHTML;
-    btnVueJoueur.style.display = "inline-block";
-    btnVueMatch.style.display = "none";
-  };
 });
-  
 
-  
+// 🧪 Exemple de log
+console.log("📋 Pronos par joueur :", pronosParJoueur);
+
+
 
     },
   });
