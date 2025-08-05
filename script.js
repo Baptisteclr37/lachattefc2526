@@ -1,4 +1,3 @@
-let vueActive = 'match'; // Valeur par défaut
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
 
@@ -43,7 +42,7 @@ function createLogoCell(content) {
 
 
 function afficherVueJoueur() {
-  vueActive = 'joueur'; // On bascule la vue
+ 
   container.innerHTML = '';
   container.textContent = 'Chargement des données…';
 
@@ -138,7 +137,7 @@ function afficherVueJoueur() {
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
-   if (vueActive !== 'match') return; // Empêche de charger si on est en vue joueur
+  
   container.textContent = 'Chargement des données…';
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
