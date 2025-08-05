@@ -16,6 +16,10 @@ container.parentNode.insertBefore(toggleBtn, container);
 let isVueMatch = true;
 // Fonction affichage vue joueur 
 function afficherVueJoueur() {
+   // On vide d’abord complètement le conteneur
+  container.innerHTML = '';
+
+  // On affiche un message de chargement pendant le parse
   container.textContent = 'Chargement des données…';
   Papa.parse(urlVueJoueur, {
     download: true,
