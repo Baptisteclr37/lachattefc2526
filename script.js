@@ -17,11 +17,13 @@ container.parentNode.insertBefore(toggleBtn, container);
 let isVueMatch = true;
 // Fonction affichage vue joueur 
 function afficherVueJoueur() {
+   // On vide d’abord complètement le conteneur
   vueActive = 'joueur'; // On bascule la vue
 
   // Vide totalement le conteneur
   container.innerHTML = '';
 
+  // On affiche un message de chargement pendant le parse
   // Charge la vue joueur normalement…
   container.textContent = 'Chargement des données…';
 
