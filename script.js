@@ -14,7 +14,7 @@ toggleBtn.style.cursor = 'pointer';
 container.parentNode.insertBefore(toggleBtn, container);
 
 let isVueMatch = true;
-// Fonction affichage vue joueur (ton gros code perso)
+// Fonction affichage vue joueur 
 function afficherVueJoueur() {
   container.textContent = 'Chargement des données…';
   Papa.parse(urlVueJoueur, {
@@ -33,7 +33,11 @@ function afficherVueJoueur() {
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
-        } else {
+        } 
+        if ((firstCell === 'VUE PAR JOUEUR')) {
+          // Ligne spéciale à fusionner sur 5 colonnes
+          html += '<td colspan="5">' + firstCell + '</td>';
+        else {
           // Autres lignes normales
           row.forEach(cell => {
             html += '<td>' + cell + '</td>';
