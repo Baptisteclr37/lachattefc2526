@@ -42,7 +42,6 @@ function createLogoCell(content) {
 
 
 function afficherVueJoueur() {
- 
 
   container.innerHTML = '';
   container.textContent = 'Chargement des données…';
@@ -138,7 +137,7 @@ function afficherVueJoueur() {
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
-
+  
   container.textContent = 'Chargement des données…';
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
@@ -147,13 +146,14 @@ function afficherVueMatch() {
     download: true,
     complete: function(results) {
       const data = results.data;
-      container.textContent = "";
       container.textContent = ""; // Clear container
+      container.textContent = "";
 
       const table = document.createElement("table");
       // ... (copie ici ton gros code de construction du tableau personnalisé, 
       // y compris la gestion des logos, fusions, missiles, etc.)
 
+      // Par exemple, coller ici ton code depuis "Papa.parse(url, { ..."
       // Étape 1 : Repérer les JACKPOT JOUES
       let jackpots = [];
       for (let i = 0; i < data.length; i++) {
@@ -170,6 +170,8 @@ function afficherVueMatch() {
         }
       }
 
+      // À la fin:
+      container.appendChild(table);
       // Étape 2 : repérer les lignes des matchs
       const matchIndexes = [];
       data.forEach((row, i) => {
@@ -231,6 +233,7 @@ function afficherVueMatch() {
             }
           }
 
+      // Appelle ta fonction markMissiles() ici, etc.
           // Mise en forme (sauts de ligne si plusieurs joueurs)
           else if (contenu.includes("(")) {
             const joueurs = contenu.split(")").filter(j => j.trim() !== "");
@@ -257,17 +260,13 @@ function afficherVueMatch() {
         lastLineWasMatch = row[0]?.toUpperCase().includes("MATCH");
         table.appendChild(tr);
       });
-      // Par exemple, coller ici ton code depuis "Papa.parse(url, { ..."
 
-      // À la fin:
       container.appendChild(table);
 
       // Appel de la fonction des missiles si elle existe
       if (typeof markMissiles === 'function') {
         markMissiles();
       }
-      // Appelle ta fonction markMissiles() ici, etc.
-
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
@@ -293,7 +292,6 @@ toggleBtn.addEventListener('click', () => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  
 
 
 
