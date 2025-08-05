@@ -297,6 +297,28 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
+
+         // Fusion des lignes JACKPOT JOUES + suivante sur 3 colonnes
+        if (row[0] && row[0].toUpperCase() === "JACKPOT JOUES") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+          // Ligne suivante fusionnée
+          if (data[i + 1]) {
+            const trNext = document.createElement("tr");
+            const tdNext = document.createElement("td");
+            tdNext.colSpan = 3;
+            tdNext.textContent = data[i + 1][0] || "";
+            trNext.appendChild(tdNext);
+            table.appendChild(trNext);
+            skipNext = true; // ignorer la ligne suivante dans la boucle principale
+          }
+          return;
+        }
+
         // Ligne avec logos après MATCH
         row.forEach((cell, index) => {
           const td = document.createElement("td");
