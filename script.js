@@ -37,9 +37,7 @@ function afficherVueJoueur() {
   
         else {
 
-                if ((firstCell === 'VUE PAR JOUEUR')) {
-          // Ligne spéciale à fusionner sur 5 colonnes
-          html += '<td colspan="5">' + firstCell + '</td>';
+
           // Autres lignes normales
           row.forEach(cell => {
             html += '<td>' + cell + '</td>';
