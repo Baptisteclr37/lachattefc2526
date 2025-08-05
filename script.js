@@ -22,7 +22,33 @@ container.parentNode.insertBefore(toggleBtn, container);
 // Variable d’état
 let isVueMatch = true;
 
-// Gestion du clic
+// Fonction pour charger et afficher le CSV
+function loadCsv(url) {
+  document.getElementById('table-container').textContent = 'Chargement des données…';
+  Papa.parse(url, {
+    download: true,
+    header: false,
+    complete: function(results) {
+      // On transforme les données en tableau HTML simple
+      const data = results.data;
+      let html = '<table border="1" cellspacing="0" cellpadding="5">';
+      data.forEach(row => {
+        html += '<tr>';
+        row.forEach(cell => {
+          html += '<td>' + cell + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</table>';
+      document.getElementById('table-container').innerHTML = html;
+    },
+    error: function(err) {
+      document.getElementById('table-container').textContent = 'Erreur de chargement : ' + err.message;
+    }
+  });
+}
+
+// Gestion du clic sur le bouton
 toggleBtn.addEventListener('click', () => {
   isVueMatch = !isVueMatch;
   if (isVueMatch) {
@@ -36,7 +62,6 @@ toggleBtn.addEventListener('click', () => {
 
 // Chargement initial
 loadCsv(urlVueMatch);
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
