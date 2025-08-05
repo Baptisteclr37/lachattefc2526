@@ -58,7 +58,10 @@ function afficherVueJoueur() {
 
            } else if (firstCell === 'Equipe Dom.') {
           // Ligne intitulés colonnes
-          html += '<td style="background-color:blue;">''</td>';
+           row.forEach(cell => {
+            html += '<td style="background-color:pink;">' + cell + '</td>';
+          });
+        }
          
 
         } else if (joueurs.includes(firstCell)) {
