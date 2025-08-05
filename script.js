@@ -24,6 +24,8 @@ function afficherVueJoueur() {
   container.innerHTML = '';
 
   // On affiche un message de chargement pendant le parse
+
+   
   // Charge la vue joueur normalement…
   container.textContent = 'Chargement des données…';
 
@@ -50,6 +52,13 @@ function afficherVueJoueur() {
         } else if (firstCell === 'VUE PAR JOUEUR') {
           // Ligne VUE PAR JOUEUR : fusion simple
           html += '<td colspan="5">' + firstCell + '</td>';
+          for (let i = 5; i < row.length; i++) {
+            html += '<td>' + row[i] + '</td>';
+          }
+
+           } else if (firstCell === 'Equipe Dom.') {
+          // Ligne intitulés colonnes
+          html += '<td style="background-color:blue;"'</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
