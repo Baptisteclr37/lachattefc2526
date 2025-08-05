@@ -34,10 +34,12 @@ function afficherVueJoueur() {
             html += '<td>' + row[i] + '</td>';
           }
         } 
-        if ((firstCell === 'VUE PAR JOUEUR')) {
+  
+        else {
+
+                if ((firstCell === 'VUE PAR JOUEUR')) {
           // Ligne spéciale à fusionner sur 5 colonnes
           html += '<td colspan="5">' + firstCell + '</td>';
-        else {
           // Autres lignes normales
           row.forEach(cell => {
             html += '<td>' + cell + '</td>';
