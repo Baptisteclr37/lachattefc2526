@@ -1,3 +1,24 @@
+// --- Étape 1 : création du bouton de bascule ---
+
+const containerId = 'table-container';
+const container = document.getElementById(containerId);
+
+// Création du bouton
+const toggleBtn = document.createElement('button');
+toggleBtn.id = 'toggleViewBtn';
+toggleBtn.textContent = 'Passer à la vue par joueur';
+toggleBtn.style.margin = '10px';
+toggleBtn.style.padding = '8px 15px';
+toggleBtn.style.fontSize = '16px';
+toggleBtn.style.cursor = 'pointer';
+
+// Insère le bouton juste avant le container
+container.parentNode.insertBefore(toggleBtn, container);
+
+// Variable d’état
+let isVueMatch = true;
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
