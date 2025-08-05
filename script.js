@@ -329,6 +329,102 @@ if (ligneTest) {
   });
 }
 
+      // 📌 Ce script ajoute un bouton de bascule entre la vue par match (vue initiale)
+// et la vue par joueur, en conservant intact le contenu initial
+
+window.addEventListener("DOMContentLoaded", () => {
+  const pronosParJoueur = {}; // Ce sera rempli plus bas
+  const container = document.getElementById("table-container");
+  const originalHTML = container.innerHTML;
+
+  // 🔘 Création des boutons de bascule
+  const boutonWrapper = document.createElement("div");
+  boutonWrapper.id = "boutons-vue";
+  boutonWrapper.style.margin = "20px";
+
+  const btnVueJoueur = document.createElement("button");
+  btnVueJoueur.id = "btn-vue-joueur";
+  btnVueJoueur.textContent = "Basculer en vue joueurs";
+
+  const btnVueMatch = document.createElement("button");
+  btnVueMatch.id = "btn-vue-match";
+  btnVueMatch.textContent = "Vue par match";
+  btnVueMatch.style.display = "none";
+
+  boutonWrapper.appendChild(btnVueJoueur);
+  boutonWrapper.appendChild(btnVueMatch);
+  document.body.insertBefore(boutonWrapper, container);
+
+  // 🔁 Remplir pronosParJoueur depuis les lignes PRONOS du CSV déjà parsé
+  if (window.data) {
+    window.data.forEach((row, i) => {
+      if (row.includes("PRONOS")) {
+        const lignePronos = window.data[i + 1];
+        const matchInfo = window.data[i - 1]?.[0] || `Match ${i}`;
+
+        ["1", "N", "2"].forEach((prono, idx) => {
+          const cell = lignePronos[idx];
+          if (!cell) return;
+          const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
+
+          joueurs.forEach(joueur => {
+            const nom = joueur.replace(/^.*?([A-Za-zÀ-ſ-]+).*$/, "$1");
+            if (!pronosParJoueur[nom]) pronosParJoueur[nom] = [];
+            pronosParJoueur[nom].push({ match: matchInfo, prono });
+          });
+        });
+      }
+    });
+  }
+
+  // ▶️ Fonction pour générer tableau vue joueur
+  function genererTableauVueParJoueur(pronos) {
+    const table = document.createElement("table");
+    table.className = "vue-par-joueur";
+
+    const thead = document.createElement("thead");
+    thead.innerHTML = `<tr><th>Joueur</th><th>Match</th><th>Prono</th></tr>`;
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    Object.entries(pronos).forEach(([joueur, matchs]) => {
+      matchs.forEach((info, idx) => {
+        const tr = document.createElement("tr");
+        if (idx === 0) {
+          const tdJoueur = document.createElement("td");
+          tdJoueur.textContent = joueur;
+          tdJoueur.rowSpan = matchs.length;
+          tr.appendChild(tdJoueur);
+        }
+        const tdMatch = document.createElement("td");
+        tdMatch.textContent = info.match;
+        const tdProno = document.createElement("td");
+        tdProno.textContent = info.prono;
+        tr.appendChild(tdMatch);
+        tr.appendChild(tdProno);
+        tbody.appendChild(tr);
+      });
+    });
+    table.appendChild(tbody);
+    return table;
+  }
+
+  // 🎯 Bouton vue joueur -> affiche la vue par joueur
+  btnVueJoueur.addEventListener("click", () => {
+    container.innerHTML = "";
+    container.appendChild(genererTableauVueParJoueur(pronosParJoueur));
+    btnVueJoueur.style.display = "none";
+    btnVueMatch.style.display = "inline-block";
+  });
+
+  // 🎯 Bouton vue match -> restaure la vue originale
+  btnVueMatch.addEventListener("click", () => {
+    container.innerHTML = originalHTML;
+    btnVueJoueur.style.display = "inline-block";
+    btnVueMatch.style.display = "none";
+  });
+});
+
     },
   });
 });
