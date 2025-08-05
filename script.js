@@ -1,3 +1,4 @@
+let vueActive = 'match'; // Valeur par défaut
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
 
@@ -42,7 +43,8 @@ function createLogoCell(content) {
 
 
 function afficherVueJoueur() {
-
+  vueActive = 'joueur'; // On bascule la vue
+ 
   container.innerHTML = '';
   container.textContent = 'Chargement des données…';
 
@@ -137,7 +139,8 @@ function afficherVueJoueur() {
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
-
+   if (vueActive !== 'match') return; // Empêche de charger si on est en vue joueur
+  
   container.textContent = 'Chargement des données…';
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
@@ -297,28 +300,6 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-
-         // Fusion des lignes JACKPOT JOUES + suivante sur 3 colonnes
-        if (row[0] && row[0].toUpperCase() === "JACKPOT JOUES") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          // Ligne suivante fusionnée
-          if (data[i + 1]) {
-            const trNext = document.createElement("tr");
-            const tdNext = document.createElement("td");
-            tdNext.colSpan = 3;
-            tdNext.textContent = data[i + 1][0] || "";
-            trNext.appendChild(tdNext);
-            table.appendChild(trNext);
-            skipNext = true; // ignorer la ligne suivante dans la boucle principale
-          }
-          return;
-        }
-
         // Ligne avec logos après MATCH
         row.forEach((cell, index) => {
           const td = document.createElement("td");
@@ -389,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const trs = table.querySelectorAll("tr");
 
   missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-    console.log(Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono});
+    console.log(`Missile trouvé : ${equipeDom} vs ${equipeExt} joueur=${joueur} prono=${prono}`);
 
     // Trouver la ligne du match
     let foundLineIndex = -1;
@@ -405,14 +386,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (foundLineIndex === -1) {
-      console.warn(Match ${equipeDom} vs ${equipeExt} non trouvé);
+      console.warn(`Match ${equipeDom} vs ${equipeExt} non trouvé`);
       return;
     }
 
     // Chercher 3 lignes plus bas → noms des joueurs par prono
     const joueursRow = trs[foundLineIndex + 3];
     if (!joueursRow) {
-      console.warn(Ligne joueurs non trouvée pour ${equipeDom});
+      console.warn(`Ligne joueurs non trouvée pour ${equipeDom}`);
       return;
     }
 
@@ -425,7 +406,7 @@ document.addEventListener("DOMContentLoaded", () => {
       .map(line => {
         const cleanLine = line.replace(/🎯/g, "").trim(); // retirer ancienne cible
         const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim(); // retirer (x pts)
-        return nameOnly === joueur ? 🎯 ${cleanLine} : line;
+        return nameOnly === joueur ? `🎯 ${cleanLine}` : line;
       })
       .join("<br>");
 
@@ -472,7 +453,7 @@ data.forEach((row, i) => {
       return;
     }
 
-    const matchInfo = data[i - 1]?.[0] || Match ${i};
+    const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
 
     // 0 = prono "1" | 1 = "N" | 2 = "2"
     ["1", "N", "2"].forEach((prono, idx) => {
