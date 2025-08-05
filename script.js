@@ -129,42 +129,8 @@ toggleBtn.addEventListener('click', () => {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
-  // Initialisation de la vue active
-  let vueActive = 'match';
-
-  const container = document.getElementById('table-container');
-  const bouton = document.createElement('button');
-  bouton.textContent = 'Basculer en vue joueur';
-  bouton.style.marginBottom = '10px';
-  bouton.addEventListener('click', function () {
-    if (vueActive === 'match') {
-      vueActive = 'joueur';
-      bouton.textContent = 'Basculer en vue match';
-      afficherVueJoueur();
-    } else {
-      vueActive = 'match';
-      bouton.textContent = 'Basculer en vue joueur';
-      afficherVueMatch(); // ta fonction personnalisée vue match
-    }
-  });
-
-  container.before(bouton);
-
-  // Ne charger la vue match qu'au chargement initial ou si on revient dessus
-  if (vueActive === 'match') {
-    Papa.parse(urlVueMatch, {
-      download: true,
-      complete: function (results) {
-        const data = results.data;
-        afficherVueMatch(data); // fonction que tu as définie
-      },
-      error: function (err) {
-        container.textContent = 'Erreur de chargement : ' + err.message;
-      }
-    });
-  }
-
+document.addEventListener("DOMContentLoaded", () => {
+  
 
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
