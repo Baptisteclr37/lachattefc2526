@@ -61,7 +61,7 @@ function afficherVueJoueur() {
            row.forEach(cell => {
             html += '<td style="background-color:pink;">' + cell + '</td>';
           });
-        }
+        
          
 
         } else if (joueurs.includes(firstCell)) {
