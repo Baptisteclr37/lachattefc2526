@@ -24,20 +24,29 @@ function afficherVueJoueur() {
       const data = results.data;
       let html = '<table border="1" cellspacing="0" cellpadding="5">';
 
+      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
+
       data.forEach((row, rowIndex) => {
         html += '<tr>';
         const firstCell = row[0];
 
         if (firstCell === 'J01') {
-          // Ligne J01 : fusion avec fond rose
+          // Ligne J01 : fusion + fond rose
           html += '<td colspan="5" style="background-color:pink;">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
 
         } else if (firstCell === 'VUE PAR JOUEUR') {
-          // Ligne VUE PAR JOUEUR : fusion sans style
+          // Ligne VUE PAR JOUEUR : fusion simple
           html += '<td colspan="5">' + firstCell + '</td>';
+          for (let i = 5; i < row.length; i++) {
+            html += '<td>' + row[i] + '</td>';
+          }
+
+        } else if (joueurs.includes(firstCell)) {
+          // Ligne prénom joueur : fusion + classe match-header
+          html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
