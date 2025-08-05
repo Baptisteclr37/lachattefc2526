@@ -17,7 +17,7 @@ container.parentNode.insertBefore(toggleBtn, container);
 let isVueMatch = true;
 
 // LOGOS POUR AFFICHAGE JOUEUR
-
+const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/"; // Chemin vers ton dossier contenant les logos
 function createLogoCell(content) {
   const td = document.createElement("td");
   const teamName = content.trim();
