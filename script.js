@@ -100,44 +100,7 @@ function afficherVueMatch() {
       // y compris la gestion des logos, fusions, missiles, etc.)
 
       // Par exemple, coller ici ton code depuis "Papa.parse(url, { ..."
-
-      // À la fin:
-      container.appendChild(table);
-
-      // Appelle ta fonction markMissiles() ici, etc.
-
-    },
-    error: function(err) {
-      container.textContent = 'Erreur de chargement : ' + err.message;
-    }
-  });
-}
-
-// Initialisation vue match
-afficherVueMatch();
-
-// Gestion clic bouton bascule
-toggleBtn.addEventListener('click', () => {
-  isVueMatch = !isVueMatch;
-  if (isVueMatch) {
-    toggleBtn.textContent = 'Passer à la vue par joueur';
-    afficherVueMatch();
-  } else {
-    toggleBtn.textContent = 'Passer à la vue par match';
-    afficherVueJoueur();
-  }
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  
-
-
-  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
-
-  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
-
-  Papa.parse(url, {
+Papa.parse(url, {
     download: true,
     complete: function (results) {
       const data = results.data;
@@ -427,4 +390,43 @@ console.log("📋 Pronos par joueur :", pronosParJoueur);
 
     },
   });
+       
+
+      // À la fin:
+      container.appendChild(table);
+
+      // Appelle ta fonction markMissiles() ici, etc.
+
+    },
+    error: function(err) {
+      container.textContent = 'Erreur de chargement : ' + err.message;
+    }
+  });
+}
+
+// Initialisation vue match
+afficherVueMatch();
+
+// Gestion clic bouton bascule
+toggleBtn.addEventListener('click', () => {
+  isVueMatch = !isVueMatch;
+  if (isVueMatch) {
+    toggleBtn.textContent = 'Passer à la vue par joueur';
+    afficherVueMatch();
+  } else {
+    toggleBtn.textContent = 'Passer à la vue par match';
+    afficherVueJoueur();
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  
+
+
+  const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
+
+  const url = "https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv";
+
+  
 });
