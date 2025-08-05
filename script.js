@@ -58,7 +58,7 @@ function afficherVueJoueur() {
 
            } else if (firstCell === 'Equipe Dom.') {
           // Ligne intitulés colonnes
-          html += '<td style="background-color:blue;"'</td>';
+          html += '<td style="background-color:blue;">'+ firstCell +'</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
           }
