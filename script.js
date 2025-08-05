@@ -137,7 +137,6 @@ function afficherVueJoueur() {
 
 // Fonction affichage vue match (ton gros code perso)
 function afficherVueMatch() {
-  
   container.textContent = 'Chargement des données…';
 
   const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
@@ -146,25 +145,127 @@ function afficherVueMatch() {
     download: true,
     complete: function(results) {
       const data = results.data;
-      container.textContent = ""; // Clear container
+      container.textContent = "";
 
       const table = document.createElement("table");
-      // ... (copie ici ton gros code de construction du tableau personnalisé, 
-      // y compris la gestion des logos, fusions, missiles, etc.)
 
-      // Par exemple, coller ici ton code depuis "Papa.parse(url, { ..."
+      // Étape 1 : Repérer les JACKPOT JOUES
+      let jackpots = [];
+      for (let i = 0; i < data.length; i++) {
+        if (data[i][0] && data[i][0].toUpperCase().includes("JACKPOT JOUES")) {
+          const ligne = data[i + 1];
+          if (ligne && ligne[0]) {
+            const chaines = ligne[0].match(/\b\w+\b \b\w+\b \b\w+\b [12N]/g) || [];
+            jackpots = chaines.map(chaine => {
+              const [equipeDom, equipeExt, joueur, prono] = chaine.trim().split(/\s+/);
+              return { equipeDom, equipeExt, joueur, prono };
+            });
+          }
+          break;
+        }
+      }
 
-      // À la fin:
+      // Étape 2 : repérer les lignes des matchs
+      const matchIndexes = [];
+      data.forEach((row, i) => {
+        if (row[0] && row[0].toUpperCase().includes("MATCH")) {
+          matchIndexes.push(i);
+        }
+      });
+
+      // Étape 3 : stocker les cellules à marquer 🎰
+      const jackpotCells = [];
+
+      jackpots.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+        for (let matchIndex of matchIndexes) {
+          const matchRow = data[matchIndex + 1];
+          if (!matchRow) continue;
+
+          const dom = matchRow[0]?.trim().toLowerCase();
+          const ext = matchRow[2]?.trim().toLowerCase();
+
+          if (dom === equipeDom.toLowerCase() && ext === equipeExt.toLowerCase()) {
+            const joueurRow = data[matchIndex + 4];
+            if (!joueurRow) continue;
+
+            [0, 1, 2].forEach(col => {
+              const cellContent = joueurRow[col]?.trim();
+              if (cellContent && cellContent.includes(joueur)) {
+                jackpotCells.push({ row: matchIndex + 4, col });
+              }
+            });
+          }
+        }
+      });
+
+      // Étape 4 : construction du tableau
+      let lastLineWasMatch = false;
+
+      data.forEach((row, rowIndex) => {
+        const tr = document.createElement("tr");
+
+        row.forEach((cell, colIndex) => {
+          const td = document.createElement("td");
+          const contenu = cell?.trim() || "";
+
+          // Gestion logos
+          if (lastLineWasMatch && (colIndex === 0 || colIndex === 2)) {
+            if (contenu) {
+              const logoUrl = baseImagePath + contenu.toLowerCase().replace(/\s/g, "-") + ".png";
+              const img = document.createElement("img");
+              img.src = logoUrl;
+              img.alt = contenu + " logo";
+              img.className = "team-logo";
+              td.appendChild(img);
+              td.appendChild(document.createElement("br"));
+              const span = document.createElement("span");
+              span.textContent = contenu;
+              td.appendChild(span);
+            } else {
+              td.textContent = contenu;
+            }
+          }
+
+          // Mise en forme (sauts de ligne si plusieurs joueurs)
+          else if (contenu.includes("(")) {
+            const joueurs = contenu.split(")").filter(j => j.trim() !== "");
+            td.innerHTML = joueurs.map(j => j.trim() + ")").join("<br>");
+          } else if (contenu.split(/\s+/).length > 1) {
+            td.innerHTML = contenu.split(/\s+/).join("<br>");
+          } else {
+            td.textContent = contenu;
+          }
+
+          // 🎰 Jackpot : ajout picto
+          const isJackpot = jackpotCells.some(c => c.row === rowIndex && c.col === colIndex);
+          if (isJackpot) {
+            if (td.innerHTML.includes("🎯")) {
+              td.innerHTML = "🎰 " + td.innerHTML;
+            } else {
+              td.innerHTML = "🎰 " + td.innerHTML;
+            }
+          }
+
+          tr.appendChild(td);
+        });
+
+        lastLineWasMatch = row[0]?.toUpperCase().includes("MATCH");
+        table.appendChild(tr);
+      });
+
       container.appendChild(table);
 
-      // Appelle ta fonction markMissiles() ici, etc.
-
+      // Appel de la fonction des missiles si elle existe
+      if (typeof markMissiles === 'function') {
+        markMissiles();
+      }
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
 }
+
 
 // Initialisation vue match
 afficherVueMatch();
