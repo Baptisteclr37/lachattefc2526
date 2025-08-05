@@ -258,96 +258,22 @@ if (missilesRowIndex !== -1) {
       markMissiles();
 
       document.body.appendChild(table);
-// 🔁 Vue par joueur (à ne pas activer tout de suite si on teste)
-const pronosParJoueur = {};
 
-// 🔍 Trouver les lignes PRONOS et joueurs
-      console.log("🔍 Début analyse vue par joueur...");
 
-data.forEach((row, i) => {
-  if (row.includes("PRONOS")) {
-    console.log("✅ Ligne PRONOS détectée à l’index", i);
-    console.log("🔎 Ligne i+1 :", data[i + 1]);
-  console.log("🔎 Ligne i+2 :", data[i + 2]);
-  console.log("🔎 Ligne i+3 :", data[i + 3]);
-
-     console.log("➡️ Ligne en i+2 :", data[i + 2]);
-    const lignePronos = data[i + 1]; // 2 lignes sous PRONOS
-    console.log("➡️ Ligne joueurs brut :", lignePronos);
-
-    if (!lignePronos) {
-      console.error("❌ Ligne des joueurs non trouvée");
-      return;
-    }
-  // Ajoute ceci :
-  console.log("🧪 Cellule 0 :", lignePronos[0]);
-  console.log("🧪 Cellule 1 :", lignePronos[1]);
-  console.log("🧪 Cellule 2 :", lignePronos[2]);
-
-    const matchInfo = data[i - 1]?.[0] || `Match ${i}`;
-
-    // 0 = prono "1" | 1 = "N" | 2 = "2"
-    ["1", "N", "2"].forEach((prono, idx) => {
-      const cell = lignePronos[idx];
-      if (!cell) return;
-
-      // Séparer les joueurs sur retours à la ligne
-      const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
-
-      joueurs.forEach(joueur => {
-        // Nettoyage : enlever pictos + points éventuels
-        const nom = joueur.replace(/^.*?([A-Za-zÀ-ÿ-]+).*$/, '$1');
-
-        if (!pronosParJoueur[nom]) pronosParJoueur[nom] = [];
-        pronosParJoueur[nom].push({
-          match: matchInfo,
-          prono: prono
-        });
-      });
-    });
-  }
-});
-
-// 🧪 Exemple de log
-console.log("📋 Pronos par joueur :", pronosParJoueur);
-
-const ligneTest = data[7]; // essaie avec différentes lignes
-
-if (ligneTest) {
-  console.log("🔬 Ligne test complète :", ligneTest);
-  ["1", "N", "2"].forEach((prono, idx) => {
-    const cell = ligneTest[idx];
-    console.log(`📦 Cellule ${prono} :`, cell);
-
-    if (cell) {
-      const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
-      joueurs.forEach(joueur => {
-        const nom = joueur.replace(/^.*?([A-Za-zÀ-ÿ-]+).*$/, '$1');
-        console.log(`👤 ${nom} a joué ${prono}`);
-      });
-    }
-  });
-}
-
-      // 📌 Ce script ajoute un bouton de bascule entre la vue par match (vue initiale)
-// et la vue par joueur, en conservant intact le contenu initial
-
-window.addEventListener("DOMContentLoaded", () => {
-  const pronosParJoueur = {}; // Ce sera rempli plus bas
+  window.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("table-container");
   const originalHTML = container.innerHTML;
 
-  // 🔘 Création des boutons de bascule
+  // ▶️ Création des boutons
   const boutonWrapper = document.createElement("div");
   boutonWrapper.id = "boutons-vue";
   boutonWrapper.style.margin = "20px";
+  boutonWrapper.style.display = "flex";
+  boutonWrapper.style.gap = "10px";
 
   const btnVueJoueur = document.createElement("button");
-  btnVueJoueur.id = "btn-vue-joueur";
   btnVueJoueur.textContent = "Basculer en vue joueurs";
-
   const btnVueMatch = document.createElement("button");
-  btnVueMatch.id = "btn-vue-match";
   btnVueMatch.textContent = "Vue par match";
   btnVueMatch.style.display = "none";
 
@@ -355,75 +281,64 @@ window.addEventListener("DOMContentLoaded", () => {
   boutonWrapper.appendChild(btnVueMatch);
   document.body.insertBefore(boutonWrapper, container);
 
-  // 🔁 Remplir pronosParJoueur depuis les lignes PRONOS du CSV déjà parsé
-  if (window.data) {
-    window.data.forEach((row, i) => {
-      if (row.includes("PRONOS")) {
-        const lignePronos = window.data[i + 1];
-        const matchInfo = window.data[i - 1]?.[0] || `Match ${i}`;
+  // ▶️ URL du CSV "vue par joueur"
+  const csvJoueursURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv";
 
-        ["1", "N", "2"].forEach((prono, idx) => {
-          const cell = lignePronos[idx];
-          if (!cell) return;
-          const joueurs = cell.split(/\r?\n/).map(j => j.trim()).filter(j => j);
+  // ▶️ Fonction de chargement CSV + affichage tableau
+  async function chargerVueParJoueur() {
+    try {
+      const response = await fetch(csvJoueursURL);
+      const csvText = await response.text();
+      const lignes = csvText.trim().split("\n").map(l => l.split(","));
 
-          joueurs.forEach(joueur => {
-            const nom = joueur.replace(/^.*?([A-Za-zÀ-ſ-]+).*$/, "$1");
-            if (!pronosParJoueur[nom]) pronosParJoueur[nom] = [];
-            pronosParJoueur[nom].push({ match: matchInfo, prono });
-          });
-        });
-      }
-    });
-  }
+      const table = document.createElement("table");
+      table.className = "vue-par-joueur";
 
-  // ▶️ Fonction pour générer tableau vue joueur
-  function genererTableauVueParJoueur(pronos) {
-    const table = document.createElement("table");
-    table.className = "vue-par-joueur";
-
-    const thead = document.createElement("thead");
-    thead.innerHTML = `<tr><th>Joueur</th><th>Match</th><th>Prono</th></tr>`;
-    table.appendChild(thead);
-
-    const tbody = document.createElement("tbody");
-    Object.entries(pronos).forEach(([joueur, matchs]) => {
-      matchs.forEach((info, idx) => {
-        const tr = document.createElement("tr");
-        if (idx === 0) {
-          const tdJoueur = document.createElement("td");
-          tdJoueur.textContent = joueur;
-          tdJoueur.rowSpan = matchs.length;
-          tr.appendChild(tdJoueur);
-        }
-        const tdMatch = document.createElement("td");
-        tdMatch.textContent = info.match;
-        const tdProno = document.createElement("td");
-        tdProno.textContent = info.prono;
-        tr.appendChild(tdMatch);
-        tr.appendChild(tdProno);
-        tbody.appendChild(tr);
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      lignes[0].forEach(cellText => {
+        const th = document.createElement("th");
+        th.textContent = cellText;
+        headerRow.appendChild(th);
       });
-    });
-    table.appendChild(tbody);
-    return table;
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      for (let i = 1; i < lignes.length; i++) {
+        const row = document.createElement("tr");
+        lignes[i].forEach(cellText => {
+          const td = document.createElement("td");
+          td.textContent = cellText;
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+      }
+
+      table.appendChild(tbody);
+      container.innerHTML = "";
+      container.appendChild(table);
+
+      btnVueJoueur.style.display = "none";
+      btnVueMatch.style.display = "inline-block";
+    } catch (err) {
+      alert("Erreur lors du chargement de la vue par joueur.");
+      console.error(err);
+    }
   }
 
-  // 🎯 Bouton vue joueur -> affiche la vue par joueur
-  btnVueJoueur.addEventListener("click", () => {
-    container.innerHTML = "";
-    container.appendChild(genererTableauVueParJoueur(pronosParJoueur));
-    btnVueJoueur.style.display = "none";
-    btnVueMatch.style.display = "inline-block";
-  });
+  // ▶️ Boutons
+  btnVueJoueur.onclick = chargerVueParJoueur;
 
-  // 🎯 Bouton vue match -> restaure la vue originale
-  btnVueMatch.addEventListener("click", () => {
+  btnVueMatch.onclick = () => {
     container.innerHTML = originalHTML;
     btnVueJoueur.style.display = "inline-block";
     btnVueMatch.style.display = "none";
-  });
+  };
 });
+  
+
+  
 
     },
   });
