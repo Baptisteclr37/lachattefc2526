@@ -342,7 +342,101 @@ function afficherVueMatch() {
         }
       }
 
+
+
+
+
+// 🎰 Marquage des jackpots
+function markJackpots() {
+  const jackpotRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "JACKPOT JOUE");
+  if (jackpotRowIndex === -1) return;
+
+  const jackpotText = data[jackpotRowIndex + 1]?.[0];
+  if (!jackpotText) return;
+
+  const jackpots = jackpotText.split(/\r?\n/).filter(x => x.trim()).map(line => {
+    const parts = line.trim().split(/\s+/);
+    if (parts.length < 4) return null;
+    return {
+      equipeDom: parts[0],
+      equipeExt: parts[1], // pas utilisé ici mais on garde pour cohérence
+      joueur: parts[2],
+      prono: parts[3],
+    };
+  }).filter(Boolean);
+
+  const trs = table.querySelectorAll("tr");
+
+  jackpots.forEach(({ equipeDom, joueur, prono }) => {
+    let foundLineIndex = -1;
+
+    for (let i = 0; i < trs.length; i++) {
+      const td = trs[i].querySelector("td");
+      if (!td) continue;
+
+      // Vérifie s’il y a un logo (image) en col 0 et récupère le texte
+      const hasLogo = td.querySelector("img");
+      const text = td.textContent.trim();
+
+      if (hasLogo && text === equipeDom) {
+        foundLineIndex = i;
+        break;
+      }
+    }
+
+    if (foundLineIndex === -1) return;
+
+    const joueursRow = trs[foundLineIndex + 3];
+    if (!joueursRow) return;
+
+    const joueurTd = joueursRow.querySelectorAll("td")[0];
+    if (!joueurTd) return;
+
+    const currentHTML = joueurTd.innerHTML;
+    const updatedHTML = currentHTML
+      .split(/<br\s*\/?>/i)
+      .map(line => {
+        const match = line.match(/(?:🎯|🎰)*\s*(\w+)/);
+        const nameOnly = match?.[1] || "";
+        if (nameOnly === joueur) {
+          // Si missile déjà présent, on met 🎰 devant
+          if (line.includes("🎯")) {
+            return line.replace("🎯", "🎰🎯");
+          } else if (!line.includes("🎰")) {
+            return `🎰 ${line.trim()}`;
+          }
+        }
+        return line;
+      })
+      .join("<br>");
+
+    joueurTd.innerHTML = updatedHTML;
+  });
+
+  // Masquer les deux lignes visibles
+  const rows = table.querySelectorAll("tr");
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+    if (visibleIndex === jackpotRowIndex || visibleIndex === jackpotRowIndex + 1) {
+      rows[i].style.display = "none";
+    }
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+      
       markMissiles(); // 👉 Appel juste ici
+      markJackpots(); // 👉 Appel juste après markMissiles
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
