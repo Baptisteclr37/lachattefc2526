@@ -567,59 +567,76 @@ joueurTds.forEach(td => {
 
   console.log("🎉 Jackpot processing terminé.");
 }
-// Fonction surprise
+// Marquage de la Fonction surprise
 
 function markSurpriseLines() {
+  console.log("🔍 Lancement de markSurpriseLines");
+
   const lignes = Array.from(document.querySelectorAll("tr"));
-  const lignePronosIndex = lignes.findIndex(ligne => ligne.textContent.toUpperCase().includes("PRONOS"));
-  if (lignePronosIndex === -1) {
-    console.warn("❌ Ligne 'PRONOS' non trouvée");
-    return;
-  }
+  console.log(`🔎 Total lignes trouvées : ${lignes.length}`);
 
-  const ligneJoueurs = lignes[lignePronosIndex + 2];
-  if (!ligneJoueurs) {
-    console.warn("❌ Ligne joueurs non trouvée");
-    return;
-  }
+  lignes.forEach((ligne, index) => {
+    if (!ligne.textContent.toUpperCase().includes("PRONOS")) return;
 
-  const cellules = Array.from(ligneJoueurs.querySelectorAll("td"));
-  if (cellules.length < 3) {
-    console.warn("❌ Moins de 3 colonnes dans la ligne joueurs");
-    return;
-  }
+    console.log(`📍 Ligne PRONOS détectée à l'index ${index}`);
 
-  // Étape 1 : compter les vrais joueurs par cellule
-  const nbJoueursParCellule = cellules.map(cellule => {
-    const contenu = cellule.innerHTML
-      .replace(/<br\s*\/?>/gi, '\n')        // transformer <br> en \n
-      .split('\n')                          // couper chaque ligne
-      .map(l => l.trim())                   // enlever les espaces
-      .filter(l => l !== "" && l !== "#N/A"); // virer vides et #N/A
-    return contenu.length;
-  });
-
-  const totalJoueurs = nbJoueursParCellule.reduce((a, b) => a + b, 0);
-  if (totalJoueurs === 0) {
-    console.warn("❌ Aucun joueur détecté dans les 3 colonnes");
-    return;
-  }
-
-  // Étape 2 : marquer les surprises
-  cellules.forEach((cellule, index) => {
-    const nbJoueursCellule = nbJoueursParCellule[index];
-    const ratio = nbJoueursCellule / totalJoueurs;
-
-    if (ratio <= 0.25) {
-      // Ajouter SURPRISE uniquement si pas déjà présent
-      if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRISE?")) {
-        cellule.innerHTML = `🕵🏻‍♂️SURPRISE?<br>${cellule.innerHTML}`;
-      }
+    const ligneJoueurs = lignes[index + 2];
+    if (!ligneJoueurs) {
+      console.warn(`❌ Pas de ligne joueur à l’index ${index + 2}`);
+      return;
     }
+
+    const cellules = Array.from(ligneJoueurs.querySelectorAll("td"));
+    if (cellules.length < 3) {
+      console.warn(`❌ Moins de 3 colonnes à l'index ${index + 2}`);
+      return;
+    }
+
+    // Étape 1 : compter les vrais joueurs par cellule
+    const nbJoueursParCellule = cellules.map((cellule, i) => {
+      const brut = cellule.innerHTML;
+      const contenu = brut
+        .replace(/<br\s*\/?>/gi, '\n')
+        .split('\n')
+        .map(l => l.trim())
+        .filter(l => l !== "" && l !== "#N/A");
+
+      console.log(`📦 [PRONOS ${index}] Cellule ${i} : ${contenu.length} joueurs`, contenu);
+      return contenu.length;
+    });
+
+    const totalJoueurs = nbJoueursParCellule.reduce((a, b) => a + b, 0);
+    console.log(`📊 [PRONOS ${index}] Total joueurs détectés : ${totalJoueurs}`);
+
+    if (totalJoueurs === 0) {
+      console.warn(`⚠️ [PRONOS ${index}] Aucun joueur détecté`);
+      return;
+    }
+
+    // Étape 2 : marquer les surprises
+    cellules.forEach((cellule, colIndex) => {
+      const nbJoueursCellule = nbJoueursParCellule[colIndex];
+      const ratio = nbJoueursCellule / totalJoueurs;
+
+      console.log(`📈 Cellule ${colIndex} = ${nbJoueursCellule}/${totalJoueurs} = ${ratio.toFixed(2)}`);
+
+      if (ratio <= 0.25) {
+        if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRISE?")) {
+          console.log(`🚨 SURPRISE ajoutée en cellule ${colIndex} (ligne ${index + 2})`);
+          cellule.innerHTML = `🕵🏻‍♂️SURPRISE?<br>${cellule.innerHTML}`;
+        } else {
+          console.log(`🔁 SURPRISE déjà présente en cellule ${colIndex}`);
+        }
+      } else {
+        console.log(`✅ Pas de surprise en cellule ${colIndex}`);
+      }
+    });
+
   });
 
-  console.log("✅ Détection des surprises terminée !");
+  console.log("✅ Fin de la fonction markSurpriseLines");
 }
+
 
 
 
