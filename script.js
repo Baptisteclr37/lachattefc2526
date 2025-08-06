@@ -531,12 +531,13 @@ joueurTds.forEach(td => {
 
       if (nameOnly === joueur) {
         console.log(`2️⃣ Double appliqué à ${joueur}`);
-        if (line.includes("🎯")) {
-          return line.replace("🎯", "2️⃣🎯");
-	} else if (!line.includes("🎰🎯")) {
-          return `line.replace("🎰🎯", "2️⃣🎰🎯");
-	} else if (!line.includes("🎰")) {
-          return `line.replace("🎰", "2️⃣🎰");		
+       if (line.includes("🎯")) {
+    return line.replace("🎯", "2️⃣🎯");
+} else if (!line.includes("🎰🎯")) {
+    return line.replace("🎰🎯", "2️⃣🎰🎯");
+} else if (!line.includes("🎰")) {
+    return line.replace("🎰", "2️⃣🎰");
+}	
 
         } else if (!line.includes("2️⃣")) {
           return `2️⃣ ${line}`;
