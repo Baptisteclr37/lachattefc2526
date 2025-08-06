@@ -130,26 +130,29 @@ td {
 
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
-table, th, td {
-    display: block;
-    width: 100%;
+  table {
+    font-size: 16px;
   }
-  table tr {
-    display: block;
-    margin-bottom: 1em;
+
+  td, th {
+    padding: 10px 5px;
   }
-  td {
-    position: relative;
-    padding-left: 50%;
+
+  .cell-multiline {
+    line-height: 1.6;
+    font-size: 15px;
   }
-  td::before {
-    position: absolute;
-    left: 1em;
-    top: 0.8em;
-    white-space: nowrap;
+
+  .match-header, .day-header, .pronos-row {
+    font-size: 17px;
     font-weight: bold;
-    color: #f5c518;
-    content: attr(data-header);
+  }
+
+  body {
+    padding: 10px;
+  }
+
+  .table-container {
+    overflow-x: auto;
   }
 }
-
