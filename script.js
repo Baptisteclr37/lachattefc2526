@@ -348,11 +348,11 @@ function afficherVueMatch() {
 
 // 🎰 Marquage des jackpots
 function markJackpots() {
-  const jackpotRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "JACKPOT JOUE");
+  const jackpotRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "JACKPOT JOUES");
   console.log("🔍 Jackpot row index:", jackpotRowIndex);
 
   if (jackpotRowIndex === -1) {
-    console.warn("❌ Ligne 'JACKPOT JOUE' non trouvée");
+    console.warn("❌ Ligne 'JACKPOT JOUES' non trouvée");
     return;
   }
 
