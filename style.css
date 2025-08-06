@@ -130,30 +130,26 @@ td {
 
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
-  table {
-    font-size: 16px;
+table, th, td {
+    display: block;
+    width: 100%;
   }
-
-  td, th {
-    padding: 10px 5px;
+  table tr {
+    display: block;
+    margin-bottom: 1em;
   }
-
-  .cell-multiline {
-    line-height: 1.6;
-    font-size: 15px;
+  td {
+    position: relative;
+    padding-left: 50%;
   }
-
-  .match-header, .day-header, .pronos-row {
-    font-size: 17px;
+  td::before {
+    position: absolute;
+    left: 1em;
+    top: 0.8em;
+    white-space: nowrap;
     font-weight: bold;
-  }
-
-  body {
-    padding: 10px;
-  }
-
-  .table-container {
-    overflow-x: auto;
+    color: #f5c518;
+    content: attr(data-header);
   }
 }
 
