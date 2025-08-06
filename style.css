@@ -4,12 +4,16 @@ body {
   background: #111;
   color: #f5c518;
   font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 2em;
+  table-layout: auto;
+  word-wrap: break-word;
   
 }
 able tr:nth-child(odd) {
@@ -42,6 +46,10 @@ td {
   text-align: center;
   font-size: 14px;
 }
+td, th {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  }
 
 .match-header {
   background-color: #ff0044;
