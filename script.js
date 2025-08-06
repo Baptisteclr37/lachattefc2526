@@ -204,7 +204,7 @@ function afficherVueMatch() {
           return;
         }
 
-        if (["MISSILES JOUES", "JACKPOT JOUES"].includes(row[0]?.toUpperCase())) {
+        if (["MISSILES JOUES", "JACKPOT JOUES", "DOUBLE CHANCE JOUES" ].includes(row[0]?.toUpperCase())) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.textContent = row[0];
