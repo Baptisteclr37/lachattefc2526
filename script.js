@@ -567,7 +567,7 @@ joueurTds.forEach(td => {
 
   console.log("🎉 Jackpot processing terminé.");
 }
-/FONCTION SURPRISES
+// Fonction surprise
 
 function markSurpriseLines() {
   const lignes = Array.from(document.querySelectorAll("tr"));
