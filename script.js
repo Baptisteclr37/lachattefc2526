@@ -621,9 +621,9 @@ function markSurpriseLines() {
       console.log(`📈 Cellule ${colIndex} = ${nbJoueursCellule}/${totalJoueurs} = ${ratio.toFixed(2)}`);
 
       if (nbJoueursCellule > 0 && ratio <= 0.25) {
-        if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRISE?")) {
+        if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRIZ?")) {
           console.log(`🚨 SURPRISE ajoutée en cellule ${colIndex} (ligne ${index + 2})`);
-          cellule.innerHTML = `<strong>🕵🏻‍♂️SURPRISE?</strong><br><br>${cellule.innerHTML}`;
+          cellule.innerHTML = `<strong>🕵🏻‍♂️SURPRIZ?</strong><br><br>${cellule.innerHTML}`;
         } else {
           console.log(`🔁 SURPRISE déjà présente en cellule ${colIndex}`);
         }
