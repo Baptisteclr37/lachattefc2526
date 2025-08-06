@@ -455,7 +455,116 @@ joueurTds.forEach(td => {
 
 
 
+// 2️⃣ Marquage des Double chance
+function markDouble() {
+  const DoubleRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "DOUBLE CHANCE JOUES");
+  console.log("🔍 Double row index:", DoubleRowIndex);
 
+  if (DoubleRowIndex === -1) {
+    console.warn("❌ Ligne 'DOUBLE CHANCE JOUES' non trouvée");
+    return;
+  }
+
+  const DoubleText = data[DOubeRowIndex + 1]?.[0];
+  console.log("2️⃣ Texte Double brut :", DoubleText);
+
+  if (!DoubleText) {
+    console.warn("❌ Aucun texte dans la ligne Double Chance");
+    return;
+  }
+
+  const Double = DoubleText.split(/\r?\n/).filter(x => x.trim()).map(line => {
+    const parts = line.trim().split(/\s+/);
+    console.log("🔹 Ligne Double analysée :", parts);
+    if (parts.length < 4) return null;
+    return {
+      equipeDom: parts[0],
+      equipeExt: parts[1],
+      joueur: parts[2],
+      prono: parts[3],
+    };
+  }).filter(Boolean);
+
+  console.log("✅ Double parsés :", Double);
+
+  const trs = table.querySelectorAll("tr");
+
+  Double.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+    console.log(`2️⃣ Recherche du match pour ${equipeDom} - ${equipeExt}`);
+
+    let foundLineIndex = -1;
+    for (let i = 0; i < trs.length; i++) {
+      const td = trs[i].querySelector("td");
+      if (!td) continue;
+
+      const hasLogo = td.querySelector("img");
+      const text = td.textContent.trim();
+
+      if (hasLogo && text === equipeDom) {
+        foundLineIndex = i;
+        break;
+      }
+    }
+
+    console.log(`🔎 Match trouvé à la ligne : ${foundLineIndex}`);
+    if (foundLineIndex === -1) {
+      console.warn(`❌ Match non trouvé pour ${equipeDom}`);
+      return;
+    }
+
+    const joueursRow = trs[foundLineIndex + 3];
+    if (!joueursRow) {
+      console.warn(`❌ Pas de ligne joueurs à l'index ${foundLineIndex + 3}`);
+      return;
+    }
+
+    const joueurTds = joueursRow.querySelectorAll("td");
+if (!joueurTds.length) return;
+
+joueurTds.forEach(td => {
+  const currentHTML = td.innerHTML;
+  const updatedHTML = currentHTML
+    .split(/<br\s*\/?>/i)
+    .map(line => {
+      const cleanLine = line.trim();
+      const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|/🎯|🎰/g, "").trim();
+      if (nameOnly === joueur) {
+        console.log(`2️⃣ Double appliqué à ${joueur}`);
+        if (line.includes("🎯")) {
+          return line.replace("🎯", "2️⃣🎯");
+	} else if (!line.includes("🎰🎯")) {
+          return `line.replace("🎰🎯", "2️⃣🎰🎯");
+	} else if (!line.includes("🎰")) {
+          return `line.replace("🎰", "2️⃣🎰");		
+
+        } else if (!line.includes("2️⃣")) {
+          return `2️⃣ ${line}`;
+        }
+      }
+      return line;
+    })
+    .join("<br>");
+  td.innerHTML = updatedHTML;
+});
+
+   // console.log("✅ HTML après modif :", joueurTd.innerHTML);
+  });
+
+  // Masquer les deux lignes visibles
+  const rows = table.querySelectorAll("tr");
+  let visibleIndex = 0;
+  for (let i = 0; i < rows.length; i++) {
+    const rowText = rows[i].textContent.toUpperCase().trim();
+    if (visibleIndex === DoubleRowIndex || visibleIndex === DoubleRowIndex + 1) {
+      rows[i].style.display = "none";
+    }
+    if (!rows[i].hasAttribute('data-hidden')) {
+      visibleIndex++;
+    }
+  }
+
+  console.log("🎉 Jackpot processing terminé.");
+}
 
 
 
@@ -463,6 +572,7 @@ joueurTds.forEach(td => {
       
       markMissiles(); // 👉 Appel juste ici
       markJackpots(); // 👉 Appel juste après markMissiles
+       markDouble(); // 👉 Appel juste après markMissiles
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
