@@ -542,7 +542,7 @@ joueurTds.forEach(td => {
         } else if (!line.includes("2️⃣")) {
           return `2️⃣ ${line}`;
         }
-      });
+      
       return line;
     })
     .join("<br>");
