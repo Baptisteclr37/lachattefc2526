@@ -433,7 +433,7 @@ joueurTds.forEach(td => {
   td.innerHTML = updatedHTML;
 });
 
-    console.log("✅ HTML après modif :", joueurTd.innerHTML);
+   // console.log("✅ HTML après modif :", joueurTd.innerHTML);
   });
 
   // Masquer les deux lignes visibles
