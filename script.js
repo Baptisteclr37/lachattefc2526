@@ -465,7 +465,7 @@ function markDouble() {
     return;
   }
 
-  const DoubleText = data[DOubeRowIndex + 1]?.[0];
+  const DoubleText = data[DoubleRowIndex + 1]?.[0];
   console.log("2️⃣ Texte Double brut :", DoubleText);
 
   if (!DoubleText) {
