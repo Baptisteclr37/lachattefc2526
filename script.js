@@ -409,33 +409,30 @@ function markJackpots() {
       return;
     }
 
-    const joueurTd = joueursRow.querySelectorAll("td")[0];
-    if (!joueurTd) {
-      console.warn("❌ TD joueur non trouvé");
-      return;
-    }
+    const joueurTds = joueursRow.querySelectorAll("td");
+if (!joueurTds.length) return;
 
-    const currentHTML = joueurTd.innerHTML;
-    console.log("🧾 HTML avant modif :", currentHTML);
-
-    const updatedHTML = currentHTML
-      .split(/<br\s*\/?>/i)
-      .map(line => {
-        const cleanLine = line.trim();
-        const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
-        if (nameOnly === joueur) {
-          console.log(`🎰 Jackpot appliqué à ${joueur}`);
-          if (line.includes("🎯")) {
-            return line.replace("🎯", "🎰🎯");
-          } else if (!line.includes("🎰")) {
-            return `🎰 ${line}`;
-          }
+joueurTds.forEach(td => {
+  const currentHTML = td.innerHTML;
+  const updatedHTML = currentHTML
+    .split(/<br\s*\/?>/i)
+    .map(line => {
+      const cleanLine = line.trim();
+      const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
+      if (nameOnly === joueur) {
+        console.log(`🎰 Jackpot appliqué à ${joueur}`);
+        if (line.includes("🎯")) {
+          return line.replace("🎯", "🎰🎯");
+        } else if (!line.includes("🎰")) {
+          return `🎰 ${line}`;
         }
-        return line;
-      })
-      .join("<br>");
+      }
+      return line;
+    })
+    .join("<br>");
+  td.innerHTML = updatedHTML;
+});
 
-    joueurTd.innerHTML = updatedHTML;
     console.log("✅ HTML après modif :", joueurTd.innerHTML);
   });
 
