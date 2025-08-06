@@ -361,3 +361,18 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
   isVueMatch ? afficherVueMatch() : afficherVueJoueur();
 });
+
+
+// Menu hamburger
+  document.querySelector('.hamburger').addEventListener('click', () => {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  });
+
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+ 
