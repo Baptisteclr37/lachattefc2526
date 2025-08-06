@@ -140,6 +140,89 @@ function afficherVueMatch() {
 
         const tr = document.createElement("tr");
 
+         if (i === 0 && row[0]) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        if (row[0]?.toUpperCase().startsWith("MATCH")) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "match-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          lastLineWasMatch = true;
+          return;
+        }
+
+        if (row[0]?.toUpperCase() === "PRONOS") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "pronos-header";
+          td.textContent = "PRONOS";
+          tr.appendChild(td);
+          table.appendChild(tr);
+          lastLineWasMatch = false;
+          return;
+        }
+
+        if (row[0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        if (i > 0 && data[i - 1][0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee";
+          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim());
+
+          if (classementArray.length === 1) {
+            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim());
+          }
+
+          classementArray.sort((a, b) => {
+            const numA = parseInt(a.trim().split(".")[0]) || 9999;
+            const numB = parseInt(b.trim().split(".")[0]) || 9999;
+            return numA - numB;
+          });
+
+          td.innerHTML = classementArray.join("<br>");
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+        if (["MISSILES JOUES", "JACKPOT JOUES"].includes(row[0]?.toUpperCase())) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+
+          if (data[i + 1]) {
+            const trNext = document.createElement("tr");
+            const tdNext = document.createElement("td");
+            tdNext.colSpan = 3;
+            tdNext.textContent = data[i + 1][0] || "";
+            trNext.appendChild(tdNext);
+            table.appendChild(trNext);
+            skipNext = true;
+          }
+          return;
+        }
+
         // ... [tout ton code de construction de ligne est inchangé ici] ...
 
         row.forEach((cell, index) => {
