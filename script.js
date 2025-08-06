@@ -627,6 +627,7 @@ function markSurpriseLines() {
       markMissiles(); // 👉 Appel juste ici
       markJackpots(); // 👉 Appel juste après markMissiles
        markDouble(); // 👉 Appel juste après markMissiles
+      markSurpriseLines(); // 👉 Appel juste après markMissiles
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
