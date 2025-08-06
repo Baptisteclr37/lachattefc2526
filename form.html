@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LA CHATTE</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>&#128008; LA CHATTE &#128008; </h1>
+<h2>Formulaire </h2>
+ <!-- Menu Hamburger -->
+<div class="hamburger-container">
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="menu" id="menu">
+    <a href="#accueil">Accueil</a>
+    <a href="#classement">Classement</a>
+    <a href="#pronostics">Pronostics</a>
+    <a href="#contact">Contact</a>
+  </div>
+</div>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // Ferme le menu si on clique ailleurs
+  window.addEventListener('click', function(e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
+ <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfElzzGc7C5FL3oBTBvjMvJjtDqHHfqILWNOi1V15hgwU09HQ/viewform?usp=header"
+          width="100%" height="1200" frameborder="0" marginheight="0" marginwidth="0">
+    Chargement…
+  </iframe>  
+</body>
+</html>
