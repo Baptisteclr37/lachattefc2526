@@ -64,7 +64,7 @@ td {
   text-align: center;
 }
 
-* Conteneur */
+/* Conteneur */
 .hamburger-container {
   position: fixed;
   top: 20px;
