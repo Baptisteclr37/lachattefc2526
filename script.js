@@ -539,10 +539,10 @@ joueurTds.forEach(td => {
     return line.replace("🎰", "2️⃣🎰");
 }	
 
-        } else if (!line.includes("2️⃣")) {
+        else if (!line.includes("2️⃣")) {
           return `2️⃣ ${line}`;
         }
-      
+      }
       return line;
     })
     .join("<br>");
