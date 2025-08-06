@@ -89,6 +89,8 @@ td {
   top: 40px;
   right: 0;
   border-radius: 6px;
+  min-width: 180px; /* Ajuste selon ton contenu */
+  white-space: nowrap; /* Empêche les retours à la ligne */
   overflow: hidden;
 }
 
