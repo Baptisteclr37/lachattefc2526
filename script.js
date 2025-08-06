@@ -349,32 +349,45 @@ function afficherVueMatch() {
 // 🎰 Marquage des jackpots
 function markJackpots() {
   const jackpotRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "JACKPOT JOUE");
-  if (jackpotRowIndex === -1) return;
+  console.log("🔍 Jackpot row index:", jackpotRowIndex);
+
+  if (jackpotRowIndex === -1) {
+    console.warn("❌ Ligne 'JACKPOT JOUE' non trouvée");
+    return;
+  }
 
   const jackpotText = data[jackpotRowIndex + 1]?.[0];
-  if (!jackpotText) return;
+  console.log("🎰 Texte jackpot brut :", jackpotText);
+
+  if (!jackpotText) {
+    console.warn("❌ Aucun texte dans la ligne jackpot");
+    return;
+  }
 
   const jackpots = jackpotText.split(/\r?\n/).filter(x => x.trim()).map(line => {
     const parts = line.trim().split(/\s+/);
+    console.log("🔹 Ligne jackpot analysée :", parts);
     if (parts.length < 4) return null;
     return {
       equipeDom: parts[0],
-      equipeExt: parts[1], // pas utilisé ici mais on garde pour cohérence
+      equipeExt: parts[1],
       joueur: parts[2],
       prono: parts[3],
     };
   }).filter(Boolean);
 
+  console.log("✅ Jackpots parsés :", jackpots);
+
   const trs = table.querySelectorAll("tr");
 
-  jackpots.forEach(({ equipeDom, joueur, prono }) => {
-    let foundLineIndex = -1;
+  jackpots.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+    console.log(`🎯 Recherche du match pour ${equipeDom} - ${equipeExt}`);
 
+    let foundLineIndex = -1;
     for (let i = 0; i < trs.length; i++) {
       const td = trs[i].querySelector("td");
       if (!td) continue;
 
-      // Vérifie s’il y a un logo (image) en col 0 et récupère le texte
       const hasLogo = td.querySelector("img");
       const text = td.textContent.trim();
 
@@ -384,26 +397,38 @@ function markJackpots() {
       }
     }
 
-    if (foundLineIndex === -1) return;
+    console.log(`🔎 Match trouvé à la ligne : ${foundLineIndex}`);
+    if (foundLineIndex === -1) {
+      console.warn(`❌ Match non trouvé pour ${equipeDom}`);
+      return;
+    }
 
     const joueursRow = trs[foundLineIndex + 3];
-    if (!joueursRow) return;
+    if (!joueursRow) {
+      console.warn(`❌ Pas de ligne joueurs à l'index ${foundLineIndex + 3}`);
+      return;
+    }
 
     const joueurTd = joueursRow.querySelectorAll("td")[0];
-    if (!joueurTd) return;
+    if (!joueurTd) {
+      console.warn("❌ TD joueur non trouvé");
+      return;
+    }
 
     const currentHTML = joueurTd.innerHTML;
+    console.log("🧾 HTML avant modif :", currentHTML);
+
     const updatedHTML = currentHTML
       .split(/<br\s*\/?>/i)
       .map(line => {
-        const match = line.match(/(?:🎯|🎰)*\s*(\w+)/);
-        const nameOnly = match?.[1] || "";
+        const cleanLine = line.trim();
+        const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
         if (nameOnly === joueur) {
-          // Si missile déjà présent, on met 🎰 devant
+          console.log(`🎰 Jackpot appliqué à ${joueur}`);
           if (line.includes("🎯")) {
             return line.replace("🎯", "🎰🎯");
           } else if (!line.includes("🎰")) {
-            return `🎰 ${line.trim()}`;
+            return `🎰 ${line}`;
           }
         }
         return line;
@@ -411,6 +436,7 @@ function markJackpots() {
       .join("<br>");
 
     joueurTd.innerHTML = updatedHTML;
+    console.log("✅ HTML après modif :", joueurTd.innerHTML);
   });
 
   // Masquer les deux lignes visibles
@@ -425,7 +451,10 @@ function markJackpots() {
       visibleIndex++;
     }
   }
+
+  console.log("🎉 Jackpot processing terminé.");
 }
+
 
 
 
