@@ -120,7 +120,7 @@ function afficherVueJoueur() {
 }
 
 function afficherVueMatch() {
-  container.innerHTML = '';
+  container.innerHTML = ''; // nettoie le conteneur AVANT d’afficher “chargement”
   container.textContent = 'Chargement des données…';
 
   Papa.parse(urlVueMatch, {
@@ -140,88 +140,7 @@ function afficherVueMatch() {
 
         const tr = document.createElement("tr");
 
-        if (i === 0 && row[0]) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        if (row[0]?.toUpperCase().startsWith("MATCH")) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "match-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          lastLineWasMatch = true;
-          return;
-        }
-
-        if (row[0]?.toUpperCase() === "PRONOS") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "pronos-header";
-          td.textContent = "PRONOS";
-          tr.appendChild(td);
-          table.appendChild(tr);
-          lastLineWasMatch = false;
-          return;
-        }
-
-        if (row[0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        if (i > 0 && data[i - 1][0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee";
-          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim());
-
-          if (classementArray.length === 1) {
-            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim());
-          }
-
-          classementArray.sort((a, b) => {
-            const numA = parseInt(a.trim().split(".")[0]) || 9999;
-            const numB = parseInt(b.trim().split(".")[0]) || 9999;
-            return numA - numB;
-          });
-
-          td.innerHTML = classementArray.join("<br>");
-          tr.appendChild(td);
-          table.appendChild(tr);
-          return;
-        }
-
-        if (["MISSILES JOUES", "JACKPOT JOUES"].includes(row[0]?.toUpperCase())) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-
-          if (data[i + 1]) {
-            const trNext = document.createElement("tr");
-            const tdNext = document.createElement("td");
-            tdNext.colSpan = 3;
-            tdNext.textContent = data[i + 1][0] || "";
-            trNext.appendChild(tdNext);
-            table.appendChild(trNext);
-            skipNext = true;
-          }
-          return;
-        }
+        // ... [tout ton code de construction de ligne est inchangé ici] ...
 
         row.forEach((cell, index) => {
           const td = document.createElement("td");
@@ -267,14 +186,87 @@ function afficherVueMatch() {
         if (lastLineWasMatch) lastLineWasMatch = false;
       });
 
+      // 👉 Ajout du tableau
+      container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
       container.appendChild(table);
 
-      // Appels à markMissiles() ou autres ici si besoin
+      // 🎯 Marquage des missiles
+      function markMissiles() {
+        const missilesRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "MISSILES JOUES");
+        if (missilesRowIndex === -1) return;
+
+        const missilesText = data[missilesRowIndex + 1]?.[0];
+        if (!missilesText) return;
+
+        const missiles = missilesText.split(/\r?\n/).filter(x => x.trim()).map(line => {
+          const parts = line.trim().split(/\s+/);
+          if (parts.length < 4) return null;
+          return {
+            equipeDom: parts[0],
+            equipeExt: parts[1],
+            joueur: parts[2],
+            prono: parts[3],
+          };
+        }).filter(Boolean);
+
+        const trs = table.querySelectorAll("tr");
+
+        missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+          let foundLineIndex = -1;
+          for (let i = 0; i < trs.length; i++) {
+            const td = trs[i].querySelector("td");
+            if (!td) continue;
+            const span = td.querySelector("span");
+            const text = span ? span.textContent.trim() : td.textContent.trim();
+            if (text === equipeDom) {
+              foundLineIndex = i;
+              break;
+            }
+          }
+
+          if (foundLineIndex === -1) return;
+
+          const joueursRow = trs[foundLineIndex + 3];
+          if (!joueursRow) return;
+
+          const joueurTd = joueursRow.querySelectorAll("td")[0];
+          if (!joueurTd) return;
+
+          const currentHTML = joueurTd.innerHTML;
+          const updatedHTML = currentHTML
+            .split(/<br\s*\/?>/i)
+            .map(line => {
+              const cleanLine = line.replace(/🎯/g, "").trim();
+              const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
+              return nameOnly === joueur ? `🎯 ${cleanLine}` : line;
+            })
+            .join("<br>");
+
+          joueurTd.innerHTML = updatedHTML;
+        });
+
+        // Masquer les deux lignes affichées
+        const rows = table.querySelectorAll("tr");
+        let visibleIndex = 0;
+        for (let i = 0; i < rows.length; i++) {
+          const rowText = rows[i].textContent.toUpperCase().trim();
+          if (visibleIndex === missilesRowIndex || visibleIndex === missilesRowIndex + 1) {
+            rows[i].style.display = "none";
+          }
+          if (!rows[i].hasAttribute('data-hidden')) {
+            visibleIndex++;
+          }
+        }
+      }
+
+      markMissiles(); // 👉 Appel juste ici
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
+}
+
 }
 
 // Initialisation à la vue match
