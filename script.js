@@ -265,7 +265,7 @@ function afficherVueMatch() {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
-}
+
 
 }
 
