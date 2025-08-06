@@ -527,7 +527,8 @@ joueurTds.forEach(td => {
     .split(/<br\s*\/?>/i)
     .map(line => {
       const cleanLine = line.trim();
-      const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|/🎯|🎰/g, "").trim();
+     const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
+
       if (nameOnly === joueur) {
         console.log(`2️⃣ Double appliqué à ${joueur}`);
         if (line.includes("🎯")) {
