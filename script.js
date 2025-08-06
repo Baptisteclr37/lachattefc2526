@@ -182,7 +182,7 @@ function afficherVueMatch() {
           return;
         }
 
-        if (i > 0 && data[i - 1][0]?.toUpperCase() === "CLASSEMENT JOURNEE") {
+        if (i > 0 && data[i - 1][0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee";
