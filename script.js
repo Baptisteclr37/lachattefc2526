@@ -155,6 +155,7 @@ function afficherVueMatch() {
         }
 
           if (row[0]?.toUpperCase().startsWith("📅")) {
+            console.log("row[0] =", row[0]);
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "journee-header";
