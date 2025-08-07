@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LA CHATTE</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>LA CHATTE &#128008; </h1>
+<h2>Journées précédentes </h2>
+
+  <div id="table-container">Chargement des données…</div>
+
+  <!-- Ajout de PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  
+  <!-- Ton script -->
+  <script src="script-archives.js"></script>
+
+ <!-- Menu Hamburger -->
+<div class="hamburger-container">
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="menu" id="menu">
+    <a href="https://baptisteclr37.github.io/lachattefc2526/">🏠 Vestiaire</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/form.html">📜 Fais tes pronos</a>
+    <a href="#pronostics">🏆 Classement des Chatteux</a>
+    <a href="#contact">📈 Stats</a>
+  </div>
+</div>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // Ferme le menu si on clique ailleurs
+  window.addEventListener('click', function(e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>
