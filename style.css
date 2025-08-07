@@ -149,16 +149,16 @@ td, th {
 }
 
 #classement-container tr:first-of-type + tr td {
-  background-color: #fff8e1; /* Jaune clair pour 1er */
+  background-color: #ebe121; /* Jaune clair pour 1er */
   font-weight: bold;
 }
 
 #classement-container tr:nth-child(3) td {
-  background-color: #e1f5fe; /* Bleu clair pour 2e */
+  background-color: #21d0eb; /* Bleu clair pour 2e */
 }
 
 #classement-container tr:last-child td {
-  background-color: #ffebee; /* Rouge clair pour le dernier */
+  background-color: #eb213f; /* Rouge clair pour le dernier */
   font-style: italic;
 }
 
