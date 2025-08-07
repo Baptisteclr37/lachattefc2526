@@ -135,11 +135,57 @@ td, th {
   background-color: #f2f2f2;
 }
 
+/* === TABLEAU CLASSEMENT GENERAL === */
+#classement-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1em auto;
+}
+
+#classement-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Arial', sans-serif;
+  font-size: 0.95rem;
+  min-width: 600px; /* évite le wrap moche en mobile */
+}
+
+#classement-container th,
+#classement-container td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+  white-space: nowrap; /* évite les retours à la ligne moches */
+}
+
+#classement-container th {
+  background-color: #ffe082; /* jaune doux */
+  color: #222;
+  font-weight: bold;
+}
+
+#classement-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+#classement-container tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
 
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   table {
     font-size: 16px;
+  }
+
+  #classement-container table {
+    font-size: 0.85rem;
+  }
+
+  #classement-container th,
+  #classement-container td {
+    padding: 6px 4px;
   }
 
   td, th {
@@ -160,31 +206,7 @@ td, th {
     padding: 10px;
   }
 
-  #classement-container table {
-  width: 90%;
-  margin: auto;
-  border-collapse: collapse;
-  font-family: 'Arial', sans-serif;
-  font-size: 1rem;
-}
-
-#classement-container th,
-#classement-container td {
-  border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-}
-
-#classement-container th {
-  background-color: #ffd700;
-  color: #222;
-  text-transform: uppercase;
-}
-
-#classement-container tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
+ 
 
   .table-container {
     overflow-x: auto;
