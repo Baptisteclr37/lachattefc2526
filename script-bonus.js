@@ -56,16 +56,17 @@ Papa.parse(urlBonus, {
     container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
 
-    // --- Recherche des indices des colonnes ciblées ---
-    const headerCells = table.querySelectorAll("tr:first-child th");
-    let missileIndex = -1, jackpotIndex = -1, doubleChanceIndex = -1;
+   
+  // Prend TOUTES les cellules de la première ligne (th + td), dans l'ordre réel
+const firstRowCells = table.querySelectorAll("tr:first-child > *");
+let missileIndex = -1, jackpotIndex = -1, doubleChanceIndex = -1;
 
-    headerCells.forEach((th, i) => {
-      const text = th.textContent.trim().toUpperCase();
-      if (text === "MISSILE") missileIndex = i;
-      else if (text === "JACKPOT") jackpotIndex = i;
-      else if (text === "DOUBLE CHANCE") doubleChanceIndex = i;
-    });
+firstRowCells.forEach((cell, i) => {
+  const text = cell.textContent.trim().toUpperCase();
+  if (text === "MISSILE") missileIndex = i;
+  else if (text === "JACKPOT") jackpotIndex = i;
+  else if (text === "DOUBLE CHANCE") doubleChanceIndex = i;
+});
 
     // Ajout des classes sur les th
     if (missileIndex !== -1) headerCells[missileIndex].classList.add("missile");
@@ -140,3 +141,4 @@ Papa.parse(urlBonus, {
 
   }
 });
+
