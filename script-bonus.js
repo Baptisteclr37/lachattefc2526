@@ -56,7 +56,7 @@ Papa.parse(urlBonus, {
     container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
 
-    // --- Ajout des classes pour colonnes MISSILE, JACKPOT, DOUBLE CHANCE ---
+    // --- Recherche des indices des colonnes ciblées ---
     const headerCells = table.querySelectorAll("tr:first-child th");
     let missileIndex = -1, jackpotIndex = -1, doubleChanceIndex = -1;
 
@@ -80,5 +80,63 @@ Papa.parse(urlBonus, {
       if (jackpotIndex !== -1 && cells[jackpotIndex]) cells[jackpotIndex].classList.add("jackpot");
       if (doubleChanceIndex !== -1 && cells[doubleChanceIndex]) cells[doubleChanceIndex].classList.add("doublechance");
     });
+
+    // --- Fonction de couleur par colonne ---
+    function couleurMissile(val) {
+      if (val >= 5) return "#099617";
+      if (val === 4) return "#62ed2b";
+      if (val === 3) return "#1dd5db";
+      if (val === 2) return "#ebe00e";
+      if (val === 1) return "#fa9f0c";
+      return "#fa240c"; // 0 ou autre
+    }
+
+    function couleurJackpot(val) {
+      if (val >= 3) return "#099617";
+      if (val === 2) return "#ebe00e";
+      if (val === 1) return "#fa9f0c";
+      return "#fa240c"; // 0 ou autre
+    }
+
+    function couleurDoubleChance(val) {
+      if (val >= 4) return "#099617";
+      if (val === 3) return "#1dd5db";
+      if (val === 2) return "#ebe00e";
+      if (val === 1) return "#fa9f0c";
+      return "#fa240c"; // 0 ou autre
+    }
+
+    // --- Application des couleurs selon valeur dans chaque cellule ---
+    rows.forEach(tr => {
+      const cells = tr.querySelectorAll("td");
+
+      // Missile
+      if (missileIndex !== -1 && cells[missileIndex]) {
+        const val = parseInt(cells[missileIndex].textContent, 10);
+        if (!isNaN(val)) {
+          cells[missileIndex].style.backgroundColor = couleurMissile(val);
+          cells[missileIndex].style.color = "#fff";
+        }
+      }
+
+      // Jackpot
+      if (jackpotIndex !== -1 && cells[jackpotIndex]) {
+        const val = parseInt(cells[jackpotIndex].textContent, 10);
+        if (!isNaN(val)) {
+          cells[jackpotIndex].style.backgroundColor = couleurJackpot(val);
+          cells[jackpotIndex].style.color = "#fff";
+        }
+      }
+
+      // Double Chance
+      if (doubleChanceIndex !== -1 && cells[doubleChanceIndex]) {
+        const val = parseInt(cells[doubleChanceIndex].textContent, 10);
+        if (!isNaN(val)) {
+          cells[doubleChanceIndex].style.backgroundColor = couleurDoubleChance(val);
+          cells[doubleChanceIndex].style.color = "#fff";
+        }
+      }
+    });
+
   }
 });
