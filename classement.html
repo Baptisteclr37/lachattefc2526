@@ -13,5 +13,34 @@
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="script-classement.js"></script>
+   <!-- Menu Hamburger -->
+<div class="hamburger-container">
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="menu" id="menu">
+    <a href="https://baptisteclr37.github.io/lachattefc2526/">🏠 Vestiaire</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/form.html">📜 Fais tes pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/archives.html">🗃️ Archives pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/classement">🏆 Classement des Chatteux</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/bonus">🎁 Caisse à Bonus</a>
+    <a href="#contact">📈 Stats</a>
+    <a href="#contact">🏛️ La Chatte a ses règles</a>
+  </div>
+</div>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // Ferme le menu si on clique ailleurs
+  window.addEventListener('click', function(e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
 </body>
 </html>
+
