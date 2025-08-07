@@ -200,14 +200,7 @@ td, th {
     font-size: 16px;
   }
 
-  #classement-container table {
-    font-size: 0.9rem;
-  }
-
-  #classement-container th,
-  #classement-container td {
-    padding: 8px 4px;
-  }
+  
 
   td, th {
     padding: 10px 5px;
