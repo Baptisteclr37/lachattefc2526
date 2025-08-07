@@ -135,43 +135,64 @@ td, th {
   background-color: #f2f2f2;
 }
 
-/* === TABLEAU CLASSEMENT GENERAL === */
+/* === CLASSEMENT GENERAL === */
 #classement-container {
   width: 100%;
   overflow-x: auto;
-  margin: 1em auto;
+  margin: 2em auto;
+  padding: 0 1em;
 }
 
 #classement-container table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   font-family: 'Arial', sans-serif;
-  font-size: 0.95rem;
-  min-width: 600px; /* évite le wrap moche en mobile */
+  font-size: 1rem;
+  background-color: #fffdf5; /* fond clair neutre */
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  border: 2px solid #e0e0e0;
 }
 
-#classement-container th,
-#classement-container td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-  white-space: nowrap; /* évite les retours à la ligne moches */
-}
-
+/* En-têtes */
 #classement-container th {
-  background-color: #ffe082; /* jaune doux */
-  color: #222;
+  background-color: #e91e63; /* rose LA CHATTE */
+  color: white;
+  padding: 12px;
+  text-align: center;
   font-weight: bold;
+  text-transform: uppercase;
 }
 
+/* Cellules */
+#classement-container td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+/* Alternance de lignes */
 #classement-container tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: #fff0f6; /* rose très clair */
 }
 
 #classement-container tr:nth-child(odd) {
-  background-color: #ffffff;
+  background-color: #f9f9f9;
+}
+#classement-container tr:first-of-type + tr td {
+  background-color: #fff8e1; /* Jaune clair pour 1er */
+  font-weight: bold;
 }
 
+#classement-container tr:nth-child(3) td {
+  background-color: #e1f5fe; /* Bleu clair pour 2e */
+}
+
+#classement-container tr:last-child td {
+  background-color: #ffebee; /* Rouge clair pour le dernier */
+  font-style: italic;
+}
 
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
@@ -180,12 +201,12 @@ td, th {
   }
 
   #classement-container table {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   #classement-container th,
   #classement-container td {
-    padding: 6px 4px;
+    padding: 8px 4px;
   }
 
   td, th {
