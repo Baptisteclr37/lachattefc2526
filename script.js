@@ -679,16 +679,20 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const journees = [];
 
- // 🛠️ Étape 1 : repérer toutes les lignes 📅 JXX, même dans les cellules fusionnées
 originalRows.forEach((row, index) => {
-  const cell = row.querySelector("td, th"); // ✅ on prend la première cellule réelle, même fusionnée
-  if (cell) {
-    const contenu = cell.textContent.trim();
-    if (contenu.startsWith("📅 J")) {
-      const journee = contenu.replace("📅 ", "");
-      console.log(`📅 Détecté : ${journee} à la ligne ${index}`);
-      journees.push({ journee, start: index });
-    }
+  const cell = row.querySelector("td, th");
+  if (!cell) {
+    console.log(`🔎 Ligne ${index} : aucune cellule trouvée`);
+    return;
+  }
+
+  const contenu = cell.textContent.trim();
+  console.log(`🔍 Ligne ${index} : contenu = "${contenu}"`);
+
+  if (contenu.startsWith("📅 J")) {
+    const journee = contenu.replace("📅 ", "");
+    console.log(`✅ Journée détectée : ${journee} à la ligne ${index}`);
+    journees.push({ journee, start: index });
   }
 });
 
