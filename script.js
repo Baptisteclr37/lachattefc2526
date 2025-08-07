@@ -669,32 +669,48 @@ toggleBtn.addEventListener('click', () => {
 
 
 
+
+
+
 window.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("table-container");
   const originalRows = Array.from(container.querySelectorAll("tr"));
+  console.log("🔍 Nombre total de lignes :", originalRows.length);
+
   const journees = [];
 
-  // Identifier les lignes 📅 JXX
+  // Étape 1 : repérer toutes les lignes 📅 JXX
   originalRows.forEach((row, index) => {
     const cell = row.cells[0];
-    if (cell && cell.textContent.startsWith("📅 J")) {
-      const journee = cell.textContent.trim().replace("📅 ", "");
-      journees.push({ journee, start: index });
+    if (cell) {
+      const contenu = cell.textContent.trim();
+      if (contenu.startsWith("📅 J")) {
+        const journee = contenu.replace("📅 ", "");
+        console.log(`📅 Détecté : ${journee} à la ligne ${index}`);
+        journees.push({ journee, start: index });
+      }
     }
   });
 
-  // Calcul des plages de lignes à afficher par journée
+  if (journees.length === 0) {
+    console.warn("❌ Aucune journée 📅 JXX détectée !");
+    return;
+  }
+
+  // Étape 2 : créer les blocs de lignes par journée
   const journeeBlocs = {};
   for (let i = 0; i < journees.length; i++) {
     const { journee, start } = journees[i];
-    const end = (journees[i + 1]?.start || originalRows.length);
+    const end = journees[i + 1]?.start || originalRows.length;
     journeeBlocs[journee] = originalRows.slice(start, end);
+    console.log(`✅ Bloc ${journee} = lignes ${start} à ${end - 1}`);
   }
 
-  // Créer le <select> des journées
+  // Étape 3 : créer le <select>
   const select = document.createElement("select");
   select.id = "select-journee";
   select.style.margin = "20px";
+
   Object.keys(journeeBlocs).forEach(journee => {
     const option = document.createElement("option");
     option.value = journee;
@@ -702,22 +718,26 @@ window.addEventListener("DOMContentLoaded", () => {
     select.appendChild(option);
   });
 
-  // Insérer le sélecteur avant le tableau
+  console.log("📋 Options dans le select :", Object.keys(journeeBlocs));
+
+  // Étape 4 : insérer le select dans la page
   container.parentElement.insertBefore(select, container);
 
-  // Fonction pour afficher une journée donnée
+  // Étape 5 : fonction pour afficher une journée
   function afficherJournee(journee) {
+    console.log("🔁 Affichage de la journée :", journee);
     container.innerHTML = "";
     journeeBlocs[journee].forEach(row => container.appendChild(row.cloneNode(true)));
   }
 
-  // Gérer changement de sélection
+  // Étape 6 : réagir au changement de sélection
   select.addEventListener("change", e => {
     afficherJournee(e.target.value);
   });
 
-  // ⚡ Affichage par défaut : dernière journée
+  // Étape 7 : affichage par défaut de la dernière journée
   const derniereJournee = Object.keys(journeeBlocs).sort((a, b) => +a.slice(1) - +b.slice(1)).pop();
+  console.log("🚀 Affichage initial :", derniereJournee);
   select.value = derniereJournee;
   afficherJournee(derniereJournee);
 });
