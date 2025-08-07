@@ -136,23 +136,7 @@ td, th {
 }
 
 /* === CLASSEMENT GENERAL === */
-#classement-container {
-  width: 100%;
-  overflow-x: auto;
-  margin: 2em auto;
-  padding: 0 1em;
-}
 
-#classement-container table {
-  width: 100%;
-  min-width: 600px;
-  border-collapse: collapse;
-  font-family: 'Arial', sans-serif;
-  font-size: 1rem;
-  background-color: #fffdf5; /* fond clair neutre */
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  border: 2px solid #e0e0e0;
-}
 
 /* En-têtes */
 #classement-container th {
@@ -164,22 +148,6 @@ td, th {
   text-transform: uppercase;
 }
 
-/* Cellules */
-#classement-container td {
-  padding: 10px;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-  white-space: nowrap;
-}
-
-/* Alternance de lignes */
-#classement-container tr:nth-child(even) {
-  background-color: #fff0f6; /* rose très clair */
-}
-
-#classement-container tr:nth-child(odd) {
-  background-color: #f9f9f9;
-}
 #classement-container tr:first-of-type + tr td {
   background-color: #fff8e1; /* Jaune clair pour 1er */
   font-weight: bold;
