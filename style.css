@@ -173,6 +173,15 @@ td, th {
   font-weight: bold;
 }
 
+.classement-header {
+  background-color: #e91e63; /* rose LA CHATTE */
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   table {
