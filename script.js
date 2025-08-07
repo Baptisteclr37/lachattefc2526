@@ -154,6 +154,17 @@ function afficherVueMatch() {
           return;
         }
 
+          if (row[0]?.toUpperCase().startsWith("📅")) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          lastLineWasMatch = true;
+          return;
+        }
+
         if (row[0]?.toUpperCase() === "PRONOS") {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -266,18 +277,7 @@ function afficherVueMatch() {
       container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
       container.appendChild(table);
 
-       // 🔁 Balayage de toutes les lignes du tableau
-document.querySelectorAll("table tr").forEach((row, index) => {
-  const firstCell = row.querySelector("td, th");
-  if (!firstCell) return;
 
-  const contenu = firstCell.textContent.trim();
-
-  if (contenu.startsWith("📅 J") && !row.classList.contains("journee-header")) {
-    row.classList.add("journee-header");
-    console.log(`✅ Classe ajoutée sur la ligne ${index} : ${contenu}`);
-  }
-});
 
       // 🎯 Marquage des missiles
       function markMissiles() {
