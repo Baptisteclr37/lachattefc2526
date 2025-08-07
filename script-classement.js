@@ -33,7 +33,7 @@ Papa.parse(urlClassement, {
 });
 
 function colorerClassementAvecRangs() {
-  const lignes = document.querySelectorAll("#classement-container table tbody tr");
+  const lignes = document.querySelectorAll("#classement-container table tr:not(:first-child)");
   if (!lignes.length) return;
 
   let rangsTrouvés = new Set();
