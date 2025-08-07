@@ -1,4 +1,4 @@
-const urlBonus = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=28256136&single=true&output=csv";
+const urlBonus = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1165673648&single=true&output=csv";
 
 const container = document.getElementById("bonus-container");
 
@@ -28,3 +28,4 @@ Papa.parse(urlBonus, {
     container.appendChild(table);
   }
 });
+
