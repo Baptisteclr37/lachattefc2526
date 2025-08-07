@@ -148,18 +148,29 @@ td, th {
   text-transform: uppercase;
 }
 
-#classement-container tr:first-of-type + tr td {
-  background-color: #ebe121; /* Jaune clair pour 1er */
+
+.rang-picto {
+  margin-right: 6px;
+}
+
+.top1 {
+  background-color: #ebe121 !important; /* or clair */
   font-weight: bold;
 }
 
-#classement-container tr:nth-child(3) td {
-  background-color: #21d0eb; /* Bleu clair pour 2e */
+.top2 {
+  background-color: #21d0eb !important; /* vert clair */
+  font-weight: bold;
 }
 
-#classement-container tr:last-child td {
-  background-color: #eb213f; /* Rouge clair pour le dernier */
-  font-style: italic;
+.top3 {
+  background-color: #21eb7f !important; /* bleu clair */
+  font-weight: bold;
+}
+
+.last {
+  background-color: #eb213f !important; /* rouge clair */
+  font-weight: bold;
 }
 
 /* Mobile-friendly adjustments */
