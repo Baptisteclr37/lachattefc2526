@@ -182,6 +182,22 @@ td, th {
   text-transform: uppercase;
 }
 
+#bonus-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+#bonus-table th.missile,
+#bonus-table th.jackpot,
+#bonus-table th.doublechance,
+#bonus-table td.missile,
+#bonus-table td.jackpot,
+#bonus-table td.doublechance {
+  width: 33.33%;
+  text-align: center;
+}
+
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   table {
@@ -212,5 +228,40 @@ td, th {
 
   .table-container {
     overflow-x: auto;
+  }
+
+  #bonus-table th.missile,
+  #bonus-table th.jackpot,
+  #bonus-table th.doublechance {
+    color: transparent;
+    position: relative;
+  }
+
+  #bonus-table th.missile::after {
+    content: "🎯";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 1.2em;
+  }
+  #bonus-table th.jackpot::after {
+    content: "🎰";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 1.2em;
+  }
+  #bonus-table th.doublechance::after {
+    content: "2️⃣";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: black;
+    font-size: 1.2em;
   }
 }
