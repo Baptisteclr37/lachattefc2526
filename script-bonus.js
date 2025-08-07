@@ -56,22 +56,21 @@ Papa.parse(urlBonus, {
     container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
 
-   
-  // Prend TOUTES les cellules de la première ligne (th + td), dans l'ordre réel
-const firstRowCells = table.querySelectorAll("tr:first-child > *");
-let missileIndex = -1, jackpotIndex = -1, doubleChanceIndex = -1;
+    // Prend TOUTES les cellules de la première ligne (th + td), dans l'ordre réel
+    const firstRowCells = table.querySelectorAll("tr:first-child > *");
+    let missileIndex = -1, jackpotIndex = -1, doubleChanceIndex = -1;
 
-firstRowCells.forEach((cell, i) => {
-  const text = cell.textContent.trim().toUpperCase();
-  if (text === "MISSILE") missileIndex = i;
-  else if (text === "JACKPOT") jackpotIndex = i;
-  else if (text === "DOUBLE CHANCE") doubleChanceIndex = i;
-});
+    firstRowCells.forEach((cell, i) => {
+      const text = cell.textContent.trim().toUpperCase();
+      if (text === "MISSILE") missileIndex = i;
+      else if (text === "JACKPOT") jackpotIndex = i;
+      else if (text === "DOUBLE CHANCE") doubleChanceIndex = i;
+    });
 
-    // Ajout des classes sur les th
-    if (missileIndex !== -1) headerCells[missileIndex].classList.add("missile");
-    if (jackpotIndex !== -1) headerCells[jackpotIndex].classList.add("jackpot");
-    if (doubleChanceIndex !== -1) headerCells[doubleChanceIndex].classList.add("doublechance");
+    // Ajout des classes sur les cellules de la 1ère ligne
+    if (missileIndex !== -1) firstRowCells[missileIndex].classList.add("missile");
+    if (jackpotIndex !== -1) firstRowCells[jackpotIndex].classList.add("jackpot");
+    if (doubleChanceIndex !== -1) firstRowCells[doubleChanceIndex].classList.add("doublechance");
 
     // Ajout des classes sur les td de chaque ligne (sauf 1ère ligne)
     const rows = table.querySelectorAll("tr:not(:first-child)");
@@ -141,4 +140,3 @@ firstRowCells.forEach((cell, i) => {
 
   }
 });
-
