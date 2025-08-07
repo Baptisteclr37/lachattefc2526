@@ -665,3 +665,59 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
   isVueMatch ? afficherVueMatch() : afficherVueJoueur();
 });
+
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+  const container = document.getElementById("table-container");
+  const originalRows = Array.from(container.querySelectorAll("tr"));
+  const journees = [];
+
+  // Identifier les lignes 📅 JXX
+  originalRows.forEach((row, index) => {
+    const cell = row.cells[0];
+    if (cell && cell.textContent.startsWith("📅 J")) {
+      const journee = cell.textContent.trim().replace("📅 ", "");
+      journees.push({ journee, start: index });
+    }
+  });
+
+  // Calcul des plages de lignes à afficher par journée
+  const journeeBlocs = {};
+  for (let i = 0; i < journees.length; i++) {
+    const { journee, start } = journees[i];
+    const end = (journees[i + 1]?.start || originalRows.length);
+    journeeBlocs[journee] = originalRows.slice(start, end);
+  }
+
+  // Créer le <select> des journées
+  const select = document.createElement("select");
+  select.id = "select-journee";
+  select.style.margin = "20px";
+  Object.keys(journeeBlocs).forEach(journee => {
+    const option = document.createElement("option");
+    option.value = journee;
+    option.textContent = journee;
+    select.appendChild(option);
+  });
+
+  // Insérer le sélecteur avant le tableau
+  container.parentElement.insertBefore(select, container);
+
+  // Fonction pour afficher une journée donnée
+  function afficherJournee(journee) {
+    container.innerHTML = "";
+    journeeBlocs[journee].forEach(row => container.appendChild(row.cloneNode(true)));
+  }
+
+  // Gérer changement de sélection
+  select.addEventListener("change", e => {
+    afficherJournee(e.target.value);
+  });
+
+  // ⚡ Affichage par défaut : dernière journée
+  const derniereJournee = Object.keys(journeeBlocs).sort((a, b) => +a.slice(1) - +b.slice(1)).pop();
+  select.value = derniereJournee;
+  afficherJournee(derniereJournee);
+});
