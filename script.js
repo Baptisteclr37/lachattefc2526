@@ -679,23 +679,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const journees = [];
 
-  // Étape 1 : repérer toutes les lignes 📅 JXX
-  originalRows.forEach((row, index) => {
-    const cell = row.cells[0];
-    if (cell) {
-      const contenu = cell.textContent.trim();
-      if (contenu.startsWith("📅 J")) {
-        const journee = contenu.replace("📅 ", "");
-        console.log(`📅 Détecté : ${journee} à la ligne ${index}`);
-        journees.push({ journee, start: index });
-      }
+ // 🛠️ Étape 1 : repérer toutes les lignes 📅 JXX, même dans les cellules fusionnées
+originalRows.forEach((row, index) => {
+  const cell = row.querySelector("td, th"); // ✅ on prend la première cellule réelle, même fusionnée
+  if (cell) {
+    const contenu = cell.textContent.trim();
+    if (contenu.startsWith("📅 J")) {
+      const journee = contenu.replace("📅 ", "");
+      console.log(`📅 Détecté : ${journee} à la ligne ${index}`);
+      journees.push({ journee, start: index });
     }
-  });
-
-  if (journees.length === 0) {
-    console.warn("❌ Aucune journée 📅 JXX détectée !");
-    return;
   }
+});
+
+if (journees.length === 0) {
+  console.error("❌ Aucune journée 📅 JXX détectée !");
+}
+
 
   // Étape 2 : créer les blocs de lignes par journée
   const journeeBlocs = {};
