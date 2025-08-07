@@ -26,5 +26,57 @@ Papa.parse(urlClassement, {
 
     container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
+
+    // 🔥 Ajout des couleurs et pictos rangs
+    colorerClassementAvecRangs();
   }
 });
+
+function colorerClassementAvecRangs() {
+  const lignes = document.querySelectorAll("#classement-container table tbody tr");
+  if (!lignes.length) return;
+
+  let rangsTrouvés = new Set();
+
+  // 1️⃣ Récupération des rangs présents
+  lignes.forEach(row => {
+    const rangCell = row.children[0];
+    const rang = parseInt(rangCell.textContent.trim());
+    if (!isNaN(rang)) {
+      rangsTrouvés.add(rang);
+    }
+  });
+
+  const rangsTries = Array.from(rangsTrouvés).sort((a, b) => a - b);
+  const top1 = rangsTries[0];
+  const top2 = rangsTries[1];
+  const top3 = rangsTries[2];
+  const last = rangsTries[rangsTries.length - 1];
+
+  // 2️⃣ Application des styles et emojis
+  lignes.forEach(row => {
+    const rangCell = row.children[0];
+    const rang = parseInt(rangCell.textContent.trim());
+    if (isNaN(rang)) return;
+
+    let picto = "";
+
+    if (rang === top1) {
+      row.classList.add("top1");
+      picto = "🥇";
+    } else if (rang === top2) {
+      row.classList.add("top2");
+      picto = "🥈";
+    } else if (rang === top3) {
+      row.classList.add("top3");
+      picto = "🥉";
+    } else if (rang === last) {
+      row.classList.add("last");
+      picto = "💩";
+    }
+
+    if (picto) {
+      rangCell.innerHTML = `<span class="rang-picto">${picto}</span>${rang}`;
+    }
+  });
+}
