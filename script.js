@@ -131,6 +131,9 @@ function afficherVueMatch() {
       let lastLineWasMatch = false;
       const matchMap = new Map();
       let skipNext = false;
+      
+
+       
 
       data.forEach((row, i) => {
         if (skipNext) {
@@ -646,70 +649,7 @@ function markSurpriseLines() {
   console.log("✅ Fin de la fonction markSurpriseLines");
 }
 
-// 1️⃣ Génère le sélecteur de journée
-function creerSelecteurJournee() {
-  const headers = Array.from(document.querySelectorAll("tr.journee-header"));
-  if (headers.length === 0) {
-    console.error("❌ Aucune journée 📅 JXX détectée !");
-    return;
-  }
 
-  const select = document.createElement("select");
-  select.id = "select-journee";
-  select.style.margin = "20px";
-  select.style.padding = "5px";
-  select.style.fontSize = "16px";
-
-  const journees = headers.map(row => row.textContent.trim());
-  console.log("📋 Journées détectées :", journees);
-
-  journees.forEach(jour => {
-    const option = document.createElement("option");
-    option.value = jour;
-    option.textContent = jour;
-    select.appendChild(option);
-  });
-
-  // Ajoute le select en haut de la page (juste avant le tableau)
-  const container = document.getElementById("container");
-  container.prepend(select);
-
-  // Affiche par défaut la dernière journée
-  const derniereJournee = journees[journees.length - 1];
-  select.value = derniereJournee;
-  afficherJournee(derniereJournee);
-
-  // Change d'affichage quand on change de journée
-  select.addEventListener("change", () => {
-    afficherJournee(select.value);
-  });
-}
-
-// 2️⃣ Affiche uniquement les lignes d'une journée donnée
-function afficherJournee(journee) {
-  console.log("🔁 Affichage de la journée :", journee);
-  const lignes = Array.from(document.querySelectorAll("table tr"));
-  let afficher = false;
-  let compteur = 0;
-
-  lignes.forEach(row => {
-    if (row.classList.contains("journee-header")) {
-      if (row.textContent.trim() === journee) {
-        afficher = true;
-        compteur = 0;
-      } else {
-        afficher = false;
-      }
-    }
-
-    if (afficher && compteur <= 68) {
-      row.style.display = "";
-      compteur++;
-    } else {
-      row.style.display = "none";
-    }
-  });
-}
 
 
 
@@ -718,7 +658,7 @@ function afficherJournee(journee) {
       markJackpots(); // 👉 Appel juste après markMissiles
        markDouble(); // 👉 Appel juste après markMissiles
       markSurpriseLines(); // 👉 Appel juste après markMissiles
-      creerSelecteurJournee(); 
+      
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
