@@ -140,18 +140,7 @@ function afficherVueMatch() {
 
         const tr = document.createElement("tr");
 
-      // 🔁 Balayage de toutes les lignes du tableau
-document.querySelectorAll("table tr").forEach((row, index) => {
-  const firstCell = row.querySelector("td, th");
-  if (!firstCell) return;
-
-  const contenu = firstCell.textContent.trim();
-
-  if (contenu.startsWith("📅 J") && !row.classList.contains("journee-header")) {
-    row.classList.add("journee-header");
-    console.log(`✅ Classe ajoutée sur la ligne ${index} : ${contenu}`);
-  }
-});
+     
 
 
         if (row[0]?.toUpperCase().startsWith("MATCH")) {
@@ -276,6 +265,19 @@ document.querySelectorAll("table tr").forEach((row, index) => {
       // 👉 Ajout du tableau
       container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
       container.appendChild(table);
+
+       // 🔁 Balayage de toutes les lignes du tableau
+document.querySelectorAll("table tr").forEach((row, index) => {
+  const firstCell = row.querySelector("td, th");
+  if (!firstCell) return;
+
+  const contenu = firstCell.textContent.trim();
+
+  if (contenu.startsWith("📅 J") && !row.classList.contains("journee-header")) {
+    row.classList.add("journee-header");
+    console.log(`✅ Classe ajoutée sur la ligne ${index} : ${contenu}`);
+  }
+});
 
       // 🎯 Marquage des missiles
       function markMissiles() {
