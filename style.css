@@ -14,7 +14,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: white;
+  background: black;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -38,6 +38,7 @@ body {
 .loader-text {
   margin-top: 20px;
   font-size: 20px;
+  font-weight: bold;
   font-style: italic;
   animation: blink 1.2s infinite;
 }
