@@ -1,4 +1,4 @@
-const urlStats = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_0qjFwqt3Xka_KMzOQLUuUG-XD0Mu_I1XzHMHJXp0OELC-NwuTd98QPbfi-dAprOzb3r8iEUjAlCV/pub?gid=294855343&single=true&output=csv";
+const urlStats = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=473833868&single=true&output=csv";
 
 const container = document.getElementById("stats-container");
 
@@ -24,11 +24,12 @@ Papa.parse(urlStats, {
       table.appendChild(tr);
     });
 
-
+  container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
 
    
 }})
+
 
 
 
