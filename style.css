@@ -136,6 +136,7 @@ td, th {
   font-weight: bold;
   text-align: center;
   font-style: italic;
+  word-break: keep-all;
 }
 
 .journee-header {
