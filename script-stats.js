@@ -51,7 +51,7 @@ Papa.parse(urlStats, {
 
       // Appliquer le style pronos-header si flag posé
       if (row.__pronostype) {
-        tr.classList.add("pronos-header");
+        td.classList.add("pronos-header");
         delete row.__pronostype;
       }
 
@@ -62,6 +62,7 @@ Papa.parse(urlStats, {
     if (table) container.appendChild(table);
   }
 });
+
 
 
 
