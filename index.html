@@ -87,18 +87,13 @@
     "Nico tente un nul foireux à l’extérieur..."
   ];
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("loader-phrase").textContent =
-      phrases[Math.floor(Math.random() * phrases.length)];
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loader-phrase").textContent =
+    phrases[Math.floor(Math.random() * phrases.length)];
+});
 
-    lottie.loadAnimation({
-      container: document.getElementById("lottie-loader"),
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      path: "Footballer.lottie" // Fichier local
-    });
-  });
+
+    
 
   window.addEventListener("load", () => {
   const loader = document.getElementById("loader");
