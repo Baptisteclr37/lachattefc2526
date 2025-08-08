@@ -9,18 +9,19 @@ Papa.parse(urlStats, {
     container.innerHTML = "";
 
     let table = null;
+    let currentStatType = "";
 
     data.forEach((row, i) => {
       const first = row[0]?.toUpperCase?.().trim() || "";
 
-      // Début d'une section STATISTIQUES
+      // === DÉBUT D’UNE NOUVELLE SECTION STATISTIQUES ===
       if (first.startsWith("STATISTIQUES")) {
-        // Fermer le tableau courant si besoin
+        // Fermer le tableau précédent si besoin
         if (table) container.appendChild(table);
 
         table = document.createElement("table");
 
-        // Créer la ligne fusionnée
+        // Ligne STATISTIQUES fusionnée
         const tr = document.createElement("tr");
         const td = document.createElement("td");
         td.colSpan = row.length;
@@ -29,10 +30,11 @@ Papa.parse(urlStats, {
         tr.appendChild(td);
         table.appendChild(tr);
 
-        // Préparer que la ligne suivante soit en style pronos-header
-        results.data[i + 1] && results.data[i + 1][0] !== undefined
-          ? (results.data[i + 1].__pronostype = true)
-          : null;
+        // Retenir le type de stat (pour logiques suivantes)
+        currentStatType = first;
+
+        // Ligne suivante (entêtes) sera stylisée
+        results.data[i + 1] && (results.data[i + 1].__pronostype = true);
 
         return;
       }
@@ -41,15 +43,33 @@ Papa.parse(urlStats, {
         table = document.createElement("table");
       }
 
+      // === Nettoyage : on supprime dernière colonne vide si nécessaire ===
+      let cleanedRow = [...row];
+      if (
+        (currentStatType.includes("SCORES") ||
+         currentStatType.includes("VICTOIRES") ||
+         currentStatType.includes("GAINS")) &&
+        row.length === 4 &&
+        row[3].trim() === ""
+      ) {
+        cleanedRow = row.slice(0, 3); // retirer dernière colonne
+      }
+
       const tr = document.createElement("tr");
 
-      row.forEach(cell => {
+      cleanedRow.forEach(cell => {
         const td = document.createElement("td");
         td.textContent = cell;
+
+        // Pour le tableau STATISTIQUES DE CLASSEMENT : équilibrage
+        if (currentStatType.includes("CLASSEMENT") && cleanedRow.length === 4) {
+          td.style.width = "25%";
+        }
+
         tr.appendChild(td);
       });
 
-      // Appliquer le style pronos-header si flag posé
+      // Ligne d'en-tête sous STATISTIQUES → style pronos-header
       if (row.__pronostype) {
         tr.classList.add("pronos-header");
         delete row.__pronostype;
@@ -58,10 +78,12 @@ Papa.parse(urlStats, {
       table.appendChild(tr);
     });
 
-    // Ferme le dernier tableau affiché
+    // Fermer le dernier tableau
     if (table) container.appendChild(table);
   }
 });
+
+
 
 
 
