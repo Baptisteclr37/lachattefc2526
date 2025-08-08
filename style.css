@@ -8,6 +8,46 @@ body {
   max-width: 100vw;
 }
 
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.lottie-box {
+  width: 180px;
+  height: 180px;
+}
+
+.loader-text {
+  margin-top: 20px;
+  font-size: 20px;
+  font-style: italic;
+  animation: blink 1.2s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+
 
 .image-container {
   position: relative;
