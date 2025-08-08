@@ -1,6 +1,6 @@
 const urlStats = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_0qjFwqt3Xka_KMzOQLUuUG-XD0Mu_I1XzHMHJXp0OELC-NwuTd98QPbfi-dAprOzb3r8iEUjAlCV/pub?gid=294855343&single=true&output=csv";
 
-const container = document.getElementById("classement-container");
+const container = document.getElementById("stats-container");
 
 Papa.parse(urlStats, {
   download: true,
@@ -79,4 +79,5 @@ function colorerClassementAvecRangs() {
       rangCell.innerHTML = `<span class="rang-picto">${picto}</span>${rang}`;
     }
   });
+
 }
