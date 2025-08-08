@@ -24,7 +24,7 @@ Papa.parse(urlStats, {
       table.appendChild(tr);
     });
 
-    container.innerHTML = ""; // nettoie le "chargement..."
+  
     container.appendChild(table);
 
     // 🔥 Ajout des couleurs et pictos rangs
@@ -75,9 +75,8 @@ function colorerClassementAvecRangs() {
       picto = "💩";
     }
 
-    if (picto) {
-      rangCell.innerHTML = `<span class="rang-picto">${picto}</span>${rang}`;
-    }
+  
   });
 
 }
+
