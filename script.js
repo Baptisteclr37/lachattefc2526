@@ -285,6 +285,32 @@ function afficherVueMatch() {
       container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
       container.appendChild(table);
 
+      const rows = document.querySelectorAll("table tr");
+
+rows.forEach((tr, i) => {
+  const firstCell = tr.cells[0]?.textContent.trim();
+  
+  // On cherche les lignes MATCH (1 à 9)
+  if (/^MATCH\s[1-9]$/.test(firstCell)) {
+    const resultRow = rows[i + 1];
+    const resultCell = resultRow.cells[1]; // cellule centrale (entre col0 et col2)
+    if (!resultCell) return;
+
+    const resultValue = resultCell.textContent.trim();
+    if (!["1", "N", "2"].includes(resultValue)) return;
+
+    // Ligne des pronostics (2 lignes plus bas que celle avec le résultat)
+    const pronosRow = rows[i + 3];
+    if (!pronosRow) return;
+
+    for (let c = 0; c < 3; c++) {
+      if (pronosRow.cells[c]?.textContent.trim() === resultValue) {
+        pronosRow.cells[c].style.backgroundColor = "#a8e6a1"; // vert doux
+      }
+    }
+  }
+});
+
 
 
       // 🎯 Marquage des missiles
