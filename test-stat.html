@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Stats - LA CHATTE</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
     h1 { text-align: center; }
@@ -24,67 +25,78 @@
   <canvas id="statsChart" width="800" height="400"></canvas>
 
   <script>
-    const data = " + data_json + ";
-    const stats = data["Statistique"];
-    const players = Object.keys(data).filter(k => k !== "Statistique");
+    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR_0qjFwqt3Xka_KMzOQLUuUG-XD0Mu_I1XzHMHJXp0OELC-NwuTd98QPbfi-dAprOzb3r8iEUjAlCV/pub?gid=514799740&single=true&output=csv";
 
     const select1 = document.getElementById("player1");
     const select2 = document.getElementById("player2");
-
-    players.forEach(player => {
-      const opt1 = document.createElement("option");
-      opt1.value = opt1.text = player;
-      select1.appendChild(opt1);
-
-      const opt2 = document.createElement("option");
-      opt2.value = opt2.text = player;
-      select2.appendChild(opt2);
-    });
-
-    select1.value = players[0];
-    select2.value = players[1];
-
     const ctx = document.getElementById("statsChart").getContext("2d");
     let chart;
 
-    function updateChart() {
-      const p1 = select1.value;
-      const p2 = select2.value;
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csv => {
+        const parsed = Papa.parse(csv, { header: true });
+        const rows = parsed.data.filter(row => row["Statistique"]); // Nettoyage
+        const stats = rows.map(row => row["Statistique"]);
+        const players = Object.keys(rows[0]).filter(k => k !== "Statistique");
 
-      const values1 = data[p1].map(v => parseFloat(v) || 0);
-      const values2 = data[p2].map(v => parseFloat(v) || 0);
+        // Construire les données { joueur: [valeurs] }
+        const data = {};
+        players.forEach(player => {
+          data[player] = rows.map(row => parseFloat(row[player]) || 0);
+        });
 
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: stats,
-          datasets: [
-            {
-              label: p1,
-              data: values1,
-              backgroundColor: "#3e95cd"
+        // Remplir les menus déroulants
+        players.forEach(player => {
+          const opt1 = new Option(player, player);
+          const opt2 = new Option(player, player);
+          select1.add(opt1);
+          select2.add(opt2);
+        });
+
+        select1.value = players[0];
+        select2.value = players[1];
+
+        function updateChart() {
+          const p1 = select1.value;
+          const p2 = select2.value;
+
+          if (chart) chart.destroy();
+          chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: stats,
+              datasets: [
+                {
+                  label: p1,
+                  data: data[p1],
+                  backgroundColor: "#3e95cd"
+                },
+                {
+                  label: p2,
+                  data: data[p2],
+                  backgroundColor: "#8e5ea2"
+                }
+              ]
             },
-            {
-              label: p2,
-              data: values2,
-              backgroundColor: "#8e5ea2"
+            options: {
+              responsive: true,
+              scales: {
+                x: { ticks: { autoSkip: false } },
+                y: { beginAtZero: true }
+              }
             }
-          ]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: { ticks: { autoSkip: false } },
-            y: { beginAtZero: true }
-          }
+          });
         }
-      });
-    }
 
-    select1.onchange = updateChart;
-    select2.onchange = updateChart;
-    updateChart();
+        select1.onchange = updateChart;
+        select2.onchange = updateChart;
+        updateChart();
+      })
+      .catch(err => {
+        console.error("Erreur de chargement du CSV :", err);
+        alert("Impossible de charger les statistiques.");
+      });
   </script>
 </body>
 </html>
