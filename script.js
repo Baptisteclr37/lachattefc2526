@@ -62,7 +62,7 @@ function afficherVueJoueur() {
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
             } 
-          } if(firstCell === 'VUE PAR JOUEUR') {
+          } else if(firstCell === 'VUE PAR JOUEUR') {
           html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
@@ -71,7 +71,7 @@ function afficherVueJoueur() {
           inTeamBlock = true;
           teamBlockCounter = 0;
           row.forEach(cell => {
-            html += '<td class="prono-header">' + cell + '</td>';
+            html += '<td class="pronos-header">' + cell + '</td>';
           });
 
         } else if (joueurs.includes(firstCell)) {
