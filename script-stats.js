@@ -24,11 +24,12 @@ Papa.parse(urlStats, {
       table.appendChild(tr);
     });
 
-  
+   container.innerHTML = ""; // nettoie le "chargement..."
     container.appendChild(table);
 
    
-});
+})
+
 
 
 
