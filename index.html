@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LA CHATTE</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.10.2/lottie.min.js"></script>
 </head>
 <body>
   <div class ="image-container">
@@ -50,5 +51,56 @@
     }
   });
 </script>
+  <div id="loader">
+  <div class="loader-content">
+    <div id="lottie-loader" class="lottie-box"></div>
+    <div class="loader-text" id="loader-phrase">Chargement de la chatte...</div>
+  </div>
+</div>
+  <script>
+  const loaderStart = Date.now();
+  const minDuration = 4000; // 4 secondes
+
+  const phrases = [
+    "Réhydratation des chattards...",
+    "Compression des frappes de Kmel...",
+    "VAR en cours sur le prono de Jo...",
+    "Benzema cherche la chatte...",
+    "Tibo active le bonus missile...",
+    "Maxence fixe l'arbitre...",
+    "Karim tente la chatte à l’aveugle...",
+    "Simon calcule les xG de la chatte...",
+    "Raf attend le but du destin...",
+    "Mathieu relit les compos sur L’Équipe...",
+    "Gérald peaufine un 1-0 dégueulasse...",
+    "Nico tente un nul foireux à l’extérieur..."
+  ];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("loader-phrase").textContent =
+      phrases[Math.floor(Math.random() * phrases.length)];
+
+    lottie.loadAnimation({
+      container: document.getElementById("lottie-loader"),
+      renderer: "svg",
+      loop: true,
+      autoplay: true,
+      path: "Footballer.lottie" // Fichier local
+    });
+  });
+
+  window.addEventListener("load", () => {
+    const timeElapsed = Date.now() - loaderStart;
+    const remaining = Math.max(0, minDuration - timeElapsed);
+
+    setTimeout(() => {
+      const loader = document.getElementById("loader");
+      loader.style.transition = "opacity 0.5s ease";
+      loader.style.opacity = "0";
+      setTimeout(() => loader.remove(), 500);
+    }, remaining);
+  });
+</script>
+
 </body>
 </html>
