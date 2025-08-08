@@ -62,7 +62,7 @@ function afficherVueJoueur() {
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
             
-          }else if(firstCell === 'VUE PAR JOUEUR') {
+          } else if(firstCell === 'VUE PAR JOUEUR') {
           html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
