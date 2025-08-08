@@ -55,7 +55,7 @@
   <div id="loader">
   <div class="loader-content">
     <lottie-player
-      src="Footballer.lottie"
+      src="https://baptisteclr37.github.io/lachattefc2526/Footballer.lottie"
       background="transparent"
       speed="1"
       style="width: 180px; height: 180px;"
@@ -101,8 +101,12 @@
   });
 
   window.addEventListener("load", () => {
-    const timeElapsed = Date.now() - loaderStart;
-    const remaining = Math.max(0, minDuration - timeElapsed);
+  const loader = document.getElementById("loader");
+  const timeElapsed = Date.now() - loaderStart;
+  const remaining = Math.max(0, minDuration - timeElapsed);
+
+
+    
 
     setTimeout(() => {
       const loader = document.getElementById("loader");
