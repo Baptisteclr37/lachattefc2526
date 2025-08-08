@@ -4,31 +4,65 @@ const container = document.getElementById("stats-container");
 
 Papa.parse(urlStats, {
   download: true,
-  header: false,
   complete: function(results) {
     const data = results.data;
-    if (!data || data.length === 0) {
-      container.textContent = "❌ Stats indisponible.";
-      return;
-    }
+    container.innerHTML = "";
 
-    const table = document.createElement("table");
+    let table = null;
 
-    data.forEach((row, rowIndex) => {
+    data.forEach((row, i) => {
+      const first = row[0]?.toUpperCase?.().trim() || "";
+
+      // Début d'une section STATISTIQUES
+      if (first.startsWith("STATISTIQUES")) {
+        // Fermer le tableau courant si besoin
+        if (table) container.appendChild(table);
+
+        table = document.createElement("table");
+
+        // Créer la ligne fusionnée
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = row.length;
+        td.className = "match-header";
+        td.textContent = row[0];
+        tr.appendChild(td);
+        table.appendChild(tr);
+
+        // Préparer que la ligne suivante soit en style pronos-header
+        results.data[i + 1] && results.data[i + 1][0] !== undefined
+          ? (results.data[i + 1].__pronostype = true)
+          : null;
+
+        return;
+      }
+
+      if (!table) {
+        table = document.createElement("table");
+      }
+
       const tr = document.createElement("tr");
+
       row.forEach(cell => {
-        const cellElement = rowIndex === 0 ? document.createElement("th") : document.createElement("td");
-        cellElement.textContent = cell;
-        tr.appendChild(cellElement);
+        const td = document.createElement("td");
+        td.textContent = cell;
+        tr.appendChild(td);
       });
+
+      // Appliquer le style pronos-header si flag posé
+      if (row.__pronostype) {
+        tr.classList.add("pronos-header");
+        delete row.__pronostype;
+      }
+
       table.appendChild(tr);
     });
 
-  container.innerHTML = ""; // nettoie le "chargement..."
-    container.appendChild(table);
+    // Ferme le dernier tableau affiché
+    if (table) container.appendChild(table);
+  }
+});
 
-   
-}})
 
 
 
