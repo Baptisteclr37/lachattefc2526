@@ -64,6 +64,7 @@ body {
   color: white;
   font-size: 65px;
   font-weight: bold;
+  text-align: center;
 }
 
 
@@ -304,6 +305,7 @@ td, th {
   color: white;
   font-size: 25px;
   font-weight: bold;
+   text-align: center;
 }
 
 
