@@ -305,7 +305,7 @@ rows.forEach((tr, i) => {
 
     for (let c = 0; c < 3; c++) {
       if (pronosRow.cells[c]?.textContent.trim() === resultValue) {
-        pronosRow.cells[c].style.backgroundColor = "#a8e6a1"; // vert doux
+        pronosRow.cells[c].style.backgroundColor = "#31823c"; // vert doux
       }
     }
   }
