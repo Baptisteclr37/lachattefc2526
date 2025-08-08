@@ -4,15 +4,6 @@ const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1Y
 
 const container = document.getElementById('table-container');
 
-// Bouton bascule
-const toggleBtn = document.createElement('button');
-toggleBtn.id = 'toggleViewBtn';
-toggleBtn.textContent = 'Passer à la vue par joueur';
-toggleBtn.style.margin = '10px';
-toggleBtn.style.padding = '8px 15px';
-toggleBtn.style.fontSize = '16px';
-toggleBtn.style.cursor = 'pointer';
-container.parentNode.insertBefore(toggleBtn, container);
 
 let isVueMatch = true;
 
@@ -678,4 +669,5 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
   isVueMatch ? afficherVueMatch() : afficherVueJoueur();
 });
+
 
