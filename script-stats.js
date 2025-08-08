@@ -71,10 +71,11 @@ Papa.parse(urlStats, {
 
       // Ligne d'en-tête sous STATISTIQUES → style pronos-header
       if (row.__pronostype) {
-        tr.classList.add("pronos-header");
-        delete row.__pronostype;
-      }
-
+  tr.querySelectorAll("td").forEach(td => {
+    td.classList.add("pronos-header");
+  });
+  delete row.__pronostype;
+}
       table.appendChild(tr);
     });
 
@@ -82,6 +83,7 @@ Papa.parse(urlStats, {
     if (table) container.appendChild(table);
   }
 });
+
 
 
 
