@@ -28,7 +28,8 @@ Papa.parse(urlStats, {
     container.appendChild(table);
 
    
-})
+}})
+
 
 
 
