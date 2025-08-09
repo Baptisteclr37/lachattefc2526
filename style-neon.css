@@ -120,3 +120,27 @@ button:hover, .hamburger:hover {
 .team-logo {
     filter: drop-shadow(0 0 5px #ff00cc);
 }
+
+/* Style "card" pour séparer visuellement chaque bloc/table */
+.card {
+    background: rgba(20, 20, 40, 0.95); /* fond sombre semi-transparent */
+    border-radius: 15px; /* coins arrondis */
+    padding: 15px; /* espace interne */
+    margin: 20px 0; /* espace entre les blocs */
+    box-shadow: 0 0 10px #ff00cc, 0 0 15px #3333ff; /* glow néon */
+    overflow: hidden; /* éviter débordement des bords arrondis */
+}
+
+/* Pour éviter que les headers soient collés aux bords */
+.card th:first-child {
+    border-top-left-radius: 10px;
+}
+.card th:last-child {
+    border-top-right-radius: 10px;
+}
+
+/* Ajustement hover sur les lignes */
+.card tr:hover {
+    background: rgba(255, 0, 204, 0.15) !important;
+}
+
