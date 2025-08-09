@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+/* ==== BASE ==== */
+body {
+    background: #0a0a1a !important;
+    color: #fff !important;
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* ==== LOADER ==== */
+#loader {
+    background: #0a0a1a !important;
+    color: #fff !important;
+}
+.loader-text {
+    color: #ff00cc !important;
+    text-shadow: 0 0 5px #ff00cc, 0 0 10px #3333ff;
+}
+
+/* ==== TITRES & TEXTES ==== */
+h1, h2, h3 {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff !important;
+    text-shadow: 0 0 5px #ff00cc, 0 0 10px #3333ff;
+}
+
+/* ==== TABLEAUX ==== */
+table {
+    background: rgba(20, 20, 40, 0.95);
+    box-shadow: 0 0 10px #ff00cc, 0 0 15px #3333ff;
+    border-radius: 10px;
+}
+table th {
+    background: linear-gradient(90deg, #ff00cc, #3333ff) !important;
+    color: #fff !important;
+    text-shadow: 0 0 5px #000;
+    border: none;
+}
+table td {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+/* Alternance lignes */
+table tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+table tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Hover */
+table tr:hover {
+    background: rgba(255, 0, 204, 0.2) !important;
+}
+
+/* ==== BLOCS PRINCIPAUX ==== */
+.match-header {
+    background: linear-gradient(90deg, #ff00cc, #3333ff) !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 5px #ff00cc, 0 0 10px #3333ff;
+}
+.pronos-header {
+    background: #222 !important;
+    color: #fff !important;
+    font-style: italic !important;
+    text-shadow: 0 0 5px #ff00cc;
+}
+.journee-header {
+    background: #111 !important;
+    color: #ff00cc !important;
+    text-shadow: 0 0 10px #ff00cc;
+}
+
+/* ==== CLASSEMENTS ==== */
+#classement-container th,
+.classement-header {
+    background: linear-gradient(90deg, #ff00cc, #3333ff) !important;
+    color: white !important;
+    text-shadow: 0 0 5px #000;
+}
+
+/* Top podium */
+.top1 { background-color: #ffd700 !important; box-shadow: 0 0 10px #ffd700; }
+.top2 { background-color: #21d0eb !important; box-shadow: 0 0 10px #21d0eb; }
+.top3 { background-color: #21eb7f !important; box-shadow: 0 0 10px #21eb7f; }
+.last { background-color: #eb213f !important; box-shadow: 0 0 10px #eb213f; }
+
+/* ==== MENUS & BOUTONS ==== */
+button, .hamburger {
+    background: linear-gradient(90deg, #ff00cc, #3333ff) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    border-radius: 25px !important;
+    box-shadow: 0 0 10px #ff00cc, 0 0 20px #3333ff !important;
+    transition: 0.3s;
+}
+button:hover, .hamburger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff00cc, 0 0 30px #3333ff !important;
+}
+
+/* Menu hamburger */
+.menu {
+    background-color: rgba(20, 20, 40, 0.95) !important;
+    box-shadow: 0 0 10px #ff00cc, 0 0 15px #3333ff !important;
+}
+.menu a {
+    color: #fff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+.menu a:hover {
+    background-color: rgba(255, 0, 204, 0.2) !important;
+}
+
+/* ==== LOGOS ==== */
+.team-logo {
+    filter: drop-shadow(0 0 5px #ff00cc);
+}
