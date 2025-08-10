@@ -49,7 +49,7 @@ function afficherVueJoueur() {
     complete: function(results) {
       const data = results.data;
       let html = '<table border="1" cellspacing="0" cellpadding="5">';
-      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
+      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO", "THOMAS"];
       let inTeamBlock = false;
       let teamBlockCounter = 0;
 
