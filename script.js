@@ -5,8 +5,6 @@ function getUrlWithTimestamp(baseUrl) {
     return baseUrl + "&t=" + new Date().getTime();
 }
 
-
-const container = document.getElementById('table-mlet isVueMatch = true;
 // =====================
 // Création des boutons
 // =====================
