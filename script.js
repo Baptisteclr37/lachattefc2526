@@ -728,30 +728,7 @@ function markSurpriseLines() {
 // Initialisation à la vue match
 afficherVueMatch();
 
-// =====================
-// Rafraîchissement
-// =====================
-function refreshData() {
-    if (isVueMatch) afficherVueMatch();
-    else afficherVueJoueur();
-}
 
-
-
-// =====================
-// Gestion des boutons
-// =====================
-refreshBtn.addEventListener('click', refreshData);
-toggleBtn.addEventListener('click', () => {
-    isVueMatch = !isVueMatch;
-    toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
-    refreshData();
-});
-
-// =====================
-// Chargement initial
-// =====================
-afficherVueMatch();
 
 window.addEventListener('scroll', () => {
     if (window.scrollY > 50) {
