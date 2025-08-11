@@ -753,6 +753,14 @@ toggleBtn.addEventListener('click', () => {
 // =====================
 afficherVueMatch();
 
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        headerBar.classList.add('scrolled');
+    } else {
+        headerBar.classList.remove('scrolled');
+    }
+});
+
 
 
 
