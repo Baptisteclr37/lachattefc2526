@@ -142,6 +142,7 @@ table {
   margin-bottom: 2em;
   table-layout: auto;
   word-wrap: break-word;
+  margin-top: 52px;
   
 }
 able tr:nth-child(odd) {
