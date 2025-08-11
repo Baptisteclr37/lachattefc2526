@@ -226,14 +226,14 @@ td, th {
 }
 
 /* Conteneur */
-.hamburger-container {
+#hamburger-container {
   position: fixed;
   top: 0px;
   right: 20px;
   z-index: 1000;
 }
 
-.hamburger-container.scrolled {
+#hamburger-container.scrolled {
   position: fixed;
   top: 25px;
   right: 20px;
