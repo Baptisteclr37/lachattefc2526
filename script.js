@@ -8,11 +8,7 @@ const headerBar = document.createElement('div');
 headerBar.id = 'headerBar';
 
 
-// Logo
-const logoImg = document.createElement('img');
-logoImg.src = 'https://baptisteclr37.github.io/lachattefc2526/images/logo_lachatte.png'; // remplace par ton logo
-logoImg.alt = 'LA CHATTE';
-logoImg.id = 'logoHeader';
+
 
 // Bouton refresh
 const refreshBtn = document.createElement('button');
@@ -25,7 +21,7 @@ toggleBtn.id = 'toggleViewBtn';
 toggleBtn.textContent = 'Vue par joueur';
 
 // Ajout dans le bandeau
-headerBar.appendChild(logoImg);
+
 headerBar.appendChild(refreshBtn);
 headerBar.appendChild(toggleBtn);
 
