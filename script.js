@@ -17,12 +17,12 @@ logoImg.id = 'logoHeader';
 // Bouton refresh
 const refreshBtn = document.createElement('button');
 refreshBtn.id = 'refreshBtn';
-refreshBtn.textContent = '🔄 Rafraîchir';
+refreshBtn.textContent = '🔄 Refresh';
 
 // Bouton bascule vue
 const toggleBtn = document.createElement('button');
 toggleBtn.id = 'toggleViewBtn';
-toggleBtn.textContent = 'Passer à la vue par joueur';
+toggleBtn.textContent = 'Vue par joueur';
 
 // Ajout dans le bandeau
 headerBar.appendChild(logoImg);
@@ -60,7 +60,7 @@ function refreshData() {
 refreshBtn.addEventListener('click', refreshData);
 toggleBtn.addEventListener('click', () => {
     isVueMatch = !isVueMatch;
-    toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
+    toggleBtn.textContent = isVueMatch ? 'Vue par joueur' : 'Vue par match';
     refreshData();
 });
 
