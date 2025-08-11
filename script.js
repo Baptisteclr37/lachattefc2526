@@ -1,9 +1,18 @@
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
+// Fonction pour casser le cache
+function getUrlWithTimestamp(baseUrl) {
+    return baseUrl + "&t=" + new Date().getTime();
+}
 
+
+const container = document.getElementById('table-mlet isVueMatch = true;
+// =====================
+// Création des boutons
+// =====================
 const container = document.getElementById('table-container');
 
-// Bouton bascule
+// Bouton bascule vue
 const toggleBtn = document.createElement('button');
 toggleBtn.id = 'toggleViewBtn';
 toggleBtn.textContent = 'Passer à la vue par joueur';
@@ -11,8 +20,23 @@ toggleBtn.style.margin = '10px';
 toggleBtn.style.padding = '8px 15px';
 toggleBtn.style.fontSize = '16px';
 toggleBtn.style.cursor = 'pointer';
+
+// Bouton refresh
+const refreshBtn = document.createElement('button');
+refreshBtn.id = 'refreshBtn';
+refreshBtn.textContent = '🔄 Rafraîchir';
+refreshBtn.style.margin = '10px';
+refreshBtn.style.padding = '8px 15px';
+refreshBtn.style.fontSize = '16px';
+refreshBtn.style.cursor = 'pointer';
+
+// Ajout dans le DOM (refresh à gauche, toggle à droite)
+container.parentNode.insertBefore(refreshBtn, container);
 container.parentNode.insertBefore(toggleBtn, container);
 
+// =====================
+// Variables globales
+// =====================
 let isVueMatch = true;
 
 const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
@@ -40,10 +64,8 @@ function createLogoCell(content) {
 }
 
 function afficherVueJoueur() {
-  container.innerHTML = '';
-  container.textContent = 'Chargement des données…';
-
-  Papa.parse(urlVueJoueur, {
+  container.innerHTML = 'Chargement des données…';
+  Papa.parse(getUrlWithTimestamp(urlVueJoueurBase), {
     download: true,
     header: false,
     complete: function(results) {
@@ -56,40 +78,25 @@ function afficherVueJoueur() {
       data.forEach((row) => {
         html += '<tr>';
         const firstCell = row[0];
-
         if (firstCell === 'J01') {
           html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
-            } 
-          } else if(firstCell === 'VUE PAR JOUEUR') {
+          for (let i = 5; i < row.length; i++) html += '<td>' + row[i] + '</td>';
+        } else if (firstCell === 'VUE PAR JOUEUR') {
           html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
- }
+          for (let i = 5; i < row.length; i++) html += '<td>' + row[i] + '</td>';
         } else if (firstCell === 'Equipe Dom.') {
-          inTeamBlock = true;
-          teamBlockCounter = 0;
-          row.forEach(cell => {
-            html += '<td class="pronos-header">' + cell + '</td>';
-          });
-
+          inTeamBlock = true; teamBlockCounter = 0;
+          row.forEach(cell => { html += '<td class="pronos-header">' + cell + '</td>'; });
         } else if (joueurs.includes(firstCell)) {
           html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
-          }
-
+          for (let i = 5; i < row.length; i++) html += '<td>' + row[i] + '</td>';
         } else {
           row.forEach((cell, colIndex) => {
             let td;
-
             if (inTeamBlock && teamBlockCounter < 10 && (colIndex === 0 || colIndex === 2)) {
               td = createLogoCell(cell);
-              html += td.outerHTML;
             } else {
               td = document.createElement("td");
-
               if (cell.includes("(")) {
                 const items = cell.split(")").filter(x => x.trim() !== "");
                 td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
@@ -98,22 +105,16 @@ function afficherVueJoueur() {
               } else {
                 td.textContent = cell;
               }
-
-              html += td.outerHTML;
             }
+            html += td.outerHTML;
           });
-
           if (inTeamBlock && teamBlockCounter < 10) {
             teamBlockCounter++;
-            if (teamBlockCounter >= 10) {
-              inTeamBlock = false;
-            }
+            if (teamBlockCounter >= 10) inTeamBlock = false;
           }
         }
-
         html += '</tr>';
       });
-
       html += '</table>';
       container.innerHTML = html;
     },
@@ -123,11 +124,11 @@ function afficherVueJoueur() {
   });
 }
 
-function afficherVueMatch() {
-  container.innerHTML = ''; // nettoie le conteneur AVANT d’afficher “chargement”
-  container.textContent = 'Chargement des données…';
 
-  Papa.parse(urlVueMatch, {
+
+function afficherVueMatch() {
+  container.innerHTML = 'Chargement des données…';
+  Papa.parse(getUrlWithTimestamp(urlVueMatchBase), {
     download: true,
     complete: function(results) {
       const data = results.data;
@@ -701,13 +702,30 @@ function markSurpriseLines() {
 // Initialisation à la vue match
 afficherVueMatch();
 
-// Gestion du bouton toggle
+// =====================
+// Rafraîchissement
+// =====================
+function refreshData() {
+    if (isVueMatch) afficherVueMatch();
+    else afficherVueJoueur();
+}
+
+
+
+// =====================
+// Gestion des boutons
+// =====================
+refreshBtn.addEventListener('click', refreshData);
 toggleBtn.addEventListener('click', () => {
-  isVueMatch = !isVueMatch;
-  toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
-  isVueMatch ? afficherVueMatch() : afficherVueJoueur();
+    isVueMatch = !isVueMatch;
+    toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
+    refreshData();
 });
 
+// =====================
+// Chargement initial
+// =====================
+afficherVueMatch();
 
 
 
