@@ -39,6 +39,14 @@
   </div>
 </div>
   <script>
+        window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        hamburger-container.classList.add('scrolled');
+    } else {
+        hamburger-container.classList.remove('scrolled');
+    }
+});
+
   function toggleMenu() {
     const menu = document.getElementById('menu');
     menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
@@ -120,13 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, remaining);
   });
 
-    window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        hamburger-container.classList.add('scrolled');
-    } else {
-        hamburger-container.classList.remove('scrolled');
-    }
-});
 </script>
 
 </body>
