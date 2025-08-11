@@ -1,41 +1,69 @@
 const urlVueMatchBase = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueurBase = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
-// Fonction pour casser le cache
-function getUrlWithTimestamp(baseUrl) {
-    return baseUrl + "&t=" + new Date().getTime();
-}
 
 // =====================
-// Création des boutons
+// Création du bandeau fixe
 // =====================
-const container = document.getElementById('table-container');
+const headerBar = document.createElement('div');
+headerBar.id = 'headerBar';
 
-// Bouton bascule vue
-const toggleBtn = document.createElement('button');
-toggleBtn.id = 'toggleViewBtn';
-toggleBtn.textContent = 'Passer à la vue par joueur';
-toggleBtn.style.margin = '10px';
-toggleBtn.style.padding = '8px 15px';
-toggleBtn.style.fontSize = '16px';
-toggleBtn.style.cursor = 'pointer';
+
+// Logo
+const logoImg = document.createElement('img');
+logoImg.src = 'https://baptisteclr37.github.io/lachattefc2526/images/logo_lachatte.png'; // remplace par ton logo
+logoImg.alt = 'LA CHATTE';
+logoImg.id = 'logoHeader';
 
 // Bouton refresh
 const refreshBtn = document.createElement('button');
 refreshBtn.id = 'refreshBtn';
 refreshBtn.textContent = '🔄 Rafraîchir';
-refreshBtn.style.margin = '10px';
-refreshBtn.style.padding = '8px 15px';
-refreshBtn.style.fontSize = '16px';
-refreshBtn.style.cursor = 'pointer';
 
-// Ajout dans le DOM (refresh à gauche, toggle à droite)
-container.parentNode.insertBefore(refreshBtn, container);
-container.parentNode.insertBefore(toggleBtn, container);
+// Bouton bascule vue
+const toggleBtn = document.createElement('button');
+toggleBtn.id = 'toggleViewBtn';
+toggleBtn.textContent = 'Passer à la vue par joueur';
+
+// Ajout dans le bandeau
+headerBar.appendChild(logoImg);
+headerBar.appendChild(refreshBtn);
+headerBar.appendChild(toggleBtn);
+
+// Ajout du bandeau au-dessus de tout
+document.body.insertBefore(headerBar, document.body.firstChild);
+
+// Conteneur tableau
+const container = document.getElementById('table-container');
 
 // =====================
 // Variables globales
 // =====================
 let isVueMatch = true;
+// =====================
+// Fonctions utilitaires
+// =====================
+function getUrlWithTimestamp(baseUrl) {
+    return baseUrl + "&t=" + new Date().getTime();
+}
+
+// =====================
+// Rafraîchissement
+// =====================
+function refreshData() {
+    if (isVueMatch) afficherVueMatch();
+    else afficherVueJoueur();
+}
+
+// =====================
+// Gestion des boutons
+// =====================
+refreshBtn.addEventListener('click', refreshData);
+toggleBtn.addEventListener('click', () => {
+    isVueMatch = !isVueMatch;
+    toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
+    refreshData();
+});
+
 
 const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
