@@ -21,6 +21,18 @@
 
 </head>
 <body>
+  <button id="btnPush" style="
+  background-color: #ffcc00;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+">
+  📢 Activer les notifications LA CHATTE
+</button>
+  
   <div class ="image-container">
   <header class="site-header">
   <img src="images/header-banner.png" alt="Bannière LA CHATTE" class="header-banner">
@@ -141,6 +153,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 </script>
-
+<script>
+document.getElementById('btnPush').addEventListener('click', function() {
+  if (window.OneSignal) {
+    OneSignal.push(function() {
+      OneSignal.registerForPushNotifications();
+    });
+  } else {
+    alert("Le module OneSignal n'est pas encore chargé, réessaie dans quelques secondes.");
+  }
+});
+</script>
 </body>
 </html>
