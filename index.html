@@ -2,23 +2,7 @@
 <html lang="fr">
 <head>
   
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "df1ca940-b493-495c-a07b-39f73d362d89",
-    });
-  });
-</script>
-<script>
-window.OneSignal = window.OneSignal || [];
-OneSignal.push(function() {
-  document.getElementById('btnPush').addEventListener('click', function() {
-    OneSignal.registerForPushNotifications();
-  });
-});
-</script>
+
   
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -28,17 +12,7 @@ OneSignal.push(function() {
 
 </head>
 <body>
-  <button id="btnPush" style="
-  background-color: #ffcc00;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-">
-  📢 Activer les notifications LA CHATTE
-</button>
+  
   
   <div class ="image-container">
   <header class="site-header">
