@@ -11,7 +11,14 @@
     });
   });
 </script>
-
+<script>
+window.OneSignal = window.OneSignal || [];
+OneSignal.push(function() {
+  document.getElementById('btnPush').addEventListener('click', function() {
+    OneSignal.registerForPushNotifications();
+  });
+});
+</script>
   
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -153,16 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 </script>
-<script>
-document.getElementById('btnPush').addEventListener('click', function() {
-  if (window.OneSignal) {
-    OneSignal.push(function() {
-      OneSignal.registerForPushNotifications();
-    });
-  } else {
-    alert("Le module OneSignal n'est pas encore chargé, réessaie dans quelques secondes.");
-  }
-});
-</script>
+
 </body>
 </html>
