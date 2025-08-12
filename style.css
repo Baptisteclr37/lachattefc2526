@@ -341,6 +341,13 @@ td, th {
     font-size: 16px;
   }
 
+  body {
+    padding: calc(20px + env(safe-area-inset-top)) 20px 20px 20px;
+    box-sizing: border-box;
+    padding-top: calc(20px + constant(safe-area-inset-top));
+padding-top: calc(20px + env(safe-area-inset-top));
+  }
+
   /* Boutons */
 #headerBar button {
     font-size: 15px;
