@@ -1,0 +1,14 @@
+
+
+
+.image-container {
+  position: relative;
+   margin-top: 20px !important;
+}
+
+
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+  
+}
