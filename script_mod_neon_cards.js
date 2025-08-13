@@ -137,18 +137,53 @@ function afficherVueMatch() {
       const matchMap = new Map();
       let skipNext = false;
       
-
+ const mainTable = document.createElement("table");
+      mainTable.classList.add("card");
        
 
-      data.forEach((row, i) => {
-        if (skipNext) {
-          skipNext = false;
+      
+        const tr = document.createElement("tr");
+
+     // Détection début section1
+        if (row[0]?.toUpperCase().startsWith("📅")) {
+          section1Table = document.createElement("table");
+          section1Table.classList.add("card");
+          isInSection1 = true;
+
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          section1Table.appendChild(tr);
           return;
         }
 
-        const tr = document.createElement("tr");
+        // Détection fin section1
+        if (isInSection1 && row[0]?.toUpperCase().startsWith("🥇🥈🥉 CLASSEMENT JOURNEE")) {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          section1Table.appendChild(tr);
 
-     
+          // on ajoute le tableau section1 avant de continuer
+          container.appendChild(section1Table);
+          isInSection1 = false;
+          return;
+        }
+
+        // On ajoute les lignes à section1 si on est dedans
+        if (isInSection1) {
+          row.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          section1Table.appendChild(tr);
+          return;
+        }
 
 
         if (row[0]?.toUpperCase().startsWith("MATCH")) {
