@@ -319,45 +319,45 @@ function afficherVueMatch() {
         }
       });
 
+      // --- Création des sections « ligne avec logos + 3 lignes suivantes » (max 9) ---
       function createLogoSections() {
-    const allRows = Array.from(container.querySelectorAll('tr'));
-    const newTables = [];
-    let usedIndexes = new Set();
-    let sectionCount = 0;
+        const allRows = Array.from(container.querySelectorAll('tr'));
+        const newTables = [];
+        let usedIndexes = new Set();
+        let sectionCount = 0;
 
-    for (let i = 0; i < allRows.length && sectionCount < 9; i++) {
-      if (usedIndexes.has(i)) continue;
-      const hasTeamLogo = allRows[i].querySelector('img.team-logo') !== null;
-      if (hasTeamLogo) {
-        const table = document.createElement('table');
-        table.classList.add('card');
-        for (let j = 0; j < 4; j++) {
-          const rowIndex = i + j;
-          if (rowIndex < allRows.length) {
-            table.appendChild(allRows[rowIndex].cloneNode(true));
-            usedIndexes.add(rowIndex);
+        for (let i = 0; i < allRows.length && sectionCount < 9; i++) {
+          if (usedIndexes.has(i)) continue;
+          const hasTeamLogo = allRows[i].querySelector('img.team-logo') !== null;
+          if (hasTeamLogo) {
+            const table = document.createElement('table');
+            table.classList.add('card');
+            for (let j = 0; j < 4; j++) {
+              const rowIndex = i + j;
+              if (rowIndex < allRows.length) {
+                table.appendChild(allRows[rowIndex].cloneNode(true));
+                usedIndexes.add(rowIndex);
+              }
+            }
+            newTables.push(table);
+            sectionCount++;
           }
         }
-        newTables.push(table);
-        sectionCount++;
+
+        // Ajouter la dernière section avec tout le reste des lignes non utilisées
+        const remainingTable = document.createElement('table');
+        remainingTable.classList.add('card');
+        allRows.forEach((row, idx) => {
+          if (!usedIndexes.has(idx)) {
+            remainingTable.appendChild(row.cloneNode(true));
+          }
+        });
+        newTables.push(remainingTable);
+
+        // Remplacer le contenu par les nouvelles tables
+        container.innerHTML = '';
+        newTables.forEach(tbl => container.appendChild(tbl));
       }
-    }
-
-    // Ajouter la dernière section avec tout le reste des lignes non utilisées
-    const remainingTable = document.createElement('table');
-    remainingTable.classList.add('card');
-    allRows.forEach((row, idx) => {
-      if (!usedIndexes.has(idx)) {
-        remainingTable.appendChild(row.cloneNode(true));
-      }
-    });
-    newTables.push(remainingTable);
-
-    // Remplacer le contenu par les nouvelles tables
-    container.innerHTML = '';
-    newTables.forEach(tbl => container.appendChild(tbl));
-  }
-
 
       // 🎯 Marquage des missiles
       function markMissiles() {
@@ -398,16 +398,16 @@ function afficherVueMatch() {
           if (!joueurTd) return;
 
           const currentHTML = joueurTd.innerHTML;
-         const updatedHTML = currentHTML
-  .split(/<br\s*\/?/i)
-  .join("<br>")
-  .split("<br>")
-  .map(line => {
-    const cleanLine = line.replace(/🎯/g, "").trim();
-    const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
-    return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
-  })
-  .join("<br>");
+          const updatedHTML = currentHTML
+            .split(/<br\s*\/?>/i)
+            .join("<br>")
+            .split("<br>")
+            .map(line => {
+              const cleanLine = line.replace(/🎯/g, "").trim();
+              const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
+              return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
+            })
+            .join("<br>");
 
           joueurTd.innerHTML = updatedHTML;
         });
@@ -464,21 +464,21 @@ function afficherVueMatch() {
 
           joueurTds.forEach(td => {
             const currentHTML = td.innerHTML;
-           const updatedHTMLJackpot = currentHTML
-  .split(/<br\s*\/?/i)
-  .join("<br>")
-  .split("<br>")
-  .map(line => {
-    const cleanLine = line.trim();
-    const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
-    if (nameOnly === joueur) {
-      if (line.includes("🎯")) return line.replace("🎯", "🎰🎯");
-      if (!line.includes("🎰")) return `🎰 ${line}`;
-    }
-    return line;
-  })
-  .join("<br>");
-            td.innerHTML = updatedHTML;
+            const updatedHTMLJackpot = currentHTML
+              .split(/<br\s*\/?>/i)
+              .join("<br>")
+              .split("<br>")
+              .map(line => {
+                const cleanLine = line.trim();
+                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
+                if (nameOnly === joueur) {
+                  if (line.includes("🎯")) return line.replace("🎯", "🎰🎯");
+                  if (!line.includes("🎰")) return `🎰 ${line}`;
+                }
+                return line;
+              })
+              .join("<br>");
+            td.innerHTML = updatedHTMLJackpot; // ← fix
           });
         });
 
@@ -535,22 +535,22 @@ function afficherVueMatch() {
           joueurTds.forEach(td => {
             const currentHTML = td.innerHTML;
             const updatedHTMLDouble = currentHTML
-  .split(/<br\s*\/?/i)
-  .join("<br>")
-  .split("<br>")
-  .map(line => {
-    const cleanLine = line.trim();
-    const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
-    if (nameOnly === joueur) {
-      if (line.includes("🎯")) return line.replace("🎯", "2️⃣🎯");
-      if (line.includes("🎰🎯")) return line.replace("🎰🎯", "2️⃣🎰🎯");
-      if (line.includes("🎰")) return line.replace("🎰", "2️⃣🎰");
-      if (!line.includes("2️⃣")) return `2️⃣ ${line}`;
-    }
-    return line;
-  })
-  .join("<br>");
-            td.innerHTML = updatedHTML;
+              .split(/<br\s*\/?>/i)
+              .join("<br>")
+              .split("<br>")
+              .map(line => {
+                const cleanLine = line.trim();
+                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
+                if (nameOnly === joueur) {
+                  if (line.includes("🎯")) return line.replace("🎯", "2️⃣🎯");
+                  if (line.includes("🎰🎯")) return line.replace("🎰🎯", "2️⃣🎰🎯");
+                  if (line.includes("🎰")) return line.replace("🎰", "2️⃣🎰");
+                  if (!line.includes("2️⃣")) return `2️⃣ ${line}`;
+                }
+                return line;
+              })
+              .join("<br>");
+            td.innerHTML = updatedHTMLDouble; // ← fix
           });
         });
 
@@ -582,10 +582,10 @@ function afficherVueMatch() {
           const nbJoueursParCellule = cellules.map((cellule) => {
             const brut = cellule.innerHTML;
             const contenu = brut
-              .replace(/<br\s*\/?/ig, '<br>')
-  .split('<br>')
-  .map(l => l.trim())
-  .filter(l => l !== "" && l !== "#N/A");
+              .replace(/<br\s*\/?>/ig, '<br>')
+              .split('<br>')
+              .map(l => l.trim())
+              .filter(l => l !== "" && l !== "#N/A");
             return contenu.length;
           });
 
@@ -612,7 +612,7 @@ function afficherVueMatch() {
       createLogoSections();
     },
     error: function(err) {
-      container.textContent = 'Erreur de chargement : ' + err.message;
+      container.textContent = 'Erreur de chargement : ' + err.message';
     }
   });
 }
