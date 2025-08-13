@@ -358,16 +358,16 @@ function afficherVueMatch() {
           if (!joueurTd) return;
 
           const currentHTML = joueurTd.innerHTML;
-          const updatedHTML = currentHTML
-            .split(/<br\s*\/?>(?i)/)
-            .join("<br>")
-            .split("<br>")
-            .map(line => {
-              const cleanLine = line.replace(/🎯/g, "").trim();
-              const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
-              return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
-            })
-            .join("<br>");
+         const updatedHTML = currentHTML
+  .split(/<br\s*\/?/i)
+  .join("<br>")
+  .split("<br>")
+  .map(line => {
+    const cleanLine = line.replace(/🎯/g, "").trim();
+    const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
+    return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
+  })
+  .join("<br>");
 
           joueurTd.innerHTML = updatedHTML;
         });
@@ -424,20 +424,20 @@ function afficherVueMatch() {
 
           joueurTds.forEach(td => {
             const currentHTML = td.innerHTML;
-            const updatedHTML = currentHTML
-              .split(/<br\s*\/?>(?i)/)
-              .join("<br>")
-              .split("<br>")
-              .map(line => {
-                const cleanLine = line.trim();
-                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
-                if (nameOnly === joueur) {
-                  if (line.includes("🎯")) return line.replace("🎯", "🎰🎯");
-                  if (!line.includes("🎰")) return `🎰 ${line}`;
-                }
-                return line;
-              })
-              .join("<br>");
+           const updatedHTMLJackpot = currentHTML
+  .split(/<br\s*\/?/i)
+  .join("<br>")
+  .split("<br>")
+  .map(line => {
+    const cleanLine = line.trim();
+    const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
+    if (nameOnly === joueur) {
+      if (line.includes("🎯")) return line.replace("🎯", "🎰🎯");
+      if (!line.includes("🎰")) return `🎰 ${line}`;
+    }
+    return line;
+  })
+  .join("<br>");
             td.innerHTML = updatedHTML;
           });
         });
@@ -494,22 +494,22 @@ function afficherVueMatch() {
 
           joueurTds.forEach(td => {
             const currentHTML = td.innerHTML;
-            const updatedHTML = currentHTML
-              .split(/<br\s*\/?>(?i)/)
-              .join("<br>")
-              .split("<br>")
-              .map(line => {
-                const cleanLine = line.trim();
-                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
-                if (nameOnly === joueur) {
-                  if (line.includes("🎯")) return line.replace("🎯", "2️⃣🎯");
-                  if (line.includes("🎰🎯")) return line.replace("🎰🎯", "2️⃣🎰🎯");
-                  if (line.includes("🎰")) return line.replace("🎰", "2️⃣🎰");
-                  if (!line.includes("2️⃣")) return `2️⃣ ${line}`;
-                }
-                return line;
-              })
-              .join("<br>");
+            const updatedHTMLDouble = currentHTML
+  .split(/<br\s*\/?/i)
+  .join("<br>")
+  .split("<br>")
+  .map(line => {
+    const cleanLine = line.trim();
+    const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
+    if (nameOnly === joueur) {
+      if (line.includes("🎯")) return line.replace("🎯", "2️⃣🎯");
+      if (line.includes("🎰🎯")) return line.replace("🎰🎯", "2️⃣🎰🎯");
+      if (line.includes("🎰")) return line.replace("🎰", "2️⃣🎰");
+      if (!line.includes("2️⃣")) return `2️⃣ ${line}`;
+    }
+    return line;
+  })
+  .join("<br>");
             td.innerHTML = updatedHTML;
           });
         });
@@ -542,10 +542,10 @@ function afficherVueMatch() {
           const nbJoueursParCellule = cellules.map((cellule) => {
             const brut = cellule.innerHTML;
             const contenu = brut
-              .replace(/<br\s*\/?>(?i)/gi, '<br>')
-              .split('<br>')
-              .map(l => l.trim())
-              .filter(l => l !== "" && l !== "#N/A");
+              .replace(/<br\s*\/?/ig, '<br>')
+  .split('<br>')
+  .map(l => l.trim())
+  .filter(l => l !== "" && l !== "#N/A");
             return contenu.length;
           });
 
