@@ -124,6 +124,7 @@ function afficherVueJoueur() {
 }
 
 function afficherVueMatch() {
+  function afficherVueMatch() {
   container.innerHTML = ''; // nettoie le conteneur AVANT d’afficher “chargement”
   container.textContent = 'Chargement des données…';
 
@@ -131,20 +132,25 @@ function afficherVueMatch() {
     download: true,
     complete: function(results) {
       const data = results.data;
-      const table = document.createElement("table");
-      table.classList.add("card"); // style bloc séparé
       let lastLineWasMatch = false;
       const matchMap = new Map();
       let skipNext = false;
-      
- const mainTable = document.createElement("table");
-      mainTable.classList.add("card");
-       
 
-      
+      let section1Table = null;
+      let isInSection1 = false;
+
+      const mainTable = document.createElement("table");
+      mainTable.classList.add("card");
+
+      data.forEach((row, i) => {
+        if (skipNext) {
+          skipNext = false;
+          return;
+        }
+
         const tr = document.createElement("tr");
 
-     // Détection début section1
+        // Début de section 1
         if (row[0]?.toUpperCase().startsWith("📅")) {
           section1Table = document.createElement("table");
           section1Table.classList.add("card");
@@ -156,10 +162,11 @@ function afficherVueMatch() {
           td.textContent = row[0];
           tr.appendChild(td);
           section1Table.appendChild(tr);
+          lastLineWasMatch = true;
           return;
         }
 
-        // Détection fin section1
+        // Fin de section 1
         if (isInSection1 && row[0]?.toUpperCase().startsWith("🥇🥈🥉 CLASSEMENT JOURNEE")) {
           const td = document.createElement("td");
           td.colSpan = 3;
@@ -168,13 +175,13 @@ function afficherVueMatch() {
           tr.appendChild(td);
           section1Table.appendChild(tr);
 
-          // on ajoute le tableau section1 avant de continuer
+          // On insère la section 1 avant de continuer
           container.appendChild(section1Table);
           isInSection1 = false;
           return;
         }
 
-        // On ajoute les lignes à section1 si on est dedans
+        // Si on est dans section 1, on ajoute la ligne dedans
         if (isInSection1) {
           row.forEach(cell => {
             const td = document.createElement("td");
