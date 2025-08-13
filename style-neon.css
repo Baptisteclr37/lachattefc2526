@@ -12,6 +12,21 @@ body {
 
 }
 
+#headerBar {
+    .background : #0a0a1a !important;
+}
+
+    .image-text {
+         
+        top: 0% !important;
+    }
+
+
+.header-banner {
+display: none !important;
+}
+
+
 .hamburger-container {
 
     top: 10px !important;
