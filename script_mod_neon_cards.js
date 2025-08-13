@@ -32,7 +32,37 @@ const container = document.getElementById('table-container');
 
 
 
+// Conteneur tableau
+const container = document.getElementById('table-container');
+
+// =====================
+// Variables globales
+// =====================
 let isVueMatch = true;
+// =====================
+// Fonctions utilitaires
+// =====================
+function getUrlWithTimestamp(baseUrl) {
+    return baseUrl + "&t=" + new Date().getTime();
+}
+
+// =====================
+// Rafraîchissement
+// =====================
+function refreshData() {
+    if (isVueMatch) afficherVueMatch();
+    else afficherVueJoueur();
+}
+
+// =====================
+// Gestion des boutons
+// =====================
+refreshBtn.addEventListener('click', refreshData);
+toggleBtn.addEventListener('click', () => {
+    isVueMatch = !isVueMatch;
+    toggleBtn.textContent = isVueMatch ? 'Vue par joueur' : 'Vue par match';
+    refreshData();
+});
 
 const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
