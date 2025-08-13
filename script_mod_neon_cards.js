@@ -32,8 +32,7 @@ const container = document.getElementById('table-container');
 
 
 
-// Conteneur tableau
-const container = document.getElementById('table-container');
+
 
 // =====================
 // Variables globales
