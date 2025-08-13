@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LA CHATTE</title>
+  <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style-neon.css">
+   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+</head>
+<body>
+  <div class ="image-container">
+  <header class="site-header">
+  <img src="images/header-banner.png" alt="Bannière LA CHATTE" class="header-banner">
+      <div class="image-text">LA CHATTE &#128008; </div>
+</header>
+  </div>
+
+  <div id="table-container">Chargement des données…</div>
+
+  <!-- Ajout de PapaParse -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  
+  <!-- Ton script -->
+  <script src="script_mod_neon_cards.js"></script>
+
+ <!-- Menu Hamburger -->
+<div class="hamburger-container">
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="menu" id="menu">
+    <a href="https://baptisteclr37.github.io/lachattefc2526/">🏠 Vestiaire</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/form.html">📜 Fais tes pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/archives.html">🗃️ Archives pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/classement">🏆 Classement des Chatteux</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/bonus">🎁 Caisse à Bonus</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/stats">📈 Stats</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/reglement">🏛️ La Chatte a ses règles</a>
+  </div>
+</div>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // Ferme le menu si on clique ailleurs
+  window.addEventListener('click', function(e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
+  <div id="loader">
+  <div class="loader-content">
+    <lottie-player
+  src="https://baptisteclr37.github.io/lachattefc2526/Footballer.json"
+  background="transparent"
+  speed="1"
+  style="width: 180px; height: 180px;"
+  loop
+  autoplay
+></lottie-player>
+    <div class="loader-text" id="loader-phrase">
+      Préparation tactique des chatteux...
+    </div>
+  </div>
+</div>
+
+  <script>
+  const loaderStart = Date.now();
+  const minDuration = 4000; // 4 secondes
+
+  const phrases = [
+    "Réhydratation des chattards...",
+    "VAR en cours, chargement de la page validé",
+    "Benzema cherche la chatte de Zahia...",
+    "Tibo cherche le cadre sur peno...",
+    "Maxence sort un gros plaquage sur l'arbitre...",
+    "Karim finit sa clope, il arrive...",
+    "Simon demande à ChatGPT Comment ne pas finir dernier ?...",
+    "Raf s'enfile un CBD et après, c'est pronos à gogo...",
+    "Mathieu enfile son plus moche maillot de l'OM...",
+    "Gérald boit un dernier sky, attendez le bordel...",
+    "Nico claque une dernière fessée avant d'arriver...",
+"Jo hésite entre le Poker et La Chatte...",
+"Baptiste se fait la moustache de Cabrel...",
+"Jerem pèse le poids de ses couilles : 8kg...",
+"Juz! Habille toi, arrête la pétanque viens sur La Chatte...",
+"Rudi Garcia redessine un 5-5-0, c’est long...",
+"Dimitri Payet passe commande à UberEats... il en a pour un moment.",
+"Un joueur monégasque vient de tacler... en mocassins.",
+"Wissam Ben Yedder lance un appel en profondeur... depuis la prison.",
+  ];
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loader-phrase").textContent =
+    phrases[Math.floor(Math.random() * phrases.length)];
+});
+
+
+    
+
+  window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+  const timeElapsed = Date.now() - loaderStart;
+  const remaining = Math.max(0, minDuration - timeElapsed);
+
+
+    
+
+    setTimeout(() => {
+      const loader = document.getElementById("loader");
+      loader.style.transition = "opacity 0.5s ease";
+      loader.style.opacity = "0";
+      setTimeout(() => loader.remove(), 500);
+    }, remaining);
+  });
+</script>
+
+</body>
+</html>
