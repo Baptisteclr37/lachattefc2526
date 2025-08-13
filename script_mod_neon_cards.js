@@ -612,7 +612,7 @@ function afficherVueMatch() {
       createLogoSections();
     },
     error: function(err) {
-      container.textContent = 'Erreur de chargement : ' + err.message';
+      container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
 }
