@@ -7,6 +7,17 @@ body {
     font-family: 'Poppins', sans-serif !important;
 }
 
+.team-logo {
+  padding: 0px 20px 0px 20px !important;
+
+}
+
+.hamburger-container {
+
+    top: 10px !important;
+
+}
+
 /* ==== LOADER ==== */
 #loader {
     background: #0a0a1a !important;
