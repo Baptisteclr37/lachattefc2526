@@ -1,17 +1,36 @@
 const urlVueMatch = 'https://corsproxy.io/?https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=363948896&single=true&output=csv';
 const urlVueJoueur = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=1528731943&single=true&output=csv';
 
-const container = document.getElementById('table-container');
 
-// Bouton bascule
+// =====================
+// Création du bandeau fixe
+// =====================
+const headerBar = document.createElement('div');
+headerBar.id = 'headerBar';
+
+
+
+
+// Bouton refresh
+const refreshBtn = document.createElement('button');
+refreshBtn.id = 'refreshBtn';
+refreshBtn.textContent = '🔄 Refresh';
+
+// Bouton bascule vue
 const toggleBtn = document.createElement('button');
 toggleBtn.id = 'toggleViewBtn';
-toggleBtn.textContent = 'Passer à la vue par joueur';
-toggleBtn.style.margin = '10px';
-toggleBtn.style.padding = '8px 15px';
-toggleBtn.style.fontSize = '16px';
-toggleBtn.style.cursor = 'pointer';
-container.parentNode.insertBefore(toggleBtn, container);
+toggleBtn.textContent = 'Vue par joueur';
+
+// Ajout dans le bandeau
+
+headerBar.appendChild(refreshBtn);
+headerBar.appendChild(toggleBtn);
+
+// Ajout du bandeau au-dessus de tout
+document.body.insertBefore(headerBar, document.body.firstChild);
+const container = document.getElementById('table-container');
+
+
 
 let isVueMatch = true;
 
