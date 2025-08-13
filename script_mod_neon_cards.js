@@ -102,47 +102,70 @@ function afficherVueJoueur() {
       let teamBlockCounter = 0;
 
       const HEADER_CLASSEMENT = "🥇🥈🥉 CLASSEMENT JOURNEE";
+      let skipNext = false; // pour ne pas ré-afficher la ligne de contenu du classement après l'avoir fusionnée
 
-      data.forEach((row, i) => {
+      for (let i = 0; i < data.length; i++) {
+        if (skipNext) { skipNext = false; continue; }
+        const row = data[i];
+        if (!row) continue;
         html += '<tr>';
-        const firstCell = row[0] || '';
+        const firstCellRaw = (row[0] || '').toString();
+        const firstCell = firstCellRaw.trim();
+        const firstCellUpper = firstCell.toUpperCase();
 
-        // 📅 Journee header fusionné
+        // 📅 Journee header fusionné (sur toute la largeur)
         if (firstCell.startsWith("📅")) {
           html += '<td colspan="' + row.length + '" class="journee-header">' + firstCell + '</td>';
           html += '</tr>';
-          return; // on passe à la ligne suivante
+          continue;
         }
 
-        // 🥇🥈🥉 CLASSEMENT JOURNEE header fusionné
-        if (firstCell.toUpperCase() === HEADER_CLASSEMENT) {
+        // 🥇🥈🥉 CLASSEMENT JOURNEE header fusionné + tri numérique sur le numéro devant le nom
+        if (firstCellUpper === HEADER_CLASSEMENT) {
           html += '<td colspan="' + row.length + '" class="classement-journee-header">' + firstCell + '</td>';
           html += '</tr>';
-          // ligne suivante = contenu du classement
+
+          // lecture de la ligne suivante (contenu du classement)
           const nextRow = data[i + 1] || [];
-          let classementArray = ((nextRow[0] || "")).split(/\r?\n/).filter(x => x.trim());
+          let classementArray = ((nextRow[0] || "")).toString().split(/\r?\n/).filter(x => x.trim());
           if (classementArray.length === 1) {
-            classementArray = (nextRow[0] || '').split(/\s{2,}/).filter(x => x.trim());
+            classementArray = (nextRow[0] || '').toString().split(/\s{2,}/).filter(x => x.trim());
           }
-          // Tri alphabétique des noms de joueurs
+
+          // tri : par numéro avant le nom si présent, sinon alphabétique
           classementArray.sort((a, b) => {
-            const nameA = a.trim().toUpperCase();
-            const nameB = b.trim().toUpperCase();
-            return nameA.localeCompare(nameB);
+            const aTrim = (a || '').trim();
+            const bTrim = (b || '').trim();
+            const numA = parseInt((aTrim.split(".")[0] || "").replace(/[^\d]/g, ""), 10);
+            const numB = parseInt((bTrim.split(".")[0] || "").replace(/[^\d]/g, ""), 10);
+            const aHasNum = !isNaN(numA);
+            const bHasNum = !isNaN(numB);
+
+            if (aHasNum && bHasNum) {
+              if (numA !== numB) return numA - numB;
+              return aTrim.localeCompare(bTrim, undefined, {sensitivity: 'base'});
+            }
+            if (aHasNum) return -1;
+            if (bHasNum) return 1;
+            return aTrim.localeCompare(bTrim, undefined, {sensitivity: 'base'});
           });
+
           html += '<tr><td colspan="' + row.length + '" class="classement-journee">' + classementArray.join("<br>") + '</td></tr>';
-          return; // on saute la ligne du contenu dans la boucle
+
+          skipNext = true; // on a consumé la ligne suivante => on la saute dans la boucle
+          continue;
         }
 
+        // Reste de ta logique (préservée)
         if (firstCell === 'J01') {
           html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
+          for (let k = 5; k < row.length; k++) {
+            html += '<td>' + row[k] + '</td>';
           }
-        } else if(firstCell === 'VUE PAR JOUEUR') {
+        } else if (firstCell === 'VUE PAR JOUEUR') {
           html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
+          for (let k = 5; k < row.length; k++) {
+            html += '<td>' + row[k] + '</td>';
           }
         } else if (firstCell === 'Equipe Dom.') {
           inTeamBlock = true;
@@ -150,13 +173,11 @@ function afficherVueJoueur() {
           row.forEach(cell => {
             html += '<td class="pronos-header">' + cell + '</td>';
           });
-
         } else if (joueurs.includes(firstCell)) {
           html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
-          for (let i = 5; i < row.length; i++) {
-            html += '<td>' + row[i] + '</td>';
+          for (let k = 5; k < row.length; k++) {
+            html += '<td>' + row[k] + '</td>';
           }
-
         } else {
           row.forEach((cell, colIndex) => {
             let td;
@@ -170,8 +191,8 @@ function afficherVueJoueur() {
               if ((cell || '').includes("(")) {
                 const items = (cell || '').split(")").filter(x => x.trim() !== "");
                 td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-              } else if ((cell || '').trim().split(/\s+/).length > 1) {
-                td.innerHTML = (cell || '').trim().split(/\s+/).join("<br>");
+              } else if ((cell || '').toString().trim().split(/\s+/).length > 1) {
+                td.innerHTML = (cell || '').toString().trim().split(/\s+/).join("<br>");
               } else {
                 td.textContent = cell || '';
               }
@@ -189,7 +210,7 @@ function afficherVueJoueur() {
         }
 
         html += '</tr>';
-      });
+      } // fin boucle
 
       html += '</table>';
       container.innerHTML = html;
@@ -199,6 +220,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 
 function afficherVueMatch() {
