@@ -667,9 +667,10 @@ function afficherVueMatch() {
 // Initialisation à la vue match
 afficherVueMatch();
 
-// Gestion du bouton toggle
-toggleBtn.addEventListener('click', () => {
-  isVueMatch = !isVueMatch;
-  toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
-  isVueMatch ? afficherVueMatch() : afficherVueJoueur();
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        headerBar.classList.add('scrolled');
+    } else {
+        headerBar.classList.remove('scrolled');
+    }
 });
