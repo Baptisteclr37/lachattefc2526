@@ -96,130 +96,148 @@ function afficherVueJoueur() {
     header: false,
     complete: function(results) {
       const data = results.data;
-      let html = '<table border="1" cellspacing="0" cellpadding="5">';
       const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
-      let inTeamBlock = false;
-      let teamBlockCounter = 0;
-
       const HEADER_CLASSEMENT = "🥇🥈🥉 CLASSEMENT JOURNEE";
-      let skipNext = false; // pour ne pas ré-afficher la ligne de contenu du classement après l'avoir fusionnée
+
+      let section1Table = document.createElement("table");
+      section1Table.classList.add("card");
+
+      let otherRows = []; // contiendra toutes les lignes après la section 1
+
+      let inSection1 = false;
+      let skipNext = false;
 
       for (let i = 0; i < data.length; i++) {
         if (skipNext) { skipNext = false; continue; }
         const row = data[i];
         if (!row) continue;
-        html += '<tr>';
-        const firstCellRaw = (row[0] || '').toString();
-        const firstCell = firstCellRaw.trim();
+        const firstCell = (row[0] || '').toString().trim();
         const firstCellUpper = firstCell.toUpperCase();
+        const tr = document.createElement("tr");
 
-        // 📅 Journee header fusionné (sur toute la largeur)
+        // 📅 début section 1
         if (firstCell.startsWith("📅")) {
-          html += '<td colspan="' + row.length + '" class="journee-header">' + firstCell + '</td>';
-          html += '</tr>';
+          inSection1 = true;
+          let td = document.createElement("td");
+          td.colSpan = row.length;
+          td.className = "journee-header";
+          td.textContent = firstCell;
+          tr.appendChild(td);
+          section1Table.appendChild(tr);
           continue;
         }
 
-        // 🥇🥈🥉 CLASSEMENT JOURNEE header fusionné + tri numérique sur le numéro devant le nom
+        // 🥇🥈🥉 header classement
         if (firstCellUpper === HEADER_CLASSEMENT) {
-          html += '<td colspan="' + row.length + '" class="classement-journee-header">' + firstCell + '</td>';
-          html += '</tr>';
+          let td = document.createElement("td");
+          td.colSpan = row.length;
+          td.className = "classement-journee-header";
+          td.textContent = firstCell;
+          tr.appendChild(td);
+          section1Table.appendChild(tr);
 
-          // lecture de la ligne suivante (contenu du classement)
+          // ligne contenu classement
           const nextRow = data[i + 1] || [];
           let classementArray = ((nextRow[0] || "")).toString().split(/\r?\n/).filter(x => x.trim());
           if (classementArray.length === 1) {
             classementArray = (nextRow[0] || '').toString().split(/\s{2,}/).filter(x => x.trim());
           }
-
-          // tri : par numéro avant le nom si présent, sinon alphabétique
+          // tri numérique par rang
           classementArray.sort((a, b) => {
             const aTrim = (a || '').trim();
             const bTrim = (b || '').trim();
             const numA = parseInt((aTrim.split(".")[0] || "").replace(/[^\d]/g, ""), 10);
             const numB = parseInt((bTrim.split(".")[0] || "").replace(/[^\d]/g, ""), 10);
-            const aHasNum = !isNaN(numA);
-            const bHasNum = !isNaN(numB);
-
-            if (aHasNum && bHasNum) {
+            if (!isNaN(numA) && !isNaN(numB)) {
               if (numA !== numB) return numA - numB;
               return aTrim.localeCompare(bTrim, undefined, {sensitivity: 'base'});
             }
-            if (aHasNum) return -1;
-            if (bHasNum) return 1;
+            if (!isNaN(numA)) return -1;
+            if (!isNaN(numB)) return 1;
             return aTrim.localeCompare(bTrim, undefined, {sensitivity: 'base'});
           });
+          let tdContent = document.createElement("td");
+          tdContent.colSpan = row.length;
+          tdContent.className = "classement-journee";
+          tdContent.innerHTML = classementArray.join("<br>");
+          let trContent = document.createElement("tr");
+          trContent.appendChild(tdContent);
+          section1Table.appendChild(trContent);
 
-          html += '<tr><td colspan="' + row.length + '" class="classement-journee">' + classementArray.join("<br>") + '</td></tr>';
-
-          skipNext = true; // on a consumé la ligne suivante => on la saute dans la boucle
+          skipNext = true;
+          inSection1 = false; // section 1 finie
           continue;
         }
 
-        // Reste de ta logique (préservée)
-        if (firstCell === 'J01') {
-          html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
-          for (let k = 5; k < row.length; k++) {
-            html += '<td>' + row[k] + '</td>';
-          }
-        } else if (firstCell === 'VUE PAR JOUEUR') {
-          html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
-          for (let k = 5; k < row.length; k++) {
-            html += '<td>' + row[k] + '</td>';
-          }
-        } else if (firstCell === 'Equipe Dom.') {
-          inTeamBlock = true;
-          teamBlockCounter = 0;
-          row.forEach(cell => {
-            html += '<td class="pronos-header">' + cell + '</td>';
-          });
-        } else if (joueurs.includes(firstCell)) {
-          html += '<td colspan="5" class="match-header">' + firstCell + '</td>';
-          for (let k = 5; k < row.length; k++) {
-            html += '<td>' + row[k] + '</td>';
-          }
-        } else {
-          row.forEach((cell, colIndex) => {
-            let td;
+        // autres lignes
+        otherRows.push(row);
+      }
 
-            if (inTeamBlock && teamBlockCounter < 10 && (colIndex === 0 || colIndex === 2)) {
-              td = createLogoCell(cell);
-              html += td.outerHTML;
-            } else {
-              td = document.createElement("td");
+      // Construction des cards pour le reste
+      let cardsFragment = document.createDocumentFragment();
+      for (let i = 0; i < otherRows.length; i++) {
+        const row = otherRows[i];
+        const firstCell = (row[0] || '').toString().trim();
+        const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
 
-              if ((cell || '').includes("(")) {
-                const items = (cell || '').split(")").filter(x => x.trim() !== "");
-                td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-              } else if ((cell || '').toString().trim().split(/\s+/).length > 1) {
-                td.innerHTML = (cell || '').toString().trim().split(/\s+/).join("<br>");
+        // Début d'une nouvelle card si match-header détecté
+        if (joueurs.includes(firstCell)) {
+          let cardTable = document.createElement("table");
+          cardTable.classList.add("card");
+
+          // ligne match-header
+          let trHeader = document.createElement("tr");
+          let tdHeader = document.createElement("td");
+          tdHeader.colSpan = 5;
+          tdHeader.className = "match-header";
+          tdHeader.textContent = firstCell;
+          trHeader.appendChild(tdHeader);
+          for (let k = 5; k < row.length; k++) {
+            let td = document.createElement("td");
+            td.textContent = row[k];
+            trHeader.appendChild(td);
+          }
+          cardTable.appendChild(trHeader);
+
+          // ajouter les 11 lignes suivantes
+          for (let j = 1; j <= 11 && (i + j) < otherRows.length; j++) {
+            let tr = document.createElement("tr");
+            otherRows[i + j].forEach((cell, colIndex) => {
+              let td;
+              if ((colIndex === 0 || colIndex === 2) && j <= 10) {
+                td = createLogoCell(cell);
               } else {
-                td.textContent = cell || '';
+                td = document.createElement("td");
+                if ((cell || '').includes("(")) {
+                  const items = (cell || '').split(")").filter(x => x.trim() !== "");
+                  td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
+                } else if ((cell || '').trim().split(/\s+/).length > 1) {
+                  td.innerHTML = (cell || '').trim().split(/\s+/).join("<br>");
+                } else {
+                  td.textContent = cell || '';
+                }
               }
-
-              html += td.outerHTML;
-            }
-          });
-
-          if (inTeamBlock && teamBlockCounter < 10) {
-            teamBlockCounter++;
-            if (teamBlockCounter >= 10) {
-              inTeamBlock = false;
-            }
+              tr.appendChild(td);
+            });
+            cardTable.appendChild(tr);
           }
+
+          cardsFragment.appendChild(cardTable);
+          i += 11; // on avance après les 11 lignes
         }
+      }
 
-        html += '</tr>';
-      } // fin boucle
-
-      html += '</table>';
-      container.innerHTML = html;
+      // Affichage final
+      container.innerHTML = '';
+      container.appendChild(section1Table);
+      container.appendChild(cardsFragment);
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
 }
+
 
 
 
