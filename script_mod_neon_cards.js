@@ -61,12 +61,12 @@ function afficherVueJoueur() {
           html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
-            } 
-          } else if(firstCell === 'VUE PAR JOUEUR') {
+          }
+        } else if(firstCell === 'VUE PAR JOUEUR') {
           html += '<td colspan="5" class="classement-journee-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
             html += '<td>' + row[i] + '</td>';
- }
+          }
         } else if (firstCell === 'Equipe Dom.') {
           inTeamBlock = true;
           teamBlockCounter = 0;
@@ -90,13 +90,13 @@ function afficherVueJoueur() {
             } else {
               td = document.createElement("td");
 
-              if (cell.includes("(")) {
-                const items = cell.split(")").filter(x => x.trim() !== "");
+              if ((cell || '').includes("(")) {
+                const items = (cell || '').split(")").filter(x => x.trim() !== "");
                 td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-              } else if (cell.trim().split(/\s+/).length > 1) {
-                td.innerHTML = cell.trim().split(/\s+/).join("<br>");
+              } else if ((cell || '').trim().split(/\s+/).length > 1) {
+                td.innerHTML = (cell || '').trim().split(/\s+/).join("<br>");
               } else {
-                td.textContent = cell;
+                td.textContent = cell || '';
               }
 
               html += td.outerHTML;
@@ -124,7 +124,6 @@ function afficherVueJoueur() {
 }
 
 function afficherVueMatch() {
-  function afficherVueMatch() {
   container.innerHTML = ''; // nettoie le conteneur AVANT d’afficher “chargement”
   container.textContent = 'Chargement des données…';
 
@@ -132,30 +131,39 @@ function afficherVueMatch() {
     download: true,
     complete: function(results) {
       const data = results.data;
-      let lastLineWasMatch = false;
+
+      // 👉 On va maintenant créer 2 tables :
+      //    - section1Table : de journee-header (📅) jusqu'à la ligne "classement-journee" incluse
+      //    - table (post) : le reste (missiles, jackpots, etc.)
+      const section1Table = document.createElement("table");
+      section1Table.classList.add("card");
+
+      const table = document.createElement("table");
+      table.classList.add("card");
+
+      let inSection1 = false;                 // on est dans la 1ère section ?
+      let waitingClassementContent = false;   // juste après le header classement, on attend la ligne contenu
+      let lastLineWasMatch = false;           // même logique d'origine pour les logos
       const matchMap = new Map();
       let skipNext = false;
 
-      let section1Table = null;
-      let isInSection1 = false;
-
-      const mainTable = document.createElement("table");
-      mainTable.classList.add("card");
+      const HEADER_CLASSEMENT = "🥇🥈🥉 CLASSEMENT JOURNEE";
 
       data.forEach((row, i) => {
-        if (skipNext) {
-          skipNext = false;
-          return;
-        }
+        if (skipNext) { skipNext = false; return; }
 
+        const currentTable = inSection1 ? section1Table : table;
         const tr = document.createElement("tr");
 
-        // Début de section 1
-        if (row[0]?.toUpperCase().startsWith("📅")) {
-          section1Table = document.createElement("table");
-          section1Table.classList.add("card");
-          isInSection1 = true;
+        // Ne pas afficher la ligne "MATCH X"
+        if ((row[0] || '').toUpperCase().startsWith("MATCH")) {
+          lastLineWasMatch = true; // garder logos pour la ligne suivante
+          return; // on n'insère pas la ligne
+        }
 
+        // 📅 Début de section 1
+        if ((row[0] || '').toUpperCase().startsWith("📅")) {
+          inSection1 = true;
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "journee-header";
@@ -166,99 +174,65 @@ function afficherVueMatch() {
           return;
         }
 
-        // Fin de section 1
-        if (isInSection1 && row[0]?.toUpperCase().startsWith("🥇🥈🥉 CLASSEMENT JOURNEE")) {
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "classement-journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          section1Table.appendChild(tr);
-
-          // On insère la section 1 avant de continuer
-          container.appendChild(section1Table);
-          isInSection1 = false;
-          return;
-        }
-
-        // Si on est dans section 1, on ajoute la ligne dedans
-        if (isInSection1) {
-          row.forEach(cell => {
-            const td = document.createElement("td");
-            td.textContent = cell;
-            tr.appendChild(td);
-          });
-          section1Table.appendChild(tr);
-          return;
-        }
-
-
-        if (row[0]?.toUpperCase().startsWith("MATCH")) {
-          lastLineWasMatch = true; // garder logos
-          return; // ne pas afficher
-        }
-
-          if (row[0]?.toUpperCase().startsWith("📅")) {
-            console.log("row[0] =", row[0]);
-          const td = document.createElement("td");
-          td.colSpan = 3;
-          td.className = "journee-header";
-          td.textContent = row[0];
-          tr.appendChild(td);
-          table.appendChild(tr);
-          lastLineWasMatch = true;
-          return;
-        }
-
-        if (row[0]?.toUpperCase() === "PRONOS") {
+        // PRONOS (même comportement, on route vers la table courante)
+        if ((row[0] || '').toUpperCase() === "PRONOS") {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "pronos-header";
           td.textContent = "PRONOS";
           tr.appendChild(td);
-          table.appendChild(tr);
+          currentTable.appendChild(tr);
           lastLineWasMatch = false;
           return;
         }
 
-        if (row[0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
+        // Header Classement Journée
+        if ((row[0] || '').toUpperCase() === HEADER_CLASSEMENT) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee-header";
           td.textContent = row[0];
           tr.appendChild(td);
-          table.appendChild(tr);
+          (inSection1 ? section1Table : table).appendChild(tr);
+          if (inSection1) waitingClassementContent = true; // la prochaine ligne (contenu) reste dans section1
           return;
         }
 
-        if (i > 0 && data[i - 1][0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
+        // Ligne de contenu du classement (juste après le header)
+        if (i > 0 && (data[i - 1][0] || '').toUpperCase() === HEADER_CLASSEMENT) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.className = "classement-journee";
-          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim());
-
+          let classementArray = ((row[0] || "")).split(/\r?\n/).filter(x => x.trim());
           if (classementArray.length === 1) {
-            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim());
+            classementArray = (row[0] || '').split(/\s{2,}/).filter(x => x.trim());
           }
-
           classementArray.sort((a, b) => {
             const numA = parseInt(a.trim().split(".")[0]) || 9999;
             const numB = parseInt(b.trim().split(".")[0]) || 9999;
             return numA - numB;
           });
-
           td.innerHTML = classementArray.join("<br>");
           tr.appendChild(td);
-          table.appendChild(tr);
+
+          // Ajoute cette ligne de contenu à la bonne table
+          (waitingClassementContent && inSection1 ? section1Table : table).appendChild(tr);
+
+          // Si on était en attente, on clôt la section 1 après cette ligne
+          if (waitingClassementContent && inSection1) {
+            waitingClassementContent = false;
+            inSection1 = false; // fin de la section 1
+          }
           return;
         }
 
-        if (["MISSILES JOUES", "JACKPOT JOUES", "DOUBLE CHANCE JOUES" ].includes(row[0]?.toUpperCase())) {
+        // Blocs spéciaux (missiles, jackpot, double) — vont dans la table courante
+        if (["MISSILES JOUES", "JACKPOT JOUES", "DOUBLE CHANCE JOUES"].includes((row[0] || '').toUpperCase())) {
           const td = document.createElement("td");
           td.colSpan = 3;
           td.textContent = row[0];
           tr.appendChild(td);
-          table.appendChild(tr);
+          currentTable.appendChild(tr);
 
           if (data[i + 1]) {
             const trNext = document.createElement("tr");
@@ -266,19 +240,18 @@ function afficherVueMatch() {
             tdNext.colSpan = 3;
             tdNext.textContent = data[i + 1][0] || "";
             trNext.appendChild(tdNext);
-            table.appendChild(trNext);
+            currentTable.appendChild(trNext);
             skipNext = true;
           }
           return;
         }
 
-        // ... [tout ton code de construction de ligne est inchangé ici] ...
-
+        // Rendu des autres lignes (logos, textes, pronos)
         row.forEach((cell, index) => {
           const td = document.createElement("td");
 
           if (lastLineWasMatch && (index === 0 || index === 2)) {
-            const teamName = cell.trim();
+            const teamName = (cell || '').trim();
             if (teamName) {
               const logoUrl = baseImagePath + teamName.toLowerCase().replace(/\s/g, "-") + ".png";
               const img = document.createElement("img");
@@ -290,69 +263,65 @@ function afficherVueMatch() {
               span.textContent = " " + teamName;
               td.appendChild(span);
             } else {
-              td.textContent = cell;
+              td.textContent = cell || '';
             }
           } else {
-            if (cell.includes("(")) {
-              const items = cell.split(")").filter(x => x.trim());
+            if ((cell || '').includes("(")) {
+              const items = (cell || '').split(")").filter(x => x.trim());
               td.innerHTML = items.map(x => x.trim() + ")").join("<br>");
-            } else if (cell.trim().split(/\s+/).length > 1) {
-              td.innerHTML = cell.trim().split(/\s+/).join("<br>");
+            } else if ((cell || '').trim().split(/\s+/).length > 1) {
+              td.innerHTML = (cell || '').trim().split(/\s+/).join("<br>");
             } else {
-              td.textContent = cell;
+              td.textContent = cell || '';
             }
           }
 
           tr.appendChild(td);
         });
 
-        table.appendChild(tr);
+        currentTable.appendChild(tr);
 
         if (data[i - 1]?.[0]?.toUpperCase() === "PRONOS") {
-          const team1 = data[i - 3]?.[0]?.trim() || "";
-          const team2 = data[i - 3]?.[2]?.trim() || "";
+          const team1 = (data[i - 3]?.[0] || '').trim();
+          const team2 = (data[i - 3]?.[2] || '').trim();
           const key = team1 + "___" + team2;
           matchMap.set(key, tr);
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
-  
+      });
 
-      // 👉 Ajout du tableau
-      container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
+      // 👉 Ajout des 2 tables (section1 puis le reste)
+      container.innerHTML = '';
+      container.appendChild(section1Table);
       container.appendChild(table);
 
+      // Mise en surbrillance des bons pronos (logique existante)
       const rows = document.querySelectorAll("table tr");
+      rows.forEach((tr, i) => {
+        const firstCell = tr.cells[0]?.textContent.trim();
+        if (/^MATCH\s[1-9]$/.test(firstCell || '')) {
+          const resultRow = rows[i + 1];
+          const resultCell = resultRow?.cells[1];
+          if (!resultCell) return;
 
-rows.forEach((tr, i) => {
-  const firstCell = tr.cells[0]?.textContent.trim();
-  
-  // On cherche les lignes MATCH (1 à 9)
-  if (/^MATCH\s[1-9]$/.test(firstCell)) {
-    const resultRow = rows[i + 1];
-    const resultCell = resultRow.cells[1]; // cellule centrale (entre col0 et col2)
-    if (!resultCell) return;
+          const resultValue = resultCell.textContent.trim();
+          if (!["1", "N", "2"].includes(resultValue)) return;
 
-    const resultValue = resultCell.textContent.trim();
-    if (!["1", "N", "2"].includes(resultValue)) return;
+          const pronosRow = rows[i + 3];
+          if (!pronosRow) return;
 
-    // Ligne des pronostics (2 lignes plus bas que celle avec le résultat)
-    const pronosRow = rows[i + 3];
-    if (!pronosRow) return;
-
-    for (let c = 0; c < 3; c++) {
-      if (pronosRow.cells[c]?.textContent.trim() === resultValue) {
-        pronosRow.cells[c].style.backgroundColor = "#31823c"; // vert doux
-      }
-    }
-  }
-});
-
-
+          for (let c = 0; c < 3; c++) {
+            if (pronosRow.cells[c]?.textContent.trim() === resultValue) {
+              pronosRow.cells[c].style.backgroundColor = "#31823c"; // vert doux
+            }
+          }
+        }
+      });
 
       // 🎯 Marquage des missiles
       function markMissiles() {
-        const missilesRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "MISSILES JOUES");
+        const missilesRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "MISSILES JOUES");
         if (missilesRowIndex === -1) return;
 
         const missilesText = data[missilesRowIndex + 1]?.[0];
@@ -369,7 +338,7 @@ rows.forEach((tr, i) => {
           };
         }).filter(Boolean);
 
-        const trs = table.querySelectorAll("tr");
+        const trs = container.querySelectorAll("tr"); // ▶️ cherche sur toutes les tables
 
         missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
           let foundLineIndex = -1;
@@ -378,12 +347,8 @@ rows.forEach((tr, i) => {
             if (!td) continue;
             const span = td.querySelector("span");
             const text = span ? span.textContent.trim() : td.textContent.trim();
-            if (text === equipeDom) {
-              foundLineIndex = i;
-              break;
-            }
+            if (text === equipeDom) { foundLineIndex = i; break; }
           }
-
           if (foundLineIndex === -1) return;
 
           const joueursRow = trs[foundLineIndex + 3];
@@ -394,345 +359,221 @@ rows.forEach((tr, i) => {
 
           const currentHTML = joueurTd.innerHTML;
           const updatedHTML = currentHTML
-            .split(/<br\s*\/?>/i)
+            .split(/<br\s*\/?>(?i)/)
+            .join("<br>")
+            .split("<br>")
             .map(line => {
               const cleanLine = line.replace(/🎯/g, "").trim();
               const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
-              return nameOnly === joueur ? `🎯 ${cleanLine}` : line;
+              return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
             })
             .join("<br>");
 
           joueurTd.innerHTML = updatedHTML;
         });
 
-        // Masquer les deux lignes affichées
-        const rows = table.querySelectorAll("tr");
-        let visibleIndex = 0;
-        for (let i = 0; i < rows.length; i++) {
-          const rowText = rows[i].textContent.toUpperCase().trim();
-          if (visibleIndex === missilesRowIndex || visibleIndex === missilesRowIndex + 1) {
-            rows[i].style.display = "none";
-          }
-          if (!rows[i].hasAttribute('data-hidden')) {
-            visibleIndex++;
+        // 🔻 Masquer la ligne titre et la suivante (contenu) pour MISSILES
+        const allTrs = Array.from(container.querySelectorAll('tr'));
+        for (let i = 0; i < allTrs.length; i++) {
+          const txt = allTrs[i].textContent.trim().toUpperCase();
+          if (txt === 'MISSILES JOUES') {
+            allTrs[i].style.display = 'none';
+            if (allTrs[i + 1]) allTrs[i + 1].style.display = 'none';
+            break;
           }
         }
       }
 
+      // 🎰 Marquage des jackpots
+      function markJackpots() {
+        const jackpotRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "JACKPOT JOUES");
+        if (jackpotRowIndex === -1) return;
 
+        const jackpotText = data[jackpotRowIndex + 1]?.[0];
+        if (!jackpotText) return;
 
+        const jackpots = jackpotText.split(/\r?\n/).filter(x => x.trim()).map(line => {
+          const parts = line.trim().split(/\s+/);
+          if (parts.length < 4) return null;
+          return {
+            equipeDom: parts[0],
+            equipeExt: parts[1],
+            joueur: parts[2],
+            prono: parts[3],
+          };
+        }).filter(Boolean);
 
+        const trs = container.querySelectorAll("tr"); // ▶️ toutes tables
 
-// 🎰 Marquage des jackpots
-function markJackpots() {
-  const jackpotRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "JACKPOT JOUES");
-  console.log("🔍 Jackpot row index:", jackpotRowIndex);
+        jackpots.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+          let foundLineIndex = -1;
+          for (let i = 0; i < trs.length; i++) {
+            const td = trs[i].querySelector("td");
+            if (!td) continue;
+            const hasLogo = td.querySelector("img");
+            const text = td.textContent.trim();
+            if (hasLogo && text === equipeDom) { foundLineIndex = i; break; }
+          }
+          if (foundLineIndex === -1) return;
 
-  if (jackpotRowIndex === -1) {
-    console.warn("❌ Ligne 'JACKPOT JOUES' non trouvée");
-    return;
-  }
+          const joueursRow = trs[foundLineIndex + 3];
+          if (!joueursRow) return;
 
-  const jackpotText = data[jackpotRowIndex + 1]?.[0];
-  console.log("🎰 Texte jackpot brut :", jackpotText);
+          const joueurTds = joueursRow.querySelectorAll("td");
+          if (!joueurTds.length) return;
 
-  if (!jackpotText) {
-    console.warn("❌ Aucun texte dans la ligne jackpot");
-    return;
-  }
+          joueurTds.forEach(td => {
+            const currentHTML = td.innerHTML;
+            const updatedHTML = currentHTML
+              .split(/<br\s*\/?>(?i)/)
+              .join("<br>")
+              .split("<br>")
+              .map(line => {
+                const cleanLine = line.trim();
+                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
+                if (nameOnly === joueur) {
+                  if (line.includes("🎯")) return line.replace("🎯", "🎰🎯");
+                  if (!line.includes("🎰")) return `🎰 ${line}`;
+                }
+                return line;
+              })
+              .join("<br>");
+            td.innerHTML = updatedHTML;
+          });
+        });
 
-  const jackpots = jackpotText.split(/\r?\n/).filter(x => x.trim()).map(line => {
-    const parts = line.trim().split(/\s+/);
-    console.log("🔹 Ligne jackpot analysée :", parts);
-    if (parts.length < 4) return null;
-    return {
-      equipeDom: parts[0],
-      equipeExt: parts[1],
-      joueur: parts[2],
-      prono: parts[3],
-    };
-  }).filter(Boolean);
-
-  console.log("✅ Jackpots parsés :", jackpots);
-
-  const trs = table.querySelectorAll("tr");
-
-  jackpots.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-    console.log(`🎯 Recherche du match pour ${equipeDom} - ${equipeExt}`);
-
-    let foundLineIndex = -1;
-    for (let i = 0; i < trs.length; i++) {
-      const td = trs[i].querySelector("td");
-      if (!td) continue;
-
-      const hasLogo = td.querySelector("img");
-      const text = td.textContent.trim();
-
-      if (hasLogo && text === equipeDom) {
-        foundLineIndex = i;
-        break;
-      }
-    }
-
-    console.log(`🔎 Match trouvé à la ligne : ${foundLineIndex}`);
-    if (foundLineIndex === -1) {
-      console.warn(`❌ Match non trouvé pour ${equipeDom}`);
-      return;
-    }
-
-    const joueursRow = trs[foundLineIndex + 3];
-    if (!joueursRow) {
-      console.warn(`❌ Pas de ligne joueurs à l'index ${foundLineIndex + 3}`);
-      return;
-    }
-
-    const joueurTds = joueursRow.querySelectorAll("td");
-if (!joueurTds.length) return;
-
-joueurTds.forEach(td => {
-  const currentHTML = td.innerHTML;
-  const updatedHTML = currentHTML
-    .split(/<br\s*\/?>/i)
-    .map(line => {
-      const cleanLine = line.trim();
-      const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/🎯|🎰/g, "").trim();
-      if (nameOnly === joueur) {
-        console.log(`🎰 Jackpot appliqué à ${joueur}`);
-        if (line.includes("🎯")) {
-          return line.replace("🎯", "🎰🎯");
-        } else if (!line.includes("🎰")) {
-          return `🎰 ${line}`;
+        // 🔻 Masquer titre + contenu JACKPOT
+        const allTrs = Array.from(container.querySelectorAll('tr'));
+        for (let i = 0; i < allTrs.length; i++) {
+          const txt = allTrs[i].textContent.trim().toUpperCase();
+          if (txt === 'JACKPOT JOUES') {
+            allTrs[i].style.display = 'none';
+            if (allTrs[i + 1]) allTrs[i + 1].style.display = 'none';
+            break;
+          }
         }
       }
-      return line;
-    })
-    .join("<br>");
-  td.innerHTML = updatedHTML;
-});
 
-   // console.log("✅ HTML après modif :", joueurTd.innerHTML);
-  });
+      // 2️⃣ Marquage des Double chance
+      function markDouble() {
+        const DoubleRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "DOUBLE CHANCE JOUES");
+        if (DoubleRowIndex === -1) return;
 
-  // Masquer les deux lignes visibles
-  const rows = table.querySelectorAll("tr");
-  let visibleIndex = 0;
-  for (let i = 0; i < rows.length; i++) {
-    const rowText = rows[i].textContent.toUpperCase().trim();
-    if (visibleIndex === jackpotRowIndex || visibleIndex === jackpotRowIndex + 1) {
-      rows[i].style.display = "none";
-    }
-    if (!rows[i].hasAttribute('data-hidden')) {
-      visibleIndex++;
-    }
-  }
+        const DoubleText = data[DoubleRowIndex + 1]?.[0];
+        if (!DoubleText) return;
 
-  console.log("🎉 Jackpot processing terminé.");
-}
+        const Double = DoubleText.split(/\r?\n/).filter(x => x.trim()).map(line => {
+          const parts = line.trim().split(/\s+/);
+          if (parts.length < 4) return null;
+          return {
+            equipeDom: parts[0],
+            equipeExt: parts[1],
+            joueur: parts[2],
+            prono: parts[3],
+          };
+        }).filter(Boolean);
 
+        const trs = container.querySelectorAll("tr"); // ▶️ toutes tables
 
+        Double.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+          let foundLineIndex = -1;
+          for (let i = 0; i < trs.length; i++) {
+            const td = trs[i].querySelector("td");
+            if (!td) continue;
+            const hasLogo = td.querySelector("img");
+            const text = td.textContent.trim();
+            if (hasLogo && text === equipeDom) { foundLineIndex = i; break; }
+          }
+          if (foundLineIndex === -1) return;
 
+          const joueursRow = trs[foundLineIndex + 3];
+          if (!joueursRow) return;
 
-// 2️⃣ Marquage des Double chance
-function markDouble() {
-  const DoubleRowIndex = data.findIndex(row => row[0]?.toUpperCase() === "DOUBLE CHANCE JOUES");
-  console.log("🔍 Double row index:", DoubleRowIndex);
+          const joueurTds = joueursRow.querySelectorAll("td");
+          if (!joueurTds.length) return;
 
-  if (DoubleRowIndex === -1) {
-    console.warn("❌ Ligne 'DOUBLE CHANCE JOUES' non trouvée");
-    return;
-  }
+          joueurTds.forEach(td => {
+            const currentHTML = td.innerHTML;
+            const updatedHTML = currentHTML
+              .split(/<br\s*\/?>(?i)/)
+              .join("<br>")
+              .split("<br>")
+              .map(line => {
+                const cleanLine = line.trim();
+                const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
+                if (nameOnly === joueur) {
+                  if (line.includes("🎯")) return line.replace("🎯", "2️⃣🎯");
+                  if (line.includes("🎰🎯")) return line.replace("🎰🎯", "2️⃣🎰🎯");
+                  if (line.includes("🎰")) return line.replace("🎰", "2️⃣🎰");
+                  if (!line.includes("2️⃣")) return `2️⃣ ${line}`;
+                }
+                return line;
+              })
+              .join("<br>");
+            td.innerHTML = updatedHTML;
+          });
+        });
 
-  const DoubleText = data[DoubleRowIndex + 1]?.[0];
-  console.log("2️⃣ Texte Double brut :", DoubleText);
-
-  if (!DoubleText) {
-    console.warn("❌ Aucun texte dans la ligne Double Chance");
-    return;
-  }
-
-  const Double = DoubleText.split(/\r?\n/).filter(x => x.trim()).map(line => {
-    const parts = line.trim().split(/\s+/);
-    console.log("🔹 Ligne Double analysée :", parts);
-    if (parts.length < 4) return null;
-    return {
-      equipeDom: parts[0],
-      equipeExt: parts[1],
-      joueur: parts[2],
-      prono: parts[3],
-    };
-  }).filter(Boolean);
-
-  console.log("✅ Double parsés :", Double);
-
-  const trs = table.querySelectorAll("tr");
-
-  Double.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-    console.log(`2️⃣ Recherche du match pour ${equipeDom} - ${equipeExt}`);
-
-    let foundLineIndex = -1;
-    for (let i = 0; i < trs.length; i++) {
-      const td = trs[i].querySelector("td");
-      if (!td) continue;
-
-      const hasLogo = td.querySelector("img");
-      const text = td.textContent.trim();
-
-      if (hasLogo && text === equipeDom) {
-        foundLineIndex = i;
-        break;
-      }
-    }
-
-    console.log(`🔎 Match trouvé à la ligne : ${foundLineIndex}`);
-    if (foundLineIndex === -1) {
-      console.warn(`❌ Match non trouvé pour ${equipeDom}`);
-      return;
-    }
-
-    const joueursRow = trs[foundLineIndex + 3];
-    if (!joueursRow) {
-      console.warn(`❌ Pas de ligne joueurs à l'index ${foundLineIndex + 3}`);
-      return;
-    }
-
-    const joueurTds = joueursRow.querySelectorAll("td");
-if (!joueurTds.length) return;
-
-joueurTds.forEach(td => {
-  const currentHTML = td.innerHTML;
-  const updatedHTML = currentHTML
-    .split(/<br\s*\/?>/i)
-    .map(line => {
-      const cleanLine = line.trim();
-     const nameOnly = cleanLine.replace(/\s*\(.*?\)/, "").replace(/2️⃣|🎯|🎰/g, "").trim();
-
-      if (nameOnly === joueur) {
-        console.log(`2️⃣ Double appliqué à ${joueur}`);
-       if (line.includes("🎯")) {
-    return line.replace("🎯", "2️⃣🎯");
-} else if (line.includes("🎰🎯")) {
-    return line.replace("🎰🎯", "2️⃣🎰🎯");
-} else if (line.includes("🎰")) {
-    return line.replace("🎰", "2️⃣🎰");
-}	
-
-        else if (!line.includes("2️⃣")) {
-          return `2️⃣ ${line}`;
+        // 🔻 Masquer titre + contenu DOUBLE CHANCE
+        const allTrs = Array.from(container.querySelectorAll('tr'));
+        for (let i = 0; i < allTrs.length; i++) {
+          const txt = allTrs[i].textContent.trim().toUpperCase();
+          if (txt === 'DOUBLE CHANCE JOUES') {
+            allTrs[i].style.display = 'none';
+            if (allTrs[i + 1]) allTrs[i + 1].style.display = 'none';
+            break;
+          }
         }
       }
-      return line;
-    })
-    .join("<br>");
-  td.innerHTML = updatedHTML;
-});
 
-   // console.log("✅ HTML après modif :", joueurTd.innerHTML);
-  });
+      // Marquage de la fonction surprise (inchangé)
+      function markSurpriseLines() {
+        const lignes = Array.from(document.querySelectorAll("tr"));
 
-  // Masquer les deux lignes visibles
-  const rows = table.querySelectorAll("tr");
-  let visibleIndex = 0;
-  for (let i = 0; i < rows.length; i++) {
-    const rowText = rows[i].textContent.toUpperCase().trim();
-    if (visibleIndex === DoubleRowIndex || visibleIndex === DoubleRowIndex + 1) {
-      rows[i].style.display = "none";
-    }
-    if (!rows[i].hasAttribute('data-hidden')) {
-      visibleIndex++;
-    }
-  }
+        lignes.forEach((ligne, index) => {
+          if (!ligne.textContent.toUpperCase().includes("PRONOS")) return;
 
-  console.log("🎉 Jackpot processing terminé.");
-}
-// Marquage de la Fonction surprise
+          const ligneJoueurs = lignes[index + 2];
+          if (!ligneJoueurs) return;
 
-function markSurpriseLines() {
-  console.log("🔍 Lancement de markSurpriseLines");
+          const cellules = Array.from(ligneJoueurs.querySelectorAll("td"));
+          if (cellules.length < 3) return;
 
-  const lignes = Array.from(document.querySelectorAll("tr"));
-  console.log(`🔎 Total lignes trouvées : ${lignes.length}`);
+          const nbJoueursParCellule = cellules.map((cellule) => {
+            const brut = cellule.innerHTML;
+            const contenu = brut
+              .replace(/<br\s*\/?>(?i)/gi, '<br>')
+              .split('<br>')
+              .map(l => l.trim())
+              .filter(l => l !== "" && l !== "#N/A");
+            return contenu.length;
+          });
 
-  lignes.forEach((ligne, index) => {
-    if (!ligne.textContent.toUpperCase().includes("PRONOS")) return;
+          const totalJoueurs = nbJoueursParCellule.reduce((a, b) => a + b, 0);
+          if (totalJoueurs === 0) return;
 
-    console.log(`📍 Ligne PRONOS détectée à l'index ${index}`);
-
-    const ligneJoueurs = lignes[index + 2];
-    if (!ligneJoueurs) {
-      console.warn(`❌ Pas de ligne joueur à l’index ${index + 2}`);
-      return;
-    }
-
-    const cellules = Array.from(ligneJoueurs.querySelectorAll("td"));
-    if (cellules.length < 3) {
-      console.warn(`❌ Moins de 3 colonnes à l'index ${index + 2}`);
-      return;
-    }
-
-    // Étape 1 : compter les vrais joueurs par cellule
-    const nbJoueursParCellule = cellules.map((cellule, i) => {
-      const brut = cellule.innerHTML;
-      const contenu = brut
-        .replace(/<br\s*\/?>/gi, '\n')
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l !== "" && l !== "#N/A");
-
-      console.log(`📦 [PRONOS ${index}] Cellule ${i} : ${contenu.length} joueurs`, contenu);
-      return contenu.length;
-    });
-
-    const totalJoueurs = nbJoueursParCellule.reduce((a, b) => a + b, 0);
-    console.log(`📊 [PRONOS ${index}] Total joueurs détectés : ${totalJoueurs}`);
-
-    if (totalJoueurs === 0) {
-      console.warn(`⚠️ [PRONOS ${index}] Aucun joueur détecté`);
-      return;
-    }
-
-    // Étape 2 : marquer les surprises
-    cellules.forEach((cellule, colIndex) => {
-      const nbJoueursCellule = nbJoueursParCellule[colIndex];
-      const ratio = nbJoueursCellule / totalJoueurs;
-
-      console.log(`📈 Cellule ${colIndex} = ${nbJoueursCellule}/${totalJoueurs} = ${ratio.toFixed(2)}`);
-
-      if (nbJoueursCellule > 0 && ratio <= 0.25) {
-        if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRIZ?")) {
-          console.log(`🚨 SURPRISE ajoutée en cellule ${colIndex} (ligne ${index + 2})`);
-          cellule.innerHTML = `<strong>🕵🏻‍♂️SURPRIZ?</strong><br><br>${cellule.innerHTML}`;
-        } else {
-          console.log(`🔁 SURPRISE déjà présente en cellule ${colIndex}`);
-        }
-      } 
-      
-      else {
-        console.log(`✅ Pas de surprise en cellule ${colIndex}`);
+          cellules.forEach((cellule, colIndex) => {
+            const nbJoueursCellule = nbJoueursParCellule[colIndex];
+            const ratio = nbJoueursCellule / totalJoueurs;
+            if (nbJoueursCellule > 0 && ratio <= 0.25) {
+              if (!cellule.innerHTML.includes("🕵🏻‍♂️SURPRIZ?")) {
+                cellule.innerHTML = `<strong>🕵🏻‍♂️SURPRIZ?</strong><br><br>${cellule.innerHTML}`;
+              }
+            }
+          });
+        });
       }
-    });
 
-  });
-
-  console.log("✅ Fin de la fonction markSurpriseLines");
-}
-
-
-
-
-
-      
-      markMissiles(); // 👉 Appel juste ici
-      markJackpots(); // 👉 Appel juste après markMissiles
-       markDouble(); // 👉 Appel juste après markMissiles
-      markSurpriseLines(); // 👉 Appel juste après markMissiles
-      
+      // Appels
+      markMissiles();
+      markJackpots();
+      markDouble();
+      markSurpriseLines();
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
   });
-
-
 }
 
 // Initialisation à la vue match
@@ -744,11 +585,3 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.textContent = isVueMatch ? 'Passer à la vue par joueur' : 'Passer à la vue par match';
   isVueMatch ? afficherVueMatch() : afficherVueJoueur();
 });
-
-
-
-
-
-
-
-
