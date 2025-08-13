@@ -319,6 +319,46 @@ function afficherVueMatch() {
         }
       });
 
+      function createLogoSections() {
+    const allRows = Array.from(container.querySelectorAll('tr'));
+    const newTables = [];
+    let usedIndexes = new Set();
+    let sectionCount = 0;
+
+    for (let i = 0; i < allRows.length && sectionCount < 9; i++) {
+      if (usedIndexes.has(i)) continue;
+      const hasTeamLogo = allRows[i].querySelector('img.team-logo') !== null;
+      if (hasTeamLogo) {
+        const table = document.createElement('table');
+        table.classList.add('card');
+        for (let j = 0; j < 4; j++) {
+          const rowIndex = i + j;
+          if (rowIndex < allRows.length) {
+            table.appendChild(allRows[rowIndex].cloneNode(true));
+            usedIndexes.add(rowIndex);
+          }
+        }
+        newTables.push(table);
+        sectionCount++;
+      }
+    }
+
+    // Ajouter la dernière section avec tout le reste des lignes non utilisées
+    const remainingTable = document.createElement('table');
+    remainingTable.classList.add('card');
+    allRows.forEach((row, idx) => {
+      if (!usedIndexes.has(idx)) {
+        remainingTable.appendChild(row.cloneNode(true));
+      }
+    });
+    newTables.push(remainingTable);
+
+    // Remplacer le contenu par les nouvelles tables
+    container.innerHTML = '';
+    newTables.forEach(tbl => container.appendChild(tbl));
+  }
+
+
       // 🎯 Marquage des missiles
       function markMissiles() {
         const missilesRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "MISSILES JOUES");
@@ -569,6 +609,7 @@ function afficherVueMatch() {
       markJackpots();
       markDouble();
       markSurpriseLines();
+      createLogoSections();
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
