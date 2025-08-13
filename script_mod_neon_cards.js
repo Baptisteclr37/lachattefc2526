@@ -102,9 +102,7 @@ function afficherVueJoueur() {
       let section1Table = document.createElement("table");
       section1Table.classList.add("card");
 
-      let otherRows = []; // contiendra toutes les lignes après la section 1
-
-      let inSection1 = false;
+      let otherRows = [];
       let skipNext = false;
 
       for (let i = 0; i < data.length; i++) {
@@ -117,7 +115,6 @@ function afficherVueJoueur() {
 
         // 📅 début section 1
         if (firstCell.startsWith("📅")) {
-          inSection1 = true;
           let td = document.createElement("td");
           td.colSpan = row.length;
           td.className = "journee-header";
@@ -136,13 +133,12 @@ function afficherVueJoueur() {
           tr.appendChild(td);
           section1Table.appendChild(tr);
 
-          // ligne contenu classement
+          // contenu classement
           const nextRow = data[i + 1] || [];
           let classementArray = ((nextRow[0] || "")).toString().split(/\r?\n/).filter(x => x.trim());
           if (classementArray.length === 1) {
             classementArray = (nextRow[0] || '').toString().split(/\s{2,}/).filter(x => x.trim());
           }
-          // tri numérique par rang
           classementArray.sort((a, b) => {
             const aTrim = (a || '').trim();
             const bTrim = (b || '').trim();
@@ -165,7 +161,6 @@ function afficherVueJoueur() {
           section1Table.appendChild(trContent);
 
           skipNext = true;
-          inSection1 = false; // section 1 finie
           continue;
         }
 
@@ -173,19 +168,17 @@ function afficherVueJoueur() {
         otherRows.push(row);
       }
 
-      // Construction des cards pour le reste
+      // Construction des cards
       let cardsFragment = document.createDocumentFragment();
       for (let i = 0; i < otherRows.length; i++) {
         const row = otherRows[i];
         const firstCell = (row[0] || '').toString().trim();
-        const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
 
-        // Début d'une nouvelle card si match-header détecté
         if (joueurs.includes(firstCell)) {
           let cardTable = document.createElement("table");
           cardTable.classList.add("card");
 
-          // ligne match-header
+          // match-header
           let trHeader = document.createElement("tr");
           let tdHeader = document.createElement("td");
           tdHeader.colSpan = 5;
@@ -199,12 +192,24 @@ function afficherVueJoueur() {
           }
           cardTable.appendChild(trHeader);
 
-          // ajouter les 11 lignes suivantes
-          for (let j = 1; j <= 11 && (i + j) < otherRows.length; j++) {
+          // ligne juste après match-header = pronos-header (pas de logos)
+          if (i + 1 < otherRows.length) {
+            let trPronos = document.createElement("tr");
+            otherRows[i + 1].forEach(cell => {
+              let td = document.createElement("td");
+              td.className = "pronos-header";
+              td.textContent = cell || '';
+              trPronos.appendChild(td);
+            });
+            cardTable.appendChild(trPronos);
+          }
+
+          // ajouter les 10 lignes suivantes (lignes de match avec logos)
+          for (let j = 2; j <= 11 && (i + j) < otherRows.length; j++) {
             let tr = document.createElement("tr");
             otherRows[i + j].forEach((cell, colIndex) => {
               let td;
-              if ((colIndex === 0 || colIndex === 2) && j <= 10) {
+              if (colIndex === 0 || colIndex === 2) {
                 td = createLogoCell(cell);
               } else {
                 td = document.createElement("td");
@@ -223,11 +228,10 @@ function afficherVueJoueur() {
           }
 
           cardsFragment.appendChild(cardTable);
-          i += 11; // on avance après les 11 lignes
+          i += 11;
         }
       }
 
-      // Affichage final
       container.innerHTML = '';
       container.appendChild(section1Table);
       container.appendChild(cardsFragment);
@@ -237,6 +241,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 
 
