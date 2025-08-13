@@ -10,9 +10,15 @@
 top:365px !important
 }
 
+.team-logo {
+  padding: 0px 20px 0px 20px;
+}
+
 /* Mobile-friendly adjustments */
 @media (max-width: 768px) {
   .iframe {
 top:130px !important
 }
+
+
 }
