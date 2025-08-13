@@ -14,7 +14,7 @@ body {
     top: 0;
   left: 0;
     width: 100%;
-    background: linear-gradient(90deg, #0d5d2f, #127c3f);
+    background: #0a0a1a;
     padding: 15px 0;
     display: flex;
     align-items: center;
