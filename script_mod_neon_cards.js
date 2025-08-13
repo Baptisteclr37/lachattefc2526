@@ -105,6 +105,39 @@ function afficherVueJoueur() {
         html += '<tr>';
         const firstCell = row[0];
 
+           if (row[0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee-header";
+          td.textContent = row[0];
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        }
+
+
+ if (i > 0 && data[i - 1][0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.className = "classement-journee";
+          let classementArray = (row[0] || "").split(/\r?\n/).filter(x => x.trim());
+
+          if (classementArray.length === 1) {
+            classementArray = row[0].split(/\s{2,}/).filter(x => x.trim());
+          }
+
+          classementArray.sort((a, b) => {
+            const numA = parseInt(a.trim().split(".")[0]) || 9999;
+            const numB = parseInt(b.trim().split(".")[0]) || 9999;
+            return numA - numB;
+          });
+
+          td.innerHTML = classementArray.join("<br>");
+          tr.appendChild(td);
+          table.appendChild(tr);
+          return;
+        } 
+
         if (firstCell === 'J01') {
           html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
           for (let i = 5; i < row.length; i++) {
