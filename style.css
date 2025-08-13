@@ -405,8 +405,9 @@ padding-top: calc(20px + env(safe-area-inset-top));
   #bonus-table th.missile,
   #bonus-table th.jackpot,
   #bonus-table th.doublechance {
-    color: transparent;
+    color: transparent !important;
     position: relative;
+    text-shadow: none !important;
   }
 
   #bonus-table th.missile::after {
