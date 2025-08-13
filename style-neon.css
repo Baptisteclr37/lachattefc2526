@@ -16,9 +16,24 @@ body {
     .background : #0a0a1a !important;
 }
 
+
+.image-container {
+    
+    margin-top: 85px !important;
+}
+
+.image-text {
+        
+        display: inline-block !important;
+        background: linear-gradient(to left, #ff00cc, #3333ff) !important;
+        background-clip: text !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
     .image-text {
-         
-        top: 0% !important;
+        
+        position: relative !important;
     }
 
 
