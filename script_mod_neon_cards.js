@@ -101,9 +101,11 @@ function afficherVueJoueur() {
       let inTeamBlock = false;
       let teamBlockCounter = 0;
 
-      data.forEach((row) => {
-        html += '<tr>';
-        const firstCell = row[0];
+    data.forEach((row, i) => {
+        if (skipNext) {
+          skipNext = false;
+          return;
+        }
 
            if (row[0]?.toUpperCase() === "🥇🥈🥉 CLASSEMENT JOURNEE") {
           const td = document.createElement("td");
