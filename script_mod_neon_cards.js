@@ -309,7 +309,7 @@ function afficherVueMatch() {
         }
 
         if (lastLineWasMatch) lastLineWasMatch = false;
-      });
+  
 
       // 👉 Ajout du tableau
       container.innerHTML = ''; // Efface le "Chargement des données…" avant d'afficher
