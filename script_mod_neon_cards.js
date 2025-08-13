@@ -101,12 +101,38 @@ function afficherVueJoueur() {
       let inTeamBlock = false;
       let teamBlockCounter = 0;
 
-    data.forEach((row, i) => {
-        html += '<tr>';
-        const firstCell = row[0];
-    
+      const HEADER_CLASSEMENT = "🥇🥈🥉 CLASSEMENT JOURNEE";
 
-        
+      data.forEach((row, i) => {
+        html += '<tr>';
+        const firstCell = row[0] || '';
+
+        // 📅 Journee header fusionné
+        if (firstCell.startsWith("📅")) {
+          html += '<td colspan="' + row.length + '" class="journee-header">' + firstCell + '</td>';
+          html += '</tr>';
+          return; // on passe à la ligne suivante
+        }
+
+        // 🥇🥈🥉 CLASSEMENT JOURNEE header fusionné
+        if (firstCell.toUpperCase() === HEADER_CLASSEMENT) {
+          html += '<td colspan="' + row.length + '" class="classement-journee-header">' + firstCell + '</td>';
+          html += '</tr>';
+          // ligne suivante = contenu du classement
+          const nextRow = data[i + 1] || [];
+          let classementArray = ((nextRow[0] || "")).split(/\r?\n/).filter(x => x.trim());
+          if (classementArray.length === 1) {
+            classementArray = (nextRow[0] || '').split(/\s{2,}/).filter(x => x.trim());
+          }
+          // Tri alphabétique des noms de joueurs
+          classementArray.sort((a, b) => {
+            const nameA = a.trim().toUpperCase();
+            const nameB = b.trim().toUpperCase();
+            return nameA.localeCompare(nameB);
+          });
+          html += '<tr><td colspan="' + row.length + '" class="classement-journee">' + classementArray.join("<br>") + '</td></tr>';
+          return; // on saute la ligne du contenu dans la boucle
+        }
 
         if (firstCell === 'J01') {
           html += '<td colspan="5" class="journee-header">' + firstCell + '</td>';
@@ -173,6 +199,7 @@ function afficherVueJoueur() {
     }
   });
 }
+
 
 function afficherVueMatch() {
   container.innerHTML = ''; // nettoie le conteneur AVANT d’afficher “chargement”
