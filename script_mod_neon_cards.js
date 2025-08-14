@@ -96,7 +96,7 @@ function afficherVueJoueur() {
     header: false,
     complete: function(results) {
       const data = results.data;
-      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO"];
+      const joueurs = ["KMEL", "SIM", "MAT", "TIBO", "JO", "BATIST", "KRIM", "RAF", "JEREM", "JUZ", "MAX", "GERALD", "NICO", "THOMAS"];
       const HEADER_CLASSEMENT = "🥇🥈🥉 CLASSEMENT JOURNEE";
 
       let section1Table = document.createElement("table");
