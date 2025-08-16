@@ -752,12 +752,12 @@ function afficherVueMatch() {
             const cell = checkRow.cells[c];
             if (cell && cell.textContent.trim() === targetValue) {
               // Applique le dégradé
-              cell.style.background = "linear-gradient(90deg, #ff9a9e, #8e44ad)";
+              cell.style.background = "linear-gradient(to left, #ff00cc, #3333ff)";
               cell.style.color = "#fff";
               // Cellule juste en dessous
               const below = rows[3]?.cells[c];
               if (below) {
-                below.style.background = "linear-gradient(90deg, #ff9a9e, #8e44ad)";
+                below.style.background = "linear-gradient(to left, #ff00cc, #3333ff)";
                 below.style.color = "#fff";
               }
             }
