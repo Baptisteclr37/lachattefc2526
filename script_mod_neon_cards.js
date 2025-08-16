@@ -768,7 +768,7 @@ function afficherVueMatch() {
       // appel
       highlightResults();
     },
-    },
+    
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
