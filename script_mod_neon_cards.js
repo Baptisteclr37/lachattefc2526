@@ -732,6 +732,42 @@ function afficherVueMatch() {
       markDouble();
       markSurpriseLines();
       createLogoSectionsFor(table);
+
+        // 🌸 Mise en évidence des bons résultats (dégradé rose/violet)
+      function highlightResults() {
+        const cards = document.querySelectorAll("#table-container table.card");
+        // on limite aux 9 premières cards (les matchs)
+        cards.forEach((card, idx) => {
+          if (idx >= 9) return;
+          const rows = card.querySelectorAll("tr");
+          if (rows.length < 3) return;
+
+          const targetValue = rows[0].cells[1]?.textContent.trim(); // valeur du milieu première ligne
+          if (!targetValue || !["A VENIR", "1", "N", "2"].includes(targetValue)) return;
+
+          const checkRow = rows[2]; // 2 lignes plus bas
+          if (!checkRow) return;
+
+          for (let c = 0; c <= 2; c++) {
+            const cell = checkRow.cells[c];
+            if (cell && cell.textContent.trim() === targetValue) {
+              // Applique le dégradé
+              cell.style.background = "linear-gradient(90deg, #ff9a9e, #8e44ad)";
+              cell.style.color = "#fff";
+              // Cellule juste en dessous
+              const below = rows[3]?.cells[c];
+              if (below) {
+                below.style.background = "linear-gradient(90deg, #ff9a9e, #8e44ad)";
+                below.style.color = "#fff";
+              }
+            }
+          }
+        });
+      }
+
+      // appel
+      highlightResults();
+    },
     },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
