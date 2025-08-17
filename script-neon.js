@@ -738,7 +738,7 @@ function afficherVueMatch() {
         const cards = document.querySelectorAll("#table-container table.card");
         // on limite aux 9 premières cards (les matchs)
         cards.forEach((card, idx) => {
-          if (idx >= 9) return;
+          if (idx >= 10) return;
           const rows = card.querySelectorAll("tr");
           if (rows.length < 3) return;
 
