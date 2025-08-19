@@ -811,7 +811,7 @@ function afficherVueMatch() {
               }
             }
           }
-        }
+        
       }
     },
     error: function(err) {
