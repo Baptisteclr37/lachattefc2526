@@ -737,7 +737,7 @@ function afficherVueMatch() {
       markSurpriseLines();
       createLogoSectionsFor(table);
 
-        // 🌸 Mise en évidence des bons résultats (dégradé rose/violet)
+       / // 🌸 Mise en évidence des bons résultats (dégradé rose/violet)
       function highlightResults() {
         const cards = document.querySelectorAll("#table-container table.card");
         // on limite aux 9 premières cards (les matchs)
