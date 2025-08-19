@@ -421,7 +421,40 @@ function afficherVueMatch() {
       container.appendChild(section1Table);
       container.appendChild(table);
 
-        
+      // 🎨 Mise en forme spéciale pour la dernière card
+const cards = container.querySelectorAll("table.card");
+if (cards.length > 0) {
+  const lastCard = cards[cards.length - 1];
+  const rows = lastCard.querySelectorAll("tr");
+  for (let i = 1; i <= 14 && i < rows.length; i++) {
+    const row = rows[i];
+    const cells = row.querySelectorAll("td");
+    const middleCell = cells[Math.floor(cells.length / 2)];
+
+    if (middleCell) {
+      const text = middleCell.textContent.trim();
+      const match = text.match(/(\\d+)pts/);
+
+      if (match) {
+        const points = parseInt(match[1], 10);
+        switch (points) {
+          case 1:
+            row.style.backgroundColor = "pink";
+            break;
+          case 2:
+            row.style.backgroundColor = "violet";
+            break;
+          case 3:
+            row.style.background = "linear-gradient(to right, #ff9a9e, #fad0c4)";
+            break;
+          default:
+            break; // 0pts → pas de couleur
+        }
+      }
+    }
+  }
+}
+  
 
       // Mise en surbrillance des bons pronos (logique existante)
       const rows = document.querySelectorAll("table tr");
