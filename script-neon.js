@@ -423,8 +423,6 @@ function afficherVueMatch() {
 
         
 
-        
-
       // Mise en surbrillance des bons pronos (logique existante)
       const rows = document.querySelectorAll("table tr");
       rows.forEach((tr, i) => {
@@ -775,45 +773,6 @@ function afficherVueMatch() {
       highlightResults();
     },
     
-    error: function(err) {
-      container.textContent = 'Erreur de chargement : ' + err.message;
-    }
-  });
-}
-
- // 🎨 Mise en forme spéciale pour la 10ème card
-      const cards = container.querySelectorAll("table.card");
-      if (cards.length >= 10) {
-        const rows10 = cards[9].querySelectorAll("tr");
-        for (let i = 1; i <= 14 && i < rows10.length; i++) {
-          const row = rows10[i];
-          const cells = row.querySelectorAll("td");
-          const middleCell = cells[Math.floor(cells.length / 2)];
-
-          if (middleCell) {
-            const text = middleCell.textContent.trim();
-            const match = text.match(/(\\d+)pts/);
-
-            if (match) {
-              const points = parseInt(match[1], 10);
-              switch (points) {
-                case 1:
-                  row.style.backgroundColor = "pink";
-                  break;
-                case 2:
-                  row.style.backgroundColor = "violet";
-                  break;
-                case 3:
-                  row.style.background = "linear-gradient(to right, #ff9a9e, #fad0c4)";
-                  break;
-                default:
-                  break; // 0pts → pas de couleur
-              }
-            }
-          }
-        
-      }
-    },
     error: function(err) {
       container.textContent = 'Erreur de chargement : ' + err.message;
     }
