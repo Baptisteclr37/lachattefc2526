@@ -87,6 +87,42 @@ function createLogoCell(content) {
   return td;
 }
 
+// =====================
+// 🎨 Mise en forme spécifique de la 10ème card (score exact)
+// =====================
+function styleMatch10Card(cardElement) {
+const rows = cardElement.querySelectorAll("tr");
+for (let i = 1; i <= 14 && i < rows.length; i++) {
+const row = rows[i];
+const cells = row.querySelectorAll("td");
+const middleCell = cells[Math.floor(cells.length / 2)];
+
+
+if (middleCell) {
+const text = middleCell.textContent.trim();
+const match = text.match(/(\d+)pts/);
+
+
+if (match) {
+const points = parseInt(match[1], 10);
+switch (points) {
+case 1:
+row.style.backgroundColor = "pink";
+break;
+case 2:
+row.style.backgroundColor = "violet";
+break;
+case 3:
+row.style.background = "linear-gradient(to right, #ff9a9e, #fad0c4)";
+break;
+default:
+break; // 0pts -> pas de couleur
+}
+}
+}
+}
+}
+
 function afficherVueJoueur() {
   container.innerHTML = '';
   container.textContent = 'Chargement des données…';
@@ -419,6 +455,18 @@ function afficherVueMatch() {
       container.appendChild(section1Table);
       container.appendChild(table);
 
+        
+// ➕ Ajout de la mise en forme spéciale pour la 10ème card
+const cards = container.querySelectorAll("table.card");
+if (cards.length >= 10) {
+styleMatch10Card(cards[9]); // la 10ème card (index 9)
+}
+},
+error: function(err) {
+container.textContent = 'Erreur de chargement : ' + err.message;
+}
+});
+}
       // Mise en surbrillance des bons pronos (logique existante)
       const rows = document.querySelectorAll("table tr");
       rows.forEach((tr, i) => {
