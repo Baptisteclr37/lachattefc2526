@@ -421,11 +421,14 @@ function afficherVueMatch() {
       container.appendChild(section1Table);
       container.appendChild(table);
 
-      // 🎨 Mise en forme spéciale pour la dernière card
-const cards = container.querySelectorAll("table.card");
-if (cards.length > 0) {
-  const lastCard = cards[cards.length - 1];
-  const rows = lastCard.querySelectorAll("tr");
+   
+  // 🎨 Mise en forme spéciale pour le tableau du match à scorer (le dernier tableau .card)
+const allCards = container.querySelectorAll("table.card");
+if (allCards.length > 0) {
+  const scorerCard = allCards[allCards.length - 1]; // dernier tableau affiché
+  const rows = scorerCard.querySelectorAll("tr");
+
+  // On saute la 1ère ligne (header) et on traite les 14 suivantes
   for (let i = 1; i <= 14 && i < rows.length; i++) {
     const row = rows[i];
     const cells = row.querySelectorAll("td");
@@ -433,10 +436,15 @@ if (cards.length > 0) {
 
     if (middleCell) {
       const text = middleCell.textContent.trim();
-      const match = text.match(/(\\d+)pts/);
+      const match = text.match(/(\d+)\s*pt?s?/i); // accepte "1pts", "1 pt", "1pt"...
 
       if (match) {
         const points = parseInt(match[1], 10);
+
+        // Reset éventuel
+        row.style.background = '';
+        row.style.backgroundColor = '';
+
         switch (points) {
           case 1:
             row.style.backgroundColor = "pink";
@@ -448,13 +456,13 @@ if (cards.length > 0) {
             row.style.background = "linear-gradient(to right, #ff9a9e, #fad0c4)";
             break;
           default:
-            break; // 0pts → pas de couleur
+            // 0pts → pas de couleur
+            break;
         }
       }
     }
   }
 }
-  
 
       // Mise en surbrillance des bons pronos (logique existante)
       const rows = document.querySelectorAll("table tr");
