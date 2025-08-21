@@ -422,7 +422,7 @@ function afficherVueMatch() {
       container.appendChild(table);
 
    
-  // 🎨 Mise en forme spéciale pour le tableau du match à scorer (le dernier tableau .card)
+// 🎨 Mise en forme spéciale pour le tableau du match à scorer (le dernier tableau .card)
 const allCards = container.querySelectorAll("table.card");
 if (allCards.length > 0) {
   const scorerCard = allCards[allCards.length - 1]; // dernier tableau affiché
