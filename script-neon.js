@@ -526,70 +526,100 @@ if (allCards.length > 0) {
 }
 
 
-      // 🎯 Marquage des missiles
-      function markMissiles() {
-        const missilesRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "MISSILES JOUES");
-        if (missilesRowIndex === -1) return;
+    // 🎯 Marquage des missiles — calqué sur markJackpots
+function markMissiles() {
+  const missilesRowIndex = data.findIndex(row => (row[0] || '').toUpperCase() === "MISSILES JOUES");
+  if (missilesRowIndex === -1) return;
 
-        const missilesText = data[missilesRowIndex + 1]?.[0];
-        if (!missilesText) return;
+  // Récupère les lignes "missile" (compatible cellule multi-lignes OU lignes distinctes)
+  let lines = [];
+  const cell = data[missilesRowIndex + 1]?.[0];
+  if (cell && typeof cell === 'string' && cell.trim()) {
+    lines = cell.split(/\r?\n/).filter(x => x.trim());
+  } else {
+    for (let i = missilesRowIndex + 1; i < data.length; i++) {
+      const r = data[i] || [];
+      const first = (r[0] || '').trim();
+      if (!first) break;
+      const cap = first.toUpperCase();
+      if (cap === 'JACKPOT JOUES' || cap === 'DOUBLE CHANCE JOUES') break;
+      if (r.length >= 4) lines.push([r[0], r[1], r[2], r[3]].join(' '));
+      else lines.push(first);
+    }
+  }
 
-        const missiles = missilesText.split(/\r?\n/).filter(x => x.trim()).map(line => {
-          const parts = line.trim().split(/\s+/);
-          if (parts.length < 4) return null;
-          return {
-            equipeDom: parts[0],
-            equipeExt: parts[1],
-            joueur: parts[2],
-            prono: parts[3],
-          };
-        }).filter(Boolean);
+  const missiles = lines
+    .map(line => {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length < 4) return null;
+      return {
+        equipeDom: parts[0],
+        equipeExt: parts[1],
+        joueur: parts[2],
+        prono: parts[3],
+      };
+    })
+    .filter(Boolean);
 
-        const trs = container.querySelectorAll("tr"); // ▶️ cherche sur toutes les tables
+  const trs = container.querySelectorAll("tr"); // ▶️ toutes tables
 
-        missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
-          let foundLineIndex = -1;
-          for (let i = 0; i < trs.length; i++) {
-            const td = trs[i].querySelector("td");
-            if (!td) continue;
-         const span = td.querySelector("span");
-const text = span ? span.textContent.trim() : td.textContent.trim();
-if (text === equipeDom) { foundLineIndex = i; break; }
+  missiles.forEach(({ equipeDom, equipeExt, joueur, prono }) => {
+    // Trouve la ligne du match comme dans jackpots (présence du logo)
+    let foundLineIndex = -1;
+    for (let i = 0; i < trs.length; i++) {
+      const td = trs[i].querySelector("td");
+      if (!td) continue;
+      const hasLogo = td.querySelector("img");
+      const text = td.textContent.trim();
+      if (hasLogo && text === equipeDom) { foundLineIndex = i; break; }
+    }
+    if (foundLineIndex === -1) return;
+
+    // Ligne joueurs = +3 (même offset que jackpots)
+    const joueursRow = trs[foundLineIndex + 3];
+    if (!joueursRow) return;
+
+    // ✅ Parcourir TOUTES les colonnes de joueurs (1 / N / 2), pas seulement la 1re
+    const joueurTds = joueursRow.querySelectorAll("td");
+    if (!joueurTds.length) return;
+
+    joueurTds.forEach(td => {
+      const currentHTML = td.innerHTML;
+      const updatedHTMLMissile = currentHTML
+        .replace(/<br\s*\/?>/ig, '<br>')
+        .split('<br>')
+        .map(line => {
+          const cleanLine = line.trim();
+          // même normalisation que jackpots (enlève tout le contenu entre parenthèses + emojis existants)
+          const nameOnly = cleanLine
+            .replace(/\s*\(.*?\)/, "")
+            .replace(/2️⃣|🎯|🎰/g, "")
+            .trim();
+
+          if (nameOnly === joueur) {
+            // Empilement harmonisé avec jackpots : on garde 🎰 devant 🎯 si combo
+            if (line.includes("🎰")) return line.includes("🎯") ? line : line.replace("🎰", "🎰🎯");
+            if (!line.includes("🎯")) return `🎯 ${line}`;
           }
-          if (foundLineIndex === -1) return;
+          return line;
+        })
+        .join("<br>");
+      td.innerHTML = updatedHTMLMissile;
+    });
+  });
 
-          const joueursRow = trs[foundLineIndex + 3];
-          if (!joueursRow) return;
+  // 🔻 Masquer la section MISSILES (titre + contenu), comme pour jackpots
+  const allTrs = Array.from(container.querySelectorAll('tr'));
+  for (let i = 0; i < allTrs.length; i++) {
+    const txt = allTrs[i].textContent.trim().toUpperCase();
+    if (txt === 'MISSILES JOUES') {
+      allTrs[i].style.display = 'none';
+      if (allTrs[i + 1]) allTrs[i + 1].style.display = 'none';
+      break;
+    }
+  }
+}
 
-          const joueurTd = joueursRow.querySelectorAll("td")[0];
-          if (!joueurTd) return;
-
-          const currentHTML = joueurTd.innerHTML;
-          const updatedHTML = currentHTML
-            .split(/<br\s*\/?>/i)
-            .join("<br>")
-            .split("<br>")
-            .map(line => {
-              const cleanLine = line.replace(/🎯/g, "").trim();
-              const nameOnly = cleanLine.replace(/\s*\(\d+ ?pts?\)/i, "").trim();
-              return nameOnly === joueur ? `🎯 ${line.trim()}` : line;
-            })
-            .join("<br>");
-
-          joueurTd.innerHTML = updatedHTML;
-        });
-
-        // 🔻 Masquer la ligne titre et la suivante (contenu) pour MISSILES
-        const allTrs = Array.from(container.querySelectorAll('tr'));
-        for (let i = 0; i < allTrs.length; i++) {
-          const txt = allTrs[i].textContent.trim().toUpperCase();
-          if (txt === 'MISSILES JOUES') {
-            allTrs[i].style.display = 'none';
-            if (allTrs[i + 1]) allTrs[i + 1].style.display = 'none';
-            break;
-          }
-        }
-      }
 
       // 🎰 Marquage des jackpots
       function markJackpots() {
