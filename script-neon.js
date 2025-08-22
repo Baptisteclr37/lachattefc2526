@@ -552,9 +552,9 @@ if (allCards.length > 0) {
           for (let i = 0; i < trs.length; i++) {
             const td = trs[i].querySelector("td");
             if (!td) continue;
-            const span = td.querySelector("span");
-            const text = span ? span.textContent.trim() : td.textContent.trim();
-            if (text === equipeDom) { foundLineIndex = i; break; }
+         const hasLogo = td.querySelector("img");
+const text = td.textContent.trim();
+if (hasLogo && text === equipeDom) { foundLineIndex = i; break; }
           }
           if (foundLineIndex === -1) return;
 
