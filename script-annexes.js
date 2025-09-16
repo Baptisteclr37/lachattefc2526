@@ -12,7 +12,7 @@ Papa.parse(urlAnnexes, {
     let currentStatType = "";
 
     data.forEach((row, i) => {
-      const first = row[0]?.toUpperCase?.().trim() || "";
+      const first = row[0]?.toUpperCase?.trim() || "";
 
       // === DÉBUT D’UNE NOUVELLE SECTION STATISTIQUES ===
       if (first.startsWith("STATISTIQUES")) {
@@ -20,12 +20,15 @@ Papa.parse(urlAnnexes, {
         if (table) container.appendChild(table);
 
         table = document.createElement("table");
+        table.style.tableLayout = "auto";
+        table.style.width = "auto"; // largeur auto
+        table.style.whiteSpace = "nowrap"; // éviter retours à la ligne
 
         // Ligne STATISTIQUES fusionnée
         const tr = document.createElement("tr");
+        tr.classList.add("match-header"); // toute la ligne
         const td = document.createElement("td");
         td.colSpan = row.length;
-        td.className = "match-header";
         td.textContent = row[0];
         tr.appendChild(td);
         table.appendChild(tr);
@@ -41,6 +44,9 @@ Papa.parse(urlAnnexes, {
 
       if (!table) {
         table = document.createElement("table");
+        table.style.tableLayout = "auto";
+        table.style.width = "auto";
+        table.style.whiteSpace = "nowrap";
       }
 
       // === Nettoyage : on supprime dernière colonne vide si nécessaire ===
@@ -60,6 +66,8 @@ Papa.parse(urlAnnexes, {
       cleanedRow.forEach(cell => {
         const td = document.createElement("td");
         td.textContent = cell;
+        td.style.whiteSpace = "nowrap"; // empêcher retour à la ligne
+        td.style.padding = "4px 8px"; // petit confort visuel
 
         // Pour le tableau STATISTIQUES DE CLASSEMENT : équilibrage
         if (currentStatType.includes("CLASSEMENT") && cleanedRow.length === 4) {
@@ -71,11 +79,12 @@ Papa.parse(urlAnnexes, {
 
       // Ligne d'en-tête sous STATISTIQUES → style pronos-header
       if (row.__pronostype) {
-  tr.querySelectorAll("td").forEach(td => {
-    td.classList.add("pronos-header");
-  });
-  delete row.__pronostype;
-}
+        tr.querySelectorAll("td").forEach(td => {
+          td.classList.add("pronos-header");
+        });
+        delete row.__pronostype;
+      }
+
       table.appendChild(tr);
     });
 
@@ -83,16 +92,3 @@ Papa.parse(urlAnnexes, {
     if (table) container.appendChild(table);
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
