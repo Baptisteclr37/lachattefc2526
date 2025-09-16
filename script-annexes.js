@@ -12,7 +12,8 @@ Papa.parse(urlAnnexes, {
     let currentStatType = "";
 
     data.forEach((row, i) => {
-      const first = row[0]?.toUpperCase?.trim() || "";
+      // Cast sûr en string pour éviter erreurs
+      const first = (row[0] ? String(row[0]).toUpperCase().trim() : "");
 
       // === DÉBUT D’UNE NOUVELLE SECTION STATISTIQUES ===
       if (first.startsWith("STATISTIQUES")) {
@@ -67,7 +68,7 @@ Papa.parse(urlAnnexes, {
         const td = document.createElement("td");
         td.textContent = cell;
         td.style.whiteSpace = "nowrap"; // empêcher retour à la ligne
-        td.style.padding = "4px 8px"; // petit confort visuel
+        td.style.padding = "4px 8px";   // petit confort visuel
 
         // Pour le tableau STATISTIQUES DE CLASSEMENT : équilibrage
         if (currentStatType.includes("CLASSEMENT") && cleanedRow.length === 4) {
