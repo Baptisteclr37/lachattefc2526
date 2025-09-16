@@ -1,79 +1,130 @@
+<!-- bonus.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>La Chatte – Tableau spécial</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 20px;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-      background: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-      text-align: center;
-    }
-    th {
-      background: #222;
-      color: white;
-      text-transform: uppercase;
-    }
-    tr:nth-child(even) {
-      background: #f2f2f2;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CHATTANEX</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style2.css" />
+   <link rel="stylesheet" href="style-neon.css" />
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 </head>
 <body>
+  <div class ="image-container">
+  <header class="site-header">
+  <img src="images/header-banner.png" alt="Bannière LA CHATTE" class="header-banner">
+      <div class="image-text">CHATTANEX</div>
+</header>
+  </div>
 
-  <h1>Tableau spécial – La Chatte</h1>
-  <div id="table-container"></div>
+  <div id="annexes-container">Chargement des bonus...</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="script-annexes.js"></script>
+   <!-- Menu Hamburger -->
+<div class="hamburger-container">
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <div class="menu" id="menu">
+   <a href="https://baptisteclr37.github.io/lachattefc2526/">🏠 Vestiaire</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/form.html">📜 Fais tes pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/archives.html">🗃️ Archives pronos</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/classement">🏆 Classement des Chatteux</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/bonus">🎁 Caisse à Bonus</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/stats">📈 Stats</a>
+    <a href="https://baptisteclr37.github.io/lachattefc2526/reglement">🏛️ La Chatte a ses règles</a>
+
+  </div>
+</div>
+  <script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+
+  // Ferme le menu si on clique ailleurs
+  window.addEventListener('click', function(e) {
+    const menu = document.getElementById('menu');
+    const hamburger = document.querySelector('.hamburger');
+    if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+    }
+  });
+</script>
+   <div id="loader">
+  <div class="loader-content">
+    <lottie-player
+  src="https://baptisteclr37.github.io/lachattefc2526/Footballer.json"
+  background="transparent"
+  speed="1"
+  style="width: 180px; height: 180px;"
+  loop
+  autoplay
+></lottie-player>
+    <div class="loader-text" id="loader-phrase">
+      Préparation tactique des chatteux...
+    </div>
+  </div>
+</div>
 
   <script>
-    const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=20526615&single=true&output=csv";
+  const loaderStart = Date.now();
+  const minDuration = 4000; // 4 secondes
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      complete: function(results) {
-        const data = results.data;
-        const container = document.getElementById("table-container");
+  const phrases = [
+    "Réhydratation des chattards...",
+    "VAR en cours, chargement de la page validé",
+    "Benzema cherche la chatte de Zahia...",
+    "Tibo cherche le cadre sur peno...",
+    "Maxence sort un gros plaquage sur l'arbitre...",
+    "Karim finit sa clope, il arrive...",
+    "Simon demande à ChatGPT Comment ne pas finir dernier ?...",
+    "Raf s'enfile un CBD et après, c'est pronos à gogo...",
+    "Mathieu enfile son plus moche maillot de l'OM...",
+    "Gérald boit un dernier sky, attendez le bordel...",
+    "Nico claque une dernière fessée avant d'arriver...",
+"Jo hésite entre le Poker et La Chatte...",
+"Baptiste se fait la moustache de Cabrel...",
+"Jerem pèse le poids de ses couilles : 8kg...",
+"Juz! Habille toi, arrête la pétanque viens sur La Chatte...",
+"Rudi Garcia redessine un 5-5-0, c’est long...",
+"Dimitri Payet passe commande à UberEats... il en a pour un moment.",
+"Un joueur monégasque vient de tacler... en mocassins.",
+"Wissam Ben Yedder lance un appel en profondeur... depuis la prison.",
+  ];
 
-        if (data.length === 0) {
-          container.innerHTML = "<p>Aucune donnée trouvée.</p>";
-          return;
-        }
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loader-phrase").textContent =
+    phrases[Math.floor(Math.random() * phrases.length)];
+});
 
-        let table = "<table><thead><tr>";
-        // En-têtes
-        Object.keys(data[0]).forEach(col => {
-          table += "<th>" + col + "</th>";
-        });
-        table += "</tr></thead><tbody>";
 
-        // Lignes
-        data.forEach(row => {
-          table += "<tr>";
-          Object.values(row).forEach(val => {
-            table += "<td>" + (val || "") + "</td>";
-          });
-          table += "</tr>";
-        });
+    
 
-        table += "</tbody></table>";
-        container.innerHTML = table;
-      }
-    });
-  </script>
+  window.addEventListener("load", () => {
+  const loader = document.getElementById("loader");
+  const timeElapsed = Date.now() - loaderStart;
+  const remaining = Math.max(0, minDuration - timeElapsed);
+
+
+    
+
+    setTimeout(() => {
+      const loader = document.getElementById("loader");
+      loader.style.transition = "opacity 0.5s ease";
+      loader.style.opacity = "0";
+      setTimeout(() => loader.remove(), 500);
+    }, remaining);
+  });
+</script>
 
 </body>
 </html>
+
+
+
+
+
+
+
+
