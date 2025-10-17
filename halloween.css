@@ -175,7 +175,7 @@ body::after { bottom: 0; right: 0; transform: scaleX(-1); }
 /* ==== FIX DU TITRE PRINCIPAL ==== */
 .image-text {
     font-family: 'Creepster', cursive !important;
-    font-size: 64px !important;
+    font-size: 43px !important;
     text-transform: uppercase;
     letter-spacing: 4px;
     color: #ff7518 !important;
@@ -192,3 +192,4 @@ body::after { bottom: 0; right: 0; transform: scaleX(-1); }
   from { text-shadow: 0 0 10px #ff6600, 0 0 20px #ff3300, 0 0 30px #ff7518; }
   to { text-shadow: 0 0 20px #ff3300, 0 0 40px #ff6600, 0 0 60px #ff9900; }
 }
+
