@@ -7,17 +7,19 @@ body {
     background: radial-gradient(circle at top, #1a0000 0%, #000 100%) !important;
     color: #ffb84d !important;
     font-family: 'Montserrat', sans-serif !important;
+
+    /* 👇 Textures stables et légères */
     background-image: 
-        url('https://i.imgur.com/ZHXO9a3.png'), /* fine brume */
-        url('https://i.imgur.com/LqVUv2W.png');  /* motifs citrouilles */
+        url('https://www.transparenttextures.com/patterns/dark-mosaic.png'),
+        url('https://www.transparenttextures.com/patterns/asfalt-light.png');
     background-blend-mode: multiply;
     background-size: cover;
-    animation: fogMove 60s linear infinite;
+    animation: fogMove 120s linear infinite;
 }
 
 @keyframes fogMove {
   from { background-position: 0 0, 0 0; }
-  to { background-position: 1000px 0, 0 500px; }
+  to { background-position: 800px 0, 0 400px; }
 }
 
 /* ==== TITRES ==== */
@@ -155,16 +157,17 @@ h1, h2 {
   animation: flicker 2s infinite;
 }
 
-/* ==== BONUS : petites toiles d’araignée dans les coins ==== */
+/* ==== TOILES D’ARAIGNÉE (sources fiables) ==== */
 body::before, body::after {
     content: "";
     position: fixed;
-    width: 250px;
-    height: 250px;
-    background: url('https://i.imgur.com/kfxzJch.png') no-repeat center;
+    width: 220px;
+    height: 220px;
+    background: url('https://cdn.jsdelivr.net/gh/encharm/Font-Awesome-SVG-PNG@master/black/svg/spider-web.svg') no-repeat center;
     background-size: contain;
     z-index: 999;
     pointer-events: none;
+    opacity: 0.5;
 }
 body::before { top: 0; left: 0; }
 body::after { bottom: 0; right: 0; transform: scaleX(-1); }
