@@ -1,0 +1,170 @@
+/* ==== HALLOWEEN MODE : LA CHATTE ==== */
+
+/* Police d’horreur + alternative lisible */
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=Montserrat:wght@400;700&display=swap');
+
+body {
+    background: radial-gradient(circle at top, #1a0000 0%, #000 100%) !important;
+    color: #ffb84d !important;
+    font-family: 'Montserrat', sans-serif !important;
+    background-image: 
+        url('https://i.imgur.com/ZHXO9a3.png'), /* fine brume */
+        url('https://i.imgur.com/LqVUv2W.png');  /* motifs citrouilles */
+    background-blend-mode: multiply;
+    background-size: cover;
+    animation: fogMove 60s linear infinite;
+}
+
+@keyframes fogMove {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 1000px 0, 0 500px; }
+}
+
+/* ==== TITRES ==== */
+h1, h2, h3 {
+    font-family: 'Creepster', cursive !important;
+    text-transform: uppercase;
+    color: #ff7518 !important;
+    text-shadow: 0 0 10px #ff6600, 0 0 20px #ff3300, 0 0 30px #ff6600;
+    letter-spacing: 2px;
+}
+
+/* ==== TABLES ==== */
+table {
+    background: rgba(40, 10, 0, 0.95) !important;
+    border: 2px solid #ff6600 !important;
+    box-shadow: 0 0 20px #ff3300, 0 0 30px #ff7518;
+    border-radius: 12px;
+    color: #fff3e0 !important;
+}
+table th {
+    background: linear-gradient(90deg, #ff3300, #ff9900) !important;
+    color: black !important;
+    text-shadow: 0 0 5px #ff6600;
+    border: none;
+}
+table tr:nth-child(odd) {
+    background: rgba(255, 102, 0, 0.1) !important;
+}
+table tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+table tr:hover {
+    background: rgba(255, 102, 0, 0.3) !important;
+    transform: scale(1.01);
+    transition: 0.2s;
+}
+
+/* ==== BLOCS ==== */
+.card, .match-header, .pronos-header, .journee-header {
+    background: rgba(25, 0, 0, 0.9) !important;
+    box-shadow: 0 0 20px #ff6600, 0 0 40px #cc3300 !important;
+    border: 1px solid #ff6600 !important;
+    border-radius: 12px !important;
+    color: #ffb84d !important;
+}
+
+/* ==== HEADER ==== */
+#headerBar {
+    background: linear-gradient(90deg, #000, #330000, #000) !important;
+    box-shadow: 0 0 20px #ff3300 inset;
+}
+
+/* ==== LOADER ==== */
+#loader {
+    background: #0d0000 !important;
+    color: #ff6600 !important;
+}
+.loader-text {
+    color: #ff6600 !important;
+    text-shadow: 0 0 15px #ff3300, 0 0 30px #ff7518;
+}
+
+/* ==== CLASSEMENT ==== */
+#classement-container th,
+.classement-header {
+    background: linear-gradient(90deg, #ff3300, #ff9900) !important;
+    color: #000 !important;
+    text-shadow: 0 0 5px #ffb84d;
+}
+
+.top1 { background-color: #ffa500 !important; box-shadow: 0 0 20px #ffb84d; }
+.top2 { background-color: #e67300 !important; box-shadow: 0 0 15px #e67300; }
+.top3 { background-color: #cc5200 !important; box-shadow: 0 0 15px #cc5200; }
+.last { background-color: #660000 !important; box-shadow: 0 0 20px #ff0000; }
+
+/* ==== BOUTONS & MENU ==== */
+button, .hamburger {
+    background: linear-gradient(90deg, #ff3300, #ff9900) !important;
+    color: black !important;
+    border-radius: 10px !important;
+    font-family: 'Creepster', cursive !important;
+    font-size: 18px !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px #ffb84d;
+    box-shadow: 0 0 15px #ff6600, 0 0 25px #ff9900 !important;
+    transition: 0.3s ease-in-out;
+}
+button:hover, .hamburger:hover {
+    transform: scale(1.1) rotate(-2deg);
+    box-shadow: 0 0 25px #ff3300, 0 0 40px #ff9900 !important;
+}
+
+/* Menu déroulant */
+.menu {
+    background-color: rgba(30, 0, 0, 0.95) !important;
+    box-shadow: 0 0 15px #ff3300 !important;
+}
+.menu a {
+    color: #ffb84d !important;
+    border-bottom: 1px solid rgba(255, 102, 0, 0.3) !important;
+}
+.menu a:hover {
+    background-color: rgba(255, 102, 0, 0.2) !important;
+}
+
+/* ==== LOGOS ==== */
+.team-logo {
+    filter: drop-shadow(0 0 10px #ff6600) hue-rotate(-20deg);
+    transform: rotateZ(-2deg);
+    transition: transform 0.2s;
+}
+.team-logo:hover {
+    transform: rotateZ(2deg) scale(1.1);
+}
+
+/* ==== EFFETS DÉCORATIFS ==== */
+::selection {
+    background: #ff6600 !important;
+    color: #000 !important;
+}
+
+.image-text {
+    font-family: 'Creepster', cursive !important;
+    background: linear-gradient(to left, #ff9900, #ff3300) !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: 0 0 20px #ff7518;
+}
+
+/* ==== ANIMATION FANTÔME ==== */
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {opacity:1;}
+  20%, 24%, 55% {opacity:0.3;}
+}
+h1, h2 {
+  animation: flicker 2s infinite;
+}
+
+/* ==== BONUS : petites toiles d’araignée dans les coins ==== */
+body::before, body::after {
+    content: "";
+    position: fixed;
+    width: 250px;
+    height: 250px;
+    background: url('https://i.imgur.com/kfxzJch.png') no-repeat center;
+    background-size: contain;
+    z-index: 999;
+    pointer-events: none;
+}
+body::before { top: 0; left: 0; }
+body::after { bottom: 0; right: 0; transform: scaleX(-1); }
