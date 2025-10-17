@@ -171,3 +171,24 @@ body::before, body::after {
 }
 body::before { top: 0; left: 0; }
 body::after { bottom: 0; right: 0; transform: scaleX(-1); }
+
+/* ==== FIX DU TITRE PRINCIPAL ==== */
+.image-text {
+    font-family: 'Creepster', cursive !important;
+    font-size: 64px !important;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #ff7518 !important;
+    background: none !important;
+    -webkit-text-fill-color: #ff7518 !important;
+    text-shadow: 0 0 10px #ff6600, 0 0 25px #ff3300, 0 0 40px #ff7518 !important;
+    display: inline-block !important;
+    border: none !important;
+    box-shadow: none !important;
+    animation: titleGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from { text-shadow: 0 0 10px #ff6600, 0 0 20px #ff3300, 0 0 30px #ff7518; }
+  to { text-shadow: 0 0 20px #ff3300, 0 0 40px #ff6600, 0 0 60px #ff9900; }
+}
