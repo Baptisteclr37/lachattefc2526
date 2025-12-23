@@ -1,12 +1,11 @@
 // =====================
-// Script Boxing Day
+// Script Boxing Day - classement corrigé
 // =====================
 
 const urlBoxingDay = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=329510180&single=true&output=csv";
 const container = document.getElementById('table-container');
 const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
-// Fonction utilitaire : créer cellule avec logo
 function createLogoCell(content) {
     const td = document.createElement("td");
     const teamName = (content || "").trim();
@@ -26,7 +25,6 @@ function createLogoCell(content) {
     return td;
 }
 
-// Fonction principale : afficher la vue Boxing Day
 function afficherBoxingDay() {
     container.innerHTML = 'Chargement des données…';
 
@@ -36,12 +34,11 @@ function afficherBoxingDay() {
             const data = results.data;
 
             let tableFragment = document.createDocumentFragment();
-
             let classementHTML = "";
             let currentMatch = null;
             let matchCount = 0;
 
-            data.forEach((row) => {
+            data.forEach((row, rowIndex) => {
                 if (!row || row.length === 0) return;
 
                 const firstCell = (row[0] || '').trim();
@@ -56,19 +53,49 @@ function afficherBoxingDay() {
 
                 // 🥇 Classement journée
                 if (firstCell.startsWith("🥇")) {
-                    const classementRow = data[data.indexOf(row) + 1] || [];
+                    const classementRow = data[rowIndex + 1] || [];
                     classementHTML = (classementRow[0] || '').trim();
-                    const divClassement = document.createElement("div");
-                    divClassement.className = "classement-journee";
-                    divClassement.innerHTML = classementHTML.replace(/\n/g, "<br>");
-                    container.appendChild(divClassement);
+
+                    // Transformation en array par joueur
+                    let classementArray = classementHTML.split(/\r?\n/).map(x => x.trim()).filter(x => x !== "");
+
+                    // Ordre alphanumérique (numéro puis prénom)
+                    classementArray.sort((a, b) => {
+                        const numA = parseInt(a.split(".")[0]) || 0;
+                        const numB = parseInt(b.split(".")[0]) || 0;
+                        if (numA !== numB) return numA - numB;
+                        const nameA = a.replace(/^\d+\.\s*/, "");
+                        const nameB = b.replace(/^\d+\.\s*/, "");
+                        return nameA.localeCompare(nameB, undefined, {sensitivity: 'base'});
+                    });
+
+                    // Création de la card
+                    const card = document.createElement("table");
+                    card.className = "card";
+                    const trHeader = document.createElement("tr");
+                    const tdHeader = document.createElement("td");
+                    tdHeader.colSpan = 3;
+                    tdHeader.className = "classement-journee-header";
+                    tdHeader.textContent = "🥇🥈🥉 CLASSEMENT JOURNEE";
+                    trHeader.appendChild(tdHeader);
+                    card.appendChild(trHeader);
+
+                    const trContent = document.createElement("tr");
+                    const tdContent = document.createElement("td");
+                    tdContent.colSpan = 3;
+                    tdContent.className = "classement-journee";
+                    tdContent.innerHTML = classementArray.join("<br>");
+                    trContent.appendChild(tdContent);
+                    card.appendChild(trContent);
+
+                    container.appendChild(card);
                     return;
                 }
 
                 // Début d'un match
                 if (firstCell.startsWith("MATCH")) {
                     matchCount++;
-                    if (matchCount > 10) return; // sécurité
+                    if (matchCount > 10) return;
 
                     currentMatch = document.createElement("table");
                     currentMatch.className = "card";
@@ -116,7 +143,6 @@ function afficherBoxingDay() {
                     currentMatch.appendChild(tr);
                     return;
                 }
-
             });
 
             container.appendChild(tableFragment);
