@@ -2,7 +2,7 @@
 // Script Boxing Day - classement corrigé
 // =====================
 
-const urlBoxingDay = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=329510180&single=true&output=csv";
+const urlBoxingDay = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuc-XJn1YmTCl-5WtrYeOKBS8nfTnRsFCfeNMRvzJcbavfGIX9SUSQdlZnVNPQtapcgr2m4tAwYznB/pub?gid=251564720&single=true&output=csv";
 const container = document.getElementById('table-container');
 const baseImagePath = "https://baptisteclr37.github.io/lachattefc2526/images/";
 
